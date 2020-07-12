@@ -35,7 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "resumesite.apps",
+    "resumesite.apps.ResumesiteConfig",
     "blog.apps.BlogConfig",
     "users.apps.UsersConfig",
     "crispy_forms",

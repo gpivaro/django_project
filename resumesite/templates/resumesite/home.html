@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <!-- Theme Made By www.w3schools.com - No Copyright -->
-    <title>Bootstrap Theme Simply Me</title>
+    <title>Gabriel Pivaro - Website</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Add Bootstrap CDN and a link to jQuery -->
@@ -90,13 +91,17 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Me</a>
+                <a class="navbar-brand" href="#">Gabriel Pivaro</a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">WHO</a></li>
-                    <li><a href="#">WHAT</a></li>
-                    <li><a href="#">WHERE</a></li>
+                    <li><a href="#">HOME</a></li>
+                    <li><a href="#">ABOUT</a></li>
+                    <li><a href="#">SKILLS</a></li>
+                    <li><a href="#">PROJECTS</a></li>
+                    <li><a href="#">EXPERIENCE</a></li>
+                    <li><a href="#">PASSIONS</a></li>
+                    <li><a href="#">CONTACT</a></li>
                     <li><a href="{% url 'blog-home' %}">BLOG</a></li>
                 </ul>
             </div>
@@ -106,8 +111,8 @@
     <!-- First Container -->
     <div class="container-fluid bg-1 text-center">
         <h3>Who Am I?</h3>
-        <img src="/mywebsite/static/images/Sasha.jpeg" class="img-responsive img-circle" style="display:inline"
-            alt="Bird" width="350" height="350">
+        <img src="{% static 'resumesite/angela-gabriel-eng-097.jpg' %}" class="img-responsive img-circle"
+            style="display:inline" alt="Bird" width="350" height="350">
         <h3>I'm an adventurer</h3>
     </div>
 
@@ -130,23 +135,44 @@
             <div class="col-sm-4">
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore
                     et dolore magna aliqua.</p>
-                <img src="django_project/mywebsite/static/images/Sasha.jpeg" class="img-responsive" style="width:100%"
-                    alt="Image" width="350" height="300">
+                <img src="{% static 'resumesite/DSC05953.JPG' %}" class="img-responsive" style="width:100%" alt="Image"
+                    width="350" height="300">
             </div>
             <div class="col-sm-4">
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore
                     et dolore magna aliqua.</p>
-                <img src="django_project/mywebsite/static/images/Sasha.jpeg" class="img-responsive" style="width:100%"
-                    alt="Image" width="350" height="300">
+                <img src="{% static 'resumesite/DSC05988.JPG' %}" class="img-responsive" style="width:100%" alt="Image"
+                    width="350" height="300">
             </div>
             <div class="col-sm-4">
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore
                     et dolore magna aliqua.</p>
-                <img src="django_project/mywebsite/static/images/Sasha.jpeg" class="img-responsive" style="width:100%"
-                    alt="Image" width="350" height="300">
+                <img src="{% static 'resumesite/DSC07901.JPG' %}" class="img-responsive" style="width:100%" alt="Image"
+                    width="350" height="300">
             </div>
         </div>
     </div>
+
+    <!-- Contact Container -->
+    <div id="contact" class="container-fluid bg-2 text-center">
+        <div class="col-md-5">
+            <h2>Gabriel Pivaro</h2>
+            <p>Made with Django and hosted with Apache at Linux Debian Server</p>
+            <strong>Contact Info</strong>
+            <p>
+                (832)5706542
+                <br>
+                pivarog@gmail.com
+
+
+
+            </p>
+        </div>
+
+
+    </div>
+
+
 
     <!-- Footer -->
     <footer class="container-fluid bg-4 text-center">

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>willcarh.art</title>
+    <meta name="description" content="Will Carhart's portfolio, personal website, and full-stack web app">
+    <meta name="twitter:card" value="summary">
+    <meta property="og:title" content="willcarh.art" />
+    <meta property="og:image" content="/static/ico/favicon-32x32.png" />
+    <meta property="og:description" content="Will Carhart's portfolio, personal website, and full-stack web app">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/css/fixed.css">
+    <link rel="stylesheet" href="/static/css/animate.css">
+    <link rel="stylesheet" href="/static/css/arrow.css">
+    <link rel="stylesheet" href="/static/css/lightbox.css">
+    <link rel="stylesheet" href="/static/css/owl.carousel.css">
+    <link rel="stylesheet" href="/static/css/owl.theme.default.css">
+    <link rel="stylesheet" href="/static/css/waypoints.css">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/ico/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/ico/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/ico/favicon-16x16.png">
+    <link rel="manifest" href="/static/ico/site.webmanifest">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.js"
+        integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"
+        type="e44d38d614d42d255628175e-text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"
+        type="e44d38d614d42d255628175e-text/javascript"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"
+        type="e44d38d614d42d255628175e-text/javascript"></script>
+
+    <script type="e44d38d614d42d255628175e-text/javascript">
+		function sleep(ms) {
+			return new Promise(resolve => setTimeout(resolve, ms));
+		}
+		function fadeOutEffect() {
+			var fadeTarget = document.getElementById('loadingicon');
+			var fadeEffect = setInterval(function () {
+				if (!fadeTarget.style.opacity) {
+					fadeTarget.style.opacity = 1;
+				}
+				if (fadeTarget.style.opacity > 0) {
+					fadeTarget.style.opacity -= 0.05;
+				} else {
+					clearInterval(fadeEffect);
+				}
+			}, 1);
+		}
+		document.onreadystatechange = function() {
+			var state = document.readyState
+			if (state == 'loading') {
+				document.getElementById('maincontent').style.visibility="hidden";
+				window.onscroll = function() { window.scrollTo(0, 0); };
+			} else if (state == 'interactive') {
+				fadeOutEffect()
+				sleep(300).then(() => {
+				    window.onscroll = function() {};
+					document.getElementById('interactive');
+					document.getElementById('loadingicon').style.visibility="hidden";
+					document.getElementById('maincontent').style.visibility="visible";
+				});
+				
+			}
+		}
+	</script>
+</head>
+
+<body data-spy="scroll" data-target="#navbarResponsive">
+    <div id="loadingicon"></div>
+
+    <div id="maincontent">
+
+        <div id="home">
+
+            <nav class="navbar navbar-expand-lg fixed-top">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#home">Will Carhart</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive">
+                        <span class="custom-toggler-icon"><i class="fas fa-bars"></i></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarResponsive">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#home">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#about">About</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#skills">Skills</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#projects">Projects</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#experience">Experience</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#passions">Passions</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#contact">Contact</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="blog-nav-item" href="/blog/">Blog</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+
+            <div class="landing">
+                <div class="home-wrap">
+                    <div class="home-inner">
+                    </div>
+                </div>
+            </div>
+
+            <noscript>
+                <h1>Sorry! You'll need to enable JavaScript for willcarh.art to run properly!</h1>
+                <h3>Don't know how to do that? Follow this tutorial:</h3>
+                <a href="https://www.enable-javascript.com/" target="_blank">How to enable Javascript</a>
+            </noscript>
+
+            <div class="caption center-block text-center">
+                <div class="os-animation" data-animation="fadeInUp" data-delay=".6s">
+                    <h1>hi there</h1>
+                </div>
+                <div class="os-animation" data-animation="fadeInUp" data-delay="1.2s">
+                    <h3>my name's Will</h3>
+                </div>
+                <div class="os-animation" data-animation="fadeInUp" data-delay="1.8s">
+                    <a class="btn btn-outline-light btn-lg" href=#about>Explore</a>
+                </div>
+            </div>
+
+
+            <a class="down-arrow" href="#about">
+                <div class="arrow bounce d-none d-md-block">
+                    <i class="fas fa-angle-down" aria-hidden="true"></i>
+                </div>
+            </a>
+
+        </div>
+
+
+        <div id="about" class="offset">
+            <div class="os-animation" data-animation="fadeInUp">
+                <div class="narrow text-center">
+                    <div class="col-12">
+                        <h1>About</h1>
+                        <p class="lead about">Hi there! My name is Will Carhart, and I'm a software engineer living in
+                            San Diego. I love using software to find creative solutions to complex problems. I graduated
+                            <i>magna cum laude</i> with a B.S. in Computer Science from the University of San Diego in
+                            January 2019, and I currently work as a Software Engineer at Illumina, a genetics company
+                            based in San Diego.</p>
+                        <div class="heading-underline"></div>
+                        <p class="lead">In my free time, I enjoy exploring San Diego, playing my ukulele and piano,
+                            cooking, and coding side projects. Please feel free to drop me a note, check out my blog, or
+                            just explore!</p>
+                        <a class="btn btn-secondary btn-sm" href="#contact">Say Hello</a>
+                        <a class="btn btn-color btn-sm" href="#projects">See Projects</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="skills" class="offset">
+
+            <div class="jumbotron">
+                <div class="narrow">
+                    <div class="os-animation" data-animation="fadeInUp">
+                        <h1 class="heading">Skills & Languages</h1>
+                        <div class="heading-underline"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-md-4">
+                            <div class="os-animation" data-animation="fadeInLeft">
+                                <div class="skill">
+                                    <span class="fa-layers fa-4x">
+                                        <i class="fa fa-circle"></i>
+                                        <i class="fas fa-server fa-inverse" data-fa-transform="shrink-8"></i>
+                                    </span>
+                                    <h3>Back End</h3>
+                                    <p>Python, Django, Docker, Heroku, DigitalOcean, Linux</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="os-animation" data-animation="fadeInUp">
+                                <div class="skill">
+                                    <span class="fa-layers fa-4x">
+                                        <i class="fa fa-circle"></i>
+                                        <i class="fas fa-desktop fa-inverse"
+                                            data-fa-transform="shrink-8 left-1 down-0.4"></i>
+                                    </span>
+                                    <h3>Front End</h3>
+                                    <p>HTML5, CSS3, Bootstrap 4, Javascript</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="os-animation" data-animation="fadeInRight">
+                                <div class="skill">
+                                    <span class="fa-layers fa-4x">
+                                        <i class="fa fa-circle"></i>
+                                        <i class="fas fa-mobile-alt fa-inverse"
+                                            data-fa-transform="shrink-6 right-0.25"></i>
+                                    </span>
+                                    <h3>Mobile</h3>
+                                    <p>Swift, iOS</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="os-animation" data-animation="fadeInLeft">
+                                <div class="skill">
+                                    <span class="fa-layers fa-4x">
+                                        <i class="fa fa-circle"></i>
+                                        <i class="fas fa-database fa-inverse" data-fa-transform="grow-4 right-0.5"></i>
+                                    </span>
+                                    <h3>Databases</h3>
+                                    <p>PostgreSQL, Sqlite, Firebase</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="os-animation" data-animation="fadeInUp">
+                                <div class="skill">
+                                    <span class="fa-layers fa-4x">
+                                        <i class="fa fa-circle"></i>
+                                        <i class="fas fa-terminal fa-inverse"
+                                            data-fa-transform="shrink-10 left-2 down-0.3"></i>
+                                    </span>
+                                    <h3>CLIs & APIs</h3>
+                                    <p>Python, Django REST Framework, Bash, Java</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="os-animation" data-animation="fadeInRight">
+                                <div class="skill">
+                                    <span class="fa-layers fa-4x">
+                                        <i class="fa fa-circle"></i>
+                                        <i class="fas fa-hammer fa-inverse" data-fa-transform="shrink-8"></i>
+                                    </span>
+                                    <h3>Tools</h3>
+                                    <p>Bash, Heroku, DigitalOcean, Git, GitHub, Sublime, Agile, Travis CI, AWS, Jira,
+                                        Linux</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div id="projects" class="offset">
+            <div class="row padding">
+                <div class="col-12 os-animation" data-animation="fadeInUp">
+                    <h1 id="proj-header" class="heading">
+                        <i class="fas fa-long-arrow-alt-right" data-fa-transform="left-48"></i><a id="proj-center"
+                            href="/projects/">Projects</a></h1>
+                    <div class="heading-underline"></div>
+                </div>
+            </div>
+
+            <div class="container-fluid">
+                <div class="row no-padding">
+
+                    <div class="col-sm-6 col-md-3">
+                        <div class="os-animation" data-animation="bounceInLeft" data-delay=".2s">
+                            <div id="beaver-proj" class="project-item">
+                                <a href="/projects/beaver/">
+                                    <img class="example-image" src="/static/img/beaver.png" alt="beaver icon">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="os-animation" data-animation="bounceInLeft">
+                            <div id="locksmith-proj" class="project-item">
+                                <a href="/projects/locksmith/">
+                                    <img class="example-image" src="/static/img/lock.png" alt="locksmith icon">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="os-animation" data-animation="bounceInRight">
+                            <div id="othello-proj" class="project-item">
+                                <a href="/projects/othello/">
+                                    <img class="example-image" src="/static/img/checkers.png" alt="othello icon">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="os-animation" data-animation="bounceInRight" data-delay=".2s">
+                            <div id="cheers-proj" class="project-item">
+                                <a href="/projects/Cheers/">
+                                    <img class="example-image" src="/static/img/beer.png" alt="Cheers icon">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="os-animation" data-animation="bounceInLeft" data-delay=".2s">
+                            <div id="willcarhart-proj" class="project-item">
+                                <a href="/projects/willcarh.art/">
+                                    <img class="example-image" src="/static/img/internet.png" alt="willcarh.art icon">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="os-animation" data-animation="bounceInLeft">
+                            <div id="chordpanion-proj" class="project-item">
+                                <a href="/projects/Chordpanion/">
+                                    <img class="example-image" src="/static/img/musical-notes.png"
+                                        alt="Chordpanion icon">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="os-animation" data-animation="bounceInRight">
+                            <div id="sudoku-proj" class="project-item">
+                                <a href="/projects/sudoku/">
+                                    <img class="example-image" src="/static/img/square-with-numbers.png"
+                                        alt="sudoku icon">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="os-animation" data-animation="bounceInRight" data-delay=".2s">
+                            <div id="smoosh-proj" class="project-item">
+                                <a href="/projects/smoosh/">
+                                    <img class="example-image" src="/static/img/news.png" alt="smoosh icon">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="os-animation" data-animation="fadeInUp">
+                <div class="narrow text-center">
+                    <div class="col-12">
+                        <p class="lead">Not only is coding part of my career, <i>it's my passion.</i> I love starting
+                            new side projects and spend a lot of my free time coding. My GitHub always has my most
+                            recent code samples, as well as more projects that aren't highlighted here.</p>
+                        <a class="btn btn-secondary btn-sm" href="/projects/">See All Projects</a>
+                        <a class="btn btn-color btn-sm" href="https://github.com/wcarhart" target="_blank">
+                            View My Github <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div id="experience" class="offset">
+
+            <div class="jumbotron">
+                <div class="narrow">
+                    <div class="os-animation" data-animation="fadeInUp">
+                        <h1 class="heading">Experience</h1>
+                        <div class="heading-underline"></div>
+                    </div>
+
+                    <div class="row justify-content-md-center">
+                        <div class="col-md-6 col-lg-4">
+                            <div class="os-animation" data-animation="fadeInLeft">
+                                <div class="experience-column text-center">
+                                    <img src="/static/img/illumina.png" alt="Illumina logo">
+                                    <h3>Illumina</h3>
+                                    <p class="lead">Software Engineer, Test Automation</p>
+                                    <div class="experience-details">
+                                        <h4><span class="item">Team</span>: Oncology, Clinical Genomics Software</h4>
+                                        <h4><span class="item">My role</span>: In my current role at Illumina, I write
+                                            scripts to automate testing of new software components, mostly in Python. In
+                                            addition, I've written a suite of custom compression algorithms for a few of
+                                            our genomic data types, compressing them by over 90% on average.</h4>
+                                        <h4><span class="item">Technologies used</span>: Python, Bash, Docker, Jenkins
+                                        </h4>
+                                    </div>
+                                    <a class="btn btn-color btn-sm" href="https://www.illumina.com/"
+                                        target="_blank">Visit Website</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="os-animation" data-animation="fadeInUp">
+                                <div class="experience-column text-center">
+                                    <img src="/static/img/starlit-software.png" alt="Starlit Software logo">
+                                    <h3>Starlit Software</h3>
+                                    <p class="lead">Web Development Intern</p>
+                                    <div class="experience-details">
+                                        <h4><span class="item">Team</span>: Web Development</h4>
+                                        <h4><span class="item">My role</span>: In my previous internship at Starlit, I
+                                            built HTML5 webpages to supplement existing content for our consulting
+                                            partners, as well as adding ReactJS code where needed. In addition, I
+                                            troubleshot our backend Elixir code, when necessary.</h4>
+                                        <h4><span class="item">Technologies used</span>: HTML, CSS, Javascript, ReactJS,
+                                            Elixir, Docker</h4>
+                                    </div>
+                                    <a class="btn btn-color btn-sm" href="https://www.starlitsoftware.com/"
+                                        target="_blank">Visit Website</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="os-animation" data-animation="fadeInRight">
+                                <div class="experience-column text-center">
+                                    <img src="/static/img/qolsys.png" alt="Qolsys logo">
+                                    <h3>Qolsys</h3>
+                                    <p class="lead">Software Engineering Intern</p>
+                                    <div class="experience-details">
+                                        <h4><span class="item">Team</span>: Home Security</h4>
+                                        <h4><span class="item">My role</span>: In my previous internship at Qolsys, I
+                                            architected a suite of Bash scripts to emulate poor networking conditions
+                                            using <code>netem</code>. This automation setup was used to diagnose
+                                            networking issues between Qolsys's proprietary home security panels and
+                                            various routers.</h4>
+                                        <h4><span class="item">Technologies used</span>: Bash</h4>
+                                    </div>
+                                    <a class="btn btn-color btn-sm" href="https://qolsys.com/" target="_blank">Visit
+                                        Website</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+        <div id="passions" class="offset">
+
+            <div class="fixed-background">
+                <div class="row dark">
+                    <div class="col-12 os-animation" data-animation="fadeInUp">
+                        <h1 class="heading">Passions</h1>
+                        <div class="heading-underline"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="os-animation" data-animation="fadeInLeft">
+                            <h3>Music</h3>
+                            <div class="skill">
+                                <span class="fa-layers fa-3x">
+                                    <i class="fas fa-music"></i>
+                                </span>
+                            </div>
+                            <p class="lead">Since starting classical piano in second grade, music has been a big part of
+                                my life. Now, I actively play both the piano and ukulele. Some of my favorite artists to
+                                play are Jack Johnson, The Beatles, and Dispatch.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="os-animation" data-animation="fadeInUp">
+                            <h3>Cooking</h3>
+                            <div class="skill">
+                                <span class="fa-layers fa-3x">
+                                    <i class="fas fa-utensils"></i>
+                                </span>
+                            </div>
+                            <p class="lead">I am passionate about learning new things, and one of the ways I explore
+                                that passion is by finding new, fun recipes to explore. I love making <i>seemingly</i>
+                                difficult dishes from scratch, like sushi or hummus.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="os-animation" data-animation="fadeInRight">
+                            <h3>Coding</h3>
+                            <div class="skill">
+                                <span class="fa-layers fa-3x">
+                                    <i class="fas fa-code"></i>
+                                </span>
+                            </div>
+                            <p class="lead">In addition to being the foundation of my career, coding is one of my
+                                hobbies. I love being able to take an idea from inception to reality. I think of writing
+                                software can be just as much of an art form as writing or painting.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="fixed-wrap">
+                    <div id="fixed">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div id="contact" class="offset">
+            <footer>
+                <div class="row">
+                    <div class="col-md-5">
+                        <h2>Will Carhart</h2>
+                        <p>Made using Django with ❤️</p>
+                        <strong>Contact Info</strong>
+                        <p>(650) 388-8642<br><a href="/cdn-cgi/l/email-protection" class="__cf_email__"
+                                data-cfemail="e88b899a80899a9c9f818484a88f85898184c68b8785">[email&#160;protected]</a>
+                        </p>
+                        <a href="https://github.com/wcarhart" target="_blank"><i class="fab fa-github"
+                                data-fa-transform="grow-8 up-4"></i></a>
+                        <a href="https://stackoverflow.com/story/willcarhart" target="_blank"><i
+                                class="fab fa-stack-overflow" data-fa-transform="grow-8 up-4 right-1"></i></a>
+                        <a href="https://www.linkedin.com/in/willcarhart/" target="_blank"><i
+                                class="fab fa-linkedin"></i></a>
+                    </div>
+
+                    <div class="col-md-7">
+                        <h2>Say Hello!</h2>
+                        <form id="contact-form" method="post">
+                            <div class="messages">
+                                <div class="controls">
+                                    <input type="hidden" name="csrfmiddlewaretoken"
+                                        value="oldDd3apzWniEPWdK0JFhnfXJ9LdYO73a3cXdefRJ0hT8Zzim91z7BpdPHOJoI9W">
+                                    <div class="form-group">
+                                        <input type="text" name="name" id="form_name" name="name" class="form-control"
+                                            placeholder="What&#39;s your name?" required maxlength="100">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="email" name="email" id="form_email" name="email"
+                                            class="form-control" placeholder="What&#39;s your email?" required
+                                            maxlength="100">
+                                    </div>
+                                    <div class="form-group">
+                                        <textarea name="message" cols="40" rows="4" id="form_message" name="message"
+                                            class="form-control" placeholder="What&#39;s up?" required></textarea>
+                                    </div>
+                                    <div id="submit-row" class="row" style="background-color: rgba(0, 0, 0, 0)">
+                                        <button type="submit" class="btn btn-outline-light btn-sm"
+                                            onclick="if (!window.__cfRLUnblockHandlers) return false; sendEmail(this);"
+                                            data-cf-modified-e44d38d614d42d255628175e-="">Say hello!</button>
+                                        <div id="waiting-spinner"></div>
+                                    </div>
+                                    <script data-cfasync="false"
+                                        src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+                                    <script type="e44d38d614d42d255628175e-text/javascript">
+									function sendEmail(button) {
+									  	var name = document.getElementById("form_name").value;
+										var email = document.getElementById("form_email").value;
+										var message = document.getElementById("form_message").value;
+
+										var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+										var result = re.test(String(email).toLowerCase());
+
+										if (name != "" && result && message != "") {
+											button.disabled = true; 
+											button.innerHTML = "Sending...";
+											document.getElementById("waiting-spinner").innerHTML = "<i id=\"spinner\" class=\"fas fa-circle-notch fa-spin\" data-fa-transform=\"down-8\"></i>";
+											document.getElementById("contact-form").submit()
+										}
+									}
+									</script>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <hr class="socket">
+                    <div class="col-md-12 text-center">
+                        &copy; Will Carhart 2019.
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+    </div>
+
+
+    <script src="https://use.fontawesome.com/releases/v5.5.0/js/all.js"
+        type="e44d38d614d42d255628175e-text/javascript"></script>
+    <script src="/static/js/custom.js" type="e44d38d614d42d255628175e-text/javascript"></script>
+    <script src="/static/js/jquery.waypoints.min.js" type="e44d38d614d42d255628175e-text/javascript"></script>
+    <script src="/static/js/waypoints.js" type="e44d38d614d42d255628175e-text/javascript"></script>
+
+    <script src="https://ajax.cloudflare.com/cdn-cgi/scripts/7089c43e/cloudflare-static/rocket-loader.min.js"
+        data-cf-settings="e44d38d614d42d255628175e-|49" defer=""></script>
+</body>
+
+</html>

@@ -61,7 +61,9 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
-    path("", include("blog.urls")),
+    path("blog/", include("blog.urls")),
+    # Gabriel note: Included for new home page
+    path("", include("resumesite.urls")),
 ]
 
 if settings.DEBUG:

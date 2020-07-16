@@ -42,6 +42,9 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     "resumesite.apps.ResumesiteConfig",  # Gabriel: for the home page
     "dashboard.apps.DashboardConfig",  # Gabriel: for the dashboard app
+    "django_plotly_dash.apps.DjangoPlotlyDashConfig",  # Gabriel: for the dashboar app
+    "channels",  # Gabriel note: for django-plotly-dash live
+    "channels_redis",  # Gabriel note: for django-plotly-dash live
     "blog.apps.BlogConfig",  # Gabriel: for the blog app
     "users.apps.UsersConfig",  # Gabriel: for the users from blog
     "crispy_forms",  # Gabriel: used to format the html forms
@@ -135,6 +138,30 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 LOGIN_REDIRECT_URL = "blog-home"
 LOGIN_URL = "login"
+
+# For dashboard
+ASGI_APPLICATION = "django_project.routing.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": [("127.0.0.1", 6379),],},
+    }
+}
+
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "django_plotly_dash.finders.DashAssetFinder",
+    "django_plotly_dash.finders.DashComponentFinder",
+]
+
+PLOTLY_COMPONENTS = [
+    "dash_core_components",
+    "dash_html_components",
+    "dash_renderer",
+    "dpd_components",
+]
+
 
 # Gabriel note: the following lines are used to configure the email server
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

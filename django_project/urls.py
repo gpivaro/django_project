@@ -67,6 +67,7 @@ urlpatterns = [
     path("", include("resumesite.urls")),
     # Gabriel: for the dashboard app
     path("dashboard/", include("dashboard.urls")),
+    path("django_plotly_dash/", include("django_plotly_dash.urls")),
 ]
 
 if settings.DEBUG:

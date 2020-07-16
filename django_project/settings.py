@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+# Gabriel note: the sensitive info needed to run this project are in
+# /etc/config.json
 import os
 import json
 
@@ -27,18 +29,22 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = config["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = [config["ALLOWED_HOSTS_1"],config["ALLOWED_HOSTS_2"],config["ALLOWED_HOSTS_3"]]
-
+# Gabriel note: uncomment the following line when using in the production / linode server
+# to get the ALLOWED_HOSTS from the /etc/config.json
+# ALLOWED_HOSTS = [config["ALLOWED_HOSTS_1"],config["ALLOWED_HOSTS_2"],config["ALLOWED_HOSTS_3"]]
+# Gabriel: use this line if in development and using a local host / manage.py
+ALLOWED_HOSTS = []
 
 # Application definition
 
 INSTALLED_APPS = [
-    "resumesite.apps.ResumesiteConfig",
-    "blog.apps.BlogConfig",
-    "users.apps.UsersConfig",
-    "crispy_forms",
+    "resumesite.apps.ResumesiteConfig",  # Gabriel: for the home page
+    "dashboard.apps.DashboardConfig",  # Gabriel: for the dashboard app
+    "blog.apps.BlogConfig",  # Gabriel: for the blog app
+    "users.apps.UsersConfig",  # Gabriel: for the users from blog
+    "crispy_forms",  # Gabriel: used to format the html forms
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -130,6 +136,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 LOGIN_REDIRECT_URL = "blog-home"
 LOGIN_URL = "login"
 
+# Gabriel note: the following lines are used to configure the email server
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587

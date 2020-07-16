@@ -61,9 +61,12 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
+    # Gabriel note: for the blog app
     path("blog/", include("blog.urls")),
     # Gabriel note: Included for new home page
     path("", include("resumesite.urls")),
+    # Gabriel: for the dashboard app
+    path("dashboard/", include("dashboard.urls")),
 ]
 
 if settings.DEBUG:

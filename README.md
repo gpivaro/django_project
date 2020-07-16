@@ -6,3 +6,6 @@ https://www.youtube.com/watch?v=UmljXZIypDc&list=PL-osiE80TeTtoQCKZ03TU5fNfx2UY6
 
 Based on the tutorial:
 https://www.youtube.com/watch?v=F5WXNI3Dq8U&t=629s
+
+Dashboard based on:
+https://www.youtube.com/watch?v=psvU4zwO3Ao

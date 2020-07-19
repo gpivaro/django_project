@@ -78,3 +78,8 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 def about(request):
     return render(request, "blog/about.html", {"title": "About"})
+
+
+def statistics(request):
+    context = {"posts": Post.objects.all(), "num_posts": Post.objects.all().count()}
+    return render(request, "blog/statistics.html", context)

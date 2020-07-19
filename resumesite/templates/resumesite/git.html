@@ -1,71 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Initializing Git For Version Control</title>
-</head>
-<h1>Welcome to my Website!!</h1>
-<p>Built with Python Django</p>
-
-<div>
-    <h5>
-        # Assuming the local repo is clean and updated with the the remote master repo:
-    </h5>
-
-    <h6>
-        Create a new branch where the changes will be made
-    </h6>
-    <p>git branch "temporary_branch" "temporary_branch"
-    </p>
+{% extends "resumesite/base.html" %}
+{% block content %}
 
 
-
-    # Change to the new repo:
-    git checkout <temporary_branch>
-
-
-        # At this point you can work on the files inside the directory
-        # Example make changes or addition to your code
-
-        # Check the status of the changes
-        git status
-
-        # Add the changes to the stage area
-        git add -A
-
-        # Commit the changes
-        git commit -m "Explain the differences"
-
-        # Push the new local repo to the remote repo
-        git push -u origin subtract
-
-        # After all the tests are made and the new code is good to be used
-
-        # Switch to the master repo
-        git checkout master
-
-        # Pull the changes from the master repo
-        git pull origin master
-
-        # Merge the <temporary_branch> with the master repo
-            git merge <temporary_branch>
-
-                # Push the changes to the master
-                git push origin master
+<!-- Masthead-->
+<header class="masthead bg-primary text-white text-left">
+    <div class="container d-flex align-items-left flex-column">
 
 
+        <h1>List of git commands</h1>
 
-</div>
+        <p>Assuming the local repo is clean and updated with the the remote master repo:</p>
+
+        <ul>
+
+            <li>Create a new branch where the changes will be made</li>
+            $ git branch "temporary_branch" "temporary_branch"
+
+            <li>Change to the new repo:</li>
+            $ git checkout 'temporary_branch'
+
+            <p>At this point you can work on the files inside the directory. Example make changes or addition to your
+                code</p>
+
+            <li>Check the status of the changes</li>
+            $ git status
+
+            <li>Add the changes to the stage area</li>
+            $ git add -A
+
+            <li>Commit the changes</li>
+            $ git commit -m "Explain the differences"
+
+            <li>Push the new local repo to the remote repo</li>
+            $ git push -u origin subtract
+
+            <p>After all the tests are made and the new code is good to be used</p>
+
+            <li>Switch to the master repo</li>
+            $ git checkout master
+
+            <li>Pull the changes from the master repo</li>
+            $ git pull origin master
+
+            <li>Merge the 'temporary_branch' with the master repo</li>
+            $ git merge 'temporary_branch'
+
+            <li>Push the changes to the master</li>
+            $ git push origin master
+
+        </ul>
+
+    </div>
+</header>
 
 
-
-
-
-
-<body>
-
-</body>
-
-</html>
+{% endblock content%}

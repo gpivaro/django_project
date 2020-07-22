@@ -27,10 +27,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = config["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-#ALLOWED_HOSTS = [config["ALLOWED_HOSTS_1"],config["ALLOWED_HOSTS_2"],config["ALLOWED_HOSTS_3"]]
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [config["ALLOWED_HOSTS_1"],config["ALLOWED_HOSTS_2"],config["ALLOWED_HOSTS_3"]]
+#ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -85,6 +85,14 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+    },
+    "slave": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "django",
+        "USER": config.get("MYSQL_USER"),
+        "PASSWORD": config.get("MYSQL_PASS"),
+        "HOST": config.get("MYSQL_HOST"),
+        "PORT": "3306",
     }
 }
 

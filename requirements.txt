@@ -15,9 +15,10 @@ lazy-object-proxy==1.4.3
 mccabe==0.6.1
 pathspec==0.8.0
 Pillow==7.1.2
-#pkg-resources==0.0.0
+pkg-resources==0.0.0
 pycodestyle==2.6.0
 pylint==2.5.3
+PyMySQL==0.10.0
 pytz==2020.1
 regex==2020.6.8
 requests==2.20.0

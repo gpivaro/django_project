@@ -86,14 +86,6 @@ WSGI_APPLICATION = "django_project.wsgi.application"
 #        "ENGINE": "django.db.backends.sqlite3",
 #        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
 #    },
-#    "slave": {
-#        "ENGINE": "django.db.backends.mysql",
-#        "NAME": "django",
-#        "USER": config.get("MYSQL_USER"),
-#        "PASSWORD": config.get("MYSQL_PASS"),
-#        "HOST": config.get("MYSQL_HOST"),
-#        "PORT": "3306",
-#    }
 #}
 
 

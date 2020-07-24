@@ -27,10 +27,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = config["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = [config["ALLOWED_HOSTS_1"],config["ALLOWED_HOSTS_2"],config["ALLOWED_HOSTS_3"]]
-#ALLOWED_HOSTS = []
+# For use in production
+# ALLOWED_HOSTS = [
+#     config["ALLOWED_HOSTS_1"],
+#     config["ALLOWED_HOSTS_2"],
+#     config["ALLOWED_HOSTS_3"],
+# ]
+
+# For use in development
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -81,22 +88,22 @@ WSGI_APPLICATION = "django_project.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-#DATABASES = {
+# DATABASES = {
 #    "default": {
 #        "ENGINE": "django.db.backends.sqlite3",
 #        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
 #    },
-#}
+# }
 
-
+# For use in production with MySQL database
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "djangowebsite",
-        "USER": config.get("MYSQL_USER"),
-        "PASSWORD": config.get("MYSQL_PASS"),
-        "HOST": config.get("MYSQL_HOST"),
-        "PORT": "3306",
+        "USER": config.get("MYSQL_USERNAME"),
+        "PASSWORD": config.get("MYSQL_PASSWORD"),
+        "HOST": config.get("MYSQL_HOSTNAME"),
+        "PORT": config.get("MYSQL_PORT"),
     }
 }
 

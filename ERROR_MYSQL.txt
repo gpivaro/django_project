@@ -1,0 +1,11 @@
+To fix MySQL error when first setting up the database go to the virtual enviroment:
+
+/django_project/venv/lib/python3.7/site-packages/django/db/backends/mysql/operations.py
+
+and change:
+
+query = query.decode(errors='replace')
+
+to:
+
+query = errors = "replace"

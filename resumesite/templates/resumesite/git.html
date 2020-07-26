@@ -2,56 +2,56 @@
 {% block content %}
 
 
-<!-- Masthead-->
-<header class="masthead bg-primary text-white text-left">
-    <div class="container d-flex align-items-left flex-column">
 
 
-        <h1>List of git commands</h1>
+<div class="container d-flex align-items-left flex-column">
 
-        <p>Assuming the local repo is clean and updated with the the remote master repo:</p>
 
-        <ul>
+    <h1>List of git commands</h1>
 
-            <li>Create a new branch where the changes will be made</li>
-            $ git branch "temporary_branch" "temporary_branch"
+    <p>Assuming the local repo is clean and updated with the the remote master repo:</p>
 
-            <li>Change to the new repo:</li>
-            $ git checkout 'temporary_branch'
+    <ul>
 
-            <p>At this point you can work on the files inside the directory. Example make changes or addition to your
-                code</p>
+        <li>Create a new branch where the changes will be made</li>
+        $ git branch "temporary_branch" "temporary_branch"
 
-            <li>Check the status of the changes</li>
-            $ git status
+        <li>Change to the new repo:</li>
+        $ git checkout 'temporary_branch'
 
-            <li>Add the changes to the stage area</li>
-            $ git add -A
+        <p>At this point you can work on the files inside the directory. Example make changes or addition to your
+            code</p>
 
-            <li>Commit the changes</li>
-            $ git commit -m "Explain the differences"
+        <li>Check the status of the changes</li>
+        $ git status
 
-            <li>Push the new local repo to the remote repo</li>
-            $ git push -u origin subtract
+        <li>Add the changes to the stage area</li>
+        $ git add -A
 
-            <p>After all the tests are made and the new code is good to be used</p>
+        <li>Commit the changes</li>
+        $ git commit -m "Explain the differences"
 
-            <li>Switch to the master repo</li>
-            $ git checkout master
+        <li>Push the new local repo to the remote repo</li>
+        $ git push -u origin subtract
 
-            <li>Pull the changes from the master repo</li>
-            $ git pull origin master
+        <p>After all the tests are made and the new code is good to be used</p>
 
-            <li>Merge the 'temporary_branch' with the master repo</li>
-            $ git merge 'temporary_branch'
+        <li>Switch to the master repo</li>
+        $ git checkout master
 
-            <li>Push the changes to the master</li>
-            $ git push origin master
+        <li>Pull the changes from the master repo</li>
+        $ git pull origin master
 
-        </ul>
+        <li>Merge the 'temporary_branch' with the master repo</li>
+        $ git merge 'temporary_branch'
 
-    </div>
-</header>
+        <li>Push the changes to the master</li>
+        $ git push origin master
+
+    </ul>
+
+</div>
+
 
 
 
@@ -63,6 +63,33 @@
 
     <p>SELECT ... WHERE pub_date BETWEEN '2005-01-01' AND '2005-12-31';</p>
     <p>SELECT ... WHERE pub_date >= '2005-01-01';</p>
+
+</div>
+
+
+<div class="container d-flex align-items-left flex-column">
+    <h2>How to use grep recursively</h2>
+
+    <p>
+        You can search recursively i.e. read all files under each
+        directory for a string “192.168.1.5”
+        <br>
+        <code>
+            $ grep -r "CSRF_COOKIE_SECURE" /~
+        </code>
+        <br>
+        "OR"
+        <br>
+        <code>
+            $ grep -R "CSRF_COOKIE_SECURE" ~/    
+        </code>
+        <br>
+        Sample outputs:
+    </p>
+    <pre>
+        $ grep -r "CSRF_COOKIE_SECURE" ~/
+    </pre>
+
 
 </div>
 

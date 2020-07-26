@@ -9,7 +9,7 @@ from django.views.generic import (
     DeleteView,
 )
 from .models import Post
-
+import datetime
 
 # Create your views here.
 def home(request):
@@ -78,3 +78,46 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 def about(request):
     return render(request, "blog/about.html", {"title": "About"})
+
+
+# Views that will allow to pass database data to the javascript
+# application that will handle some plots
+def analytics(request):
+    data = []
+    label = []
+    num_post = []
+    week_posts = []
+    week_legend = []
+
+    months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ]
+    # loop for return number of posts by month
+    for x in range(1, 8):
+        start_date = datetime.date(2020, x, 1)
+        end_date = datetime.date(2020, x + 1, 1)
+        num_post.append(
+            len(Post.objects.filter(date_posted__range=(start_date, end_date)))
+        )
+    return render(
+        request,
+        "blog/analytics.html",
+        {
+            "title": "Analytics",
+            "num_post": num_post,
+            "months": months,
+            "week_posts": week_posts,
+            "week_legend": week_legend,
+        },
+    )

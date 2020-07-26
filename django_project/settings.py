@@ -27,25 +27,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = config["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-<<<<<<< HEAD
-#For use in production
-ALLOWED_HOSTS = [config["ALLOWED_HOSTS_1"], config["ALLOWED_HOSTS_2"], config["ALLOWED_HOSTS_3"]]
+DEBUG = False
 
 # For use in development
-#ALLOWED_HOSTS = []
-=======
-# For use in production
-# ALLOWED_HOSTS = [
-#     config["ALLOWED_HOSTS_1"],
-#     config["ALLOWED_HOSTS_2"],
-#     config["ALLOWED_HOSTS_3"],
-# ]
+ALLOWED_HOSTS = [
+    config["ALLOWED_HOSTS_1"],
+    config["ALLOWED_HOSTS_2"],
+    config["ALLOWED_HOSTS_3"],
+]
 
 # For use in development
-ALLOWED_HOSTS = []
->>>>>>> 0c732ce9e068bbcd14d9c7cb9d1535b0760e7114
+# ALLOWED_HOSTS = []
 
 # Application definition
 

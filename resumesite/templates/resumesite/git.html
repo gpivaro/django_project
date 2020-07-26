@@ -54,4 +54,16 @@
 </header>
 
 
+
+<div class="container d-flex align-items-left flex-column">
+    <h1>Django Queryset</h1>
+    <a href="https://docs.djangoproject.com/en/3.0/ref/models/querysets/#date"></a>
+    <p>Entry.objects.filter(pub_date__year=2005)</p>
+    <p>Entry.objects.filter(pub_date__year__gte=2005)</p>
+
+    <p>SELECT ... WHERE pub_date BETWEEN '2005-01-01' AND '2005-12-31';</p>
+    <p>SELECT ... WHERE pub_date >= '2005-01-01';</p>
+
+</div>
+
 {% endblock content%}

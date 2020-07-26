@@ -1,0 +1,61 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+
+
+<style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td,
+    th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+</style>
+
+<h1>Analytics</h1>
+
+<!--CDN for Chart.js-->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+
+<!--Chart begins-->
+<div id="container" style="width: 75%;">
+    <h4>Frequency of Posts</h4>
+    <canvas id="Monthly_Posts"></canvas>
+    <script>
+        var ctx = document.getElementById('Monthly_Posts').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ months| safe}},
+        datasets: [{
+            label: '# of Posts',
+            data: {{ num_post| safe}},
+    }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+    </script>
+</div>
+<!--Chart ends-->
+
+
+
+{% endblock content %}

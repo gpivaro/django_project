@@ -104,7 +104,7 @@ def analytics(request):
         "December",
     ]
     # loop for return number of posts by month
-    for x in range(1, 8):
+    for x in range(1, 12):
         start_date = datetime.date(2020, x, 1)
         end_date = datetime.date(2020, x + 1, 1)
         num_post.append(

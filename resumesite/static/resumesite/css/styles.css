@@ -6094,8 +6094,9 @@ a.close.disabled {
   vertical-align: text-top !important;
 }
 
+/* Gabriel: background color */
 .bg-primary {
-  background-color: #1abc9c !important;
+  background-color: gray !important; 
 }
 
 a.bg-primary:hover, a.bg-primary:focus,

@@ -22,37 +22,42 @@
     }
 </style>
 
-<h1>Analytics</h1>
+
 
 <!--CDN for Chart.js-->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 
 <!--Chart begins-->
-<div id="container" style="width: 75%;">
-    <h4>Frequency of Posts</h4>
-    <canvas id="Monthly_Posts"></canvas>
-    <script>
-        var ctx = document.getElementById('Monthly_Posts').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: {{ months| safe}},
-        datasets: [{
-            label: '# of Posts',
-            data: {{ num_post| safe}},
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Analytics</h1>
+            <h4>Frequency of Posts</h4>
+            <canvas id="Monthly_Posts"></canvas>
+            <script>
+                var ctx = document.getElementById('Monthly_Posts').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: {{ months| safe}},
+                datasets: [{
+                    label: '# of Posts',
+                    data: {{ num_post| safe}},
     }]
         },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
                     }
-                }]
-            }
-        }
+                }
     });
-    </script>
+            </script>
+        </div>
+    </div>
 </div>
 <!--Chart ends-->
 

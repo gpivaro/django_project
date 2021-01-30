@@ -30,11 +30,11 @@ SECRET_KEY = config["SECRET_KEY"]
 DEBUG = True
 
 # For use in development
-#ALLOWED_HOSTS = [
+# ALLOWED_HOSTS = [
 #    config["ALLOWED_HOSTS_1"],
 #    config["ALLOWED_HOSTS_2"],
 #    config["ALLOWED_HOSTS_3"],
-#]
+# ]
 
 # For use in development
 ALLOWED_HOSTS = []
@@ -42,10 +42,19 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Airtraffic site app
+    "airtrafficapp.apps.AirtrafficappConfig",
+    # Resume site app
     "resumesite.apps.ResumesiteConfig",
+    # Blog site app
     "blog.apps.BlogConfig",
+    # Users site app
     "users.apps.UsersConfig",
+    # Django Rest Framework
+    "rest_framework",
+    # Crispy forms for blog app
     "crispy_forms",
+    # Default django apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

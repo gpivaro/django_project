@@ -22,24 +22,31 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
+    # urls for admin site
     path("admin/", admin.site.urls),
+    # urls for register on the blog app
     path("register/", user_views.register, name="register"),
+    # urls for profile on the blog app
     path("profile/", user_views.profile, name="profile"),
+    # urls for login on the blog app
     path(
         "login/",
         auth_views.LoginView.as_view(template_name="users/login.html"),
         name="login",
     ),
+    # urls for logout on the blog app
     path(
         "logout/",
         auth_views.LogoutView.as_view(template_name="users/logout.html"),
         name="logout",
     ),
+    # urls for password-reset on the blog app
     path(
         "password-reset/",
         auth_views.PasswordResetView.as_view(template_name="users/password_reset.html"),
         name="password_reset",
     ),
+    # urls for password-reset done on the blog app
     path(
         "password-reset/done",
         auth_views.PasswordResetDoneView.as_view(
@@ -47,6 +54,7 @@ urlpatterns = [
         ),
         name="password_reset_done",
     ),
+    # urls for password-reset confirm on the blog app
     path(
         "password-reset-confirm/<uidb64>/<token>",
         auth_views.PasswordResetConfirmView.as_view(
@@ -54,6 +62,7 @@ urlpatterns = [
         ),
         name="password_reset_confirm",
     ),
+    # urls for password-reset complete on the blog app
     path(
         "password-reset-complete",
         auth_views.PasswordResetCompleteView.as_view(
@@ -61,9 +70,12 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
+    # urls for the blog app
     path("blog/", include("blog.urls")),
-    # Gabriel note: Included for new home page
+    # urls for the main page of the project (resume app)
     path("", include("resumesite.urls")),
+    # urls for the airtraffic app
+    path("airtraffic/", include("airtrafficapp.urls")),
 ]
 
 if settings.DEBUG:

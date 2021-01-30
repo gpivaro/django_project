@@ -276,7 +276,7 @@ function createMarker(data) {
 
 // Initialize the map
 // getDataICAO('ace6e2');
-getDataCallsign('DAL967')
+getDataCallsign('DAL1033')
 
 // loadDropdown();
 

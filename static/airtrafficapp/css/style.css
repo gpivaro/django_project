@@ -62,3 +62,17 @@ html {
 .legend .out-of-order {
   color: red;
 }
+
+
+/* The code styles the text at the bottom of the footer */
+.footer {
+  /* position: absolute; */
+  right: 0;
+  bottom: 0;
+  left: 0;
+  text-align: center;
+  margin-top: 5%;
+  padding: 5px;
+  background-color:#292b2c;
+  color: white;
+}

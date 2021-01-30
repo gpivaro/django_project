@@ -18,6 +18,10 @@ urlpatterns = [
         "api/v1.0/aircrafts-data/callsign/<CallSign>/", views.callsign, name="callsign"
     ),
     path("api/v1.0/airports-data/<country>/", views.airports, name="airports"),
+    # Delete entries
+    path("api/v1.0/aircrafts-delete", views.aircrafts_delete, name="aircrafts_delete"),
+    # API routes
+    path("api-routes", views.api_routes, name="api_routes")
     # Using Rest Framework
     # path("api/v1.0/aircrafts-data/<Country>/", include(router.urls)),
     # path("api/v1.0/aircrafts-data/<username>/", AircraftsView.as_view()),

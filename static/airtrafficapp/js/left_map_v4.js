@@ -1,6 +1,6 @@
 
 //  API endpoints created for this project
-var aircrafts_api_url = "/airtraffic/api/v1.0/aircrafts-data"
+var aircrafts_api_url = "/airtraffic/api/v1.0/aircrafts-data/"
 
 // To use OpenStreetMap default tile layer
 var streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -84,15 +84,16 @@ info.onAdd = function () {
 info.addTo(myMap);
 //   Markers With Custom Icons
 var aircraftIcon = L.icon({
-    iconUrl: '/static/images/Airplane_wwwroot_uploads_svg_symbol_0qvhey5-airplane-vector.svg',
+    iconUrl: '/static/airtrafficapp/images/Airplane_wwwroot_uploads_svg_symbol_0qvhey5-airplane-vector.svg',
     iconSize: [38 / 2, 95 / 2], // size of the icon
 });
 
+
+/* Date.prototype.toLocaleDateString()
+     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString */
+var timeOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
 // Return date formated to local string
 function formatDate(myDate) {
-    /* Date.prototype.toLocaleDateString()
-     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString */
-    var timeOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
     // timeOptions.timeZone = 'UTC';
     // Retrieve the newest meas time and convert the format
     var newestData = new Date(myDate * 1000);
@@ -227,7 +228,7 @@ function initMap() {
     loadDropdownAirport();
 
     // Load all fligths
-    createLayerAircrafts(`/airtraffic/api/v1.0/aircrafts-data/ALL`);
+    createLayerAircrafts("/airtraffic/api/v1.0/aircrafts-data/ALL");
 }
 
 
@@ -510,7 +511,7 @@ function generateDataBaseSizePlots(queryData) {
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: queryData.map(element => element.timeData),
+            labels: queryData.map(element => formatDate(element.time)),
             datasets: [{
                 label: '# of aircrafts position info',
                 data: queryData.map(element => element.totalDataPoints),
@@ -557,7 +558,7 @@ d3.json(url_aircrafts_hour).then((queryData) => {
     queryData.forEach(element => {
         totalValues = totalValues + element.totalDataPoints
     });
-    console.log(totalValues);
+
     // Display on the screen the number of cleaned data points 
     document.getElementById('totalAircraftDatabase').textContent = `${totalValues.toLocaleString()}`;
 

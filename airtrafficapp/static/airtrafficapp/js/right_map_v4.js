@@ -1,3 +1,10 @@
+// document.getElementById('aircraftICAOFlight').textContent = "Loading";
+// document.getElementById('aircraftCallsignICAO').textContent = "Loading";
+document.getElementById('totalDistance').textContent = "Loading";
+document.getElementById('aircraftICAO').textContent = "Loading";
+document.getElementById('aircraftCallsign').textContent = "Loading";
+
+
 // Responsive chart and hide control buttons on Plotly charts
 var config = {
     responsive: true,
@@ -205,7 +212,7 @@ function createMarker(data) {
             radius: 5000,
             color: "red"
         }).bindPopup(`<h5>Aircraft Info:</h5><hr>
-                    ICAO address: ${element["icao24"]}<br/>
+        ICAO24 / Mode S Code (hex): <a href='https://opensky-network.org/aircraft-profile?icao24=${element["icao24"]}' target="_blank">${element["icao24"]}</a><br/>
                     Callsign: <a href='https://flightaware.com/resources/registration/${element["callsign"]}' target="_blank">${element["callsign"]}</a><br/>
                     Origin country: ${element["origin_country"]}<br/>
                     Time of position update: ${formatDate(element["time_position"])}<br/>
@@ -276,7 +283,7 @@ function createMarker(data) {
 
 // Initialize the map
 // getDataICAO('ace6e2');
-getDataCallsign('DAL1033')
+getDataCallsign('AAL2028')
 
 // loadDropdown();
 

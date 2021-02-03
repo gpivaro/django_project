@@ -21,7 +21,13 @@ urlpatterns = [
     # Delete entries
     path("api/v1.0/aircrafts-delete", views.aircrafts_delete, name="aircrafts_delete"),
     # API routes
-    path("api-routes", views.api_routes, name="api_routes")
+    path("api-routes", views.api_routes, name="api_routes"),
+    # Return Country coordinates
+    path(
+        "api/v1.0/country-coordinates/<country>/",
+        views.country_coordinates,
+        name="country_coordinates",
+    )
     # Using Rest Framework
     # path("api/v1.0/aircrafts-data/<Country>/", include(router.urls)),
     # path("api/v1.0/aircrafts-data/<username>/", AircraftsView.as_view()),

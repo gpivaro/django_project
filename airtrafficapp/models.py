@@ -48,3 +48,16 @@ class Airports(models.Model):
         return "<Name: {}, ID: {}, City: {}>".format(
             self.Name, self.AirportID, self.City
         )
+
+
+# Class for the Country coordinates
+class CountryLatLon(models.Model):
+    country = models.CharField(max_length=3, primary_key=True)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return "<Name: {}, ID: {}, City: {}>".format(
+            self.name, self.countryID, self.country
+        )

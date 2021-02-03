@@ -1,3 +1,6 @@
+document.getElementById('numAircrafts').textContent = "Wait... Loading";
+document.getElementById('totalNumAirports').textContent = "Wait... Loading";
+document.getElementById('totalAircraftDatabase').textContent = "Wait... Loading";
 
 //  API endpoints created for this project
 var aircrafts_api_url = "/airtraffic/api/v1.0/aircrafts-data/"
@@ -113,7 +116,7 @@ function aircraftLayer(flightData) {
             icon: aircraftIcon,
         }).bindPopup(`<h5>AirCraft Information</h5><hr>
                 ICAO24 / Mode S Code (hex): <a href='https://opensky-network.org/aircraft-profile?icao24=${element["icao24"]}' target="_blank">${element["icao24"]}</a><br/>
-                Callsign: ${element["callsign"]}<br/>
+                Callsign: <a href='https://flightaware.com/live/flight/${element["callsign"]}' target="_blank">${element["callsign"]}</a><br/>
                 Origin country: ${element["origin_country"]}<br/>
                 Time of position update: ${formatDate(element["time_position"])}<br/>
                 Time of last update: ${formatDate(element["last_contact"])}<br/>
@@ -140,6 +143,12 @@ function aircraftLayer(flightData) {
 function airportsLayer(airportData) {
     // Display on the screen the number of airports
     document.getElementById('totalNumAirports').textContent = `${airportData[0].Country} ${airportData.length.toLocaleString()}`;
+
+    d3.json(`/airtraffic/api/v1.0/country-coordinates/${airportData[0].Country}`).then((CountryData) => {
+        console.log(CountryData[0]);
+        myMap.setView([CountryData[0].latitude, CountryData[0].longitude], 4);
+    })
+
 
     // add marker for the airports
     airportData.forEach(function (element) {
@@ -170,11 +179,11 @@ function airportsLayer(airportData) {
         }
 
         // get the bounds of a layerGroup in Leaflet
-        myMap.fitBounds(layersLeftMap.Airports.getBounds());
-
-
+        // myMap.fitBounds(layersLeftMap.Airports.getBounds());
 
     });
+
+
 }
 
 // call the API and create the Aircrafts layer
@@ -223,12 +232,13 @@ function createDropdownMenuAirPort(importData) {
 function initMap() {
     // Initialize the page
     // Load only Brazil fligths to speed the page loading
-    createLayerAircrafts("/airtraffic/api/v1.0/aircrafts-data/Brazil");
-    createAirportsLayer("/airtraffic/api/v1.0/airports-data/Brazil");
+
+    createAirportsLayer("/airtraffic/api/v1.0/airports-data/United%20States");
+    createLayerAircrafts("/airtraffic/api/v1.0/aircrafts-data/ALL");
     loadDropdownAirport();
 
     // Load all fligths
-    createLayerAircrafts("/airtraffic/api/v1.0/aircrafts-data/ALL");
+    // createLayerAircrafts("/airtraffic/api/v1.0/aircrafts-data/ALL");
 }
 
 

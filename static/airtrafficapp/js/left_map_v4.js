@@ -2,6 +2,16 @@ document.getElementById('numAircrafts').textContent = "Wait... Loading";
 document.getElementById('totalNumAirports').textContent = "Wait... Loading";
 document.getElementById('totalAircraftDatabase').textContent = "Wait... Loading";
 
+
+
+
+d3.json('/airtraffic/analytics/show-visitors/count/').then((visitsData) => {
+    console.log(visitsData.visits)
+    document.getElementById('pageVisits').textContent = `${visitsData.visits}`;
+});
+// $(function () { $('#exampleModal').modal('show'); });
+
+
 //  API endpoints created for this project
 var aircrafts_api_url = "/airtraffic/api/v1.0/aircrafts-data/"
 
@@ -183,11 +193,14 @@ function airportsLayer(airportData) {
 
     });
 
+    // document.getElementById('exampleModal').remove();
+
+
 
 }
 
 // call the API and create the Aircrafts layer
-function createLayerAircrafts(aircrafts_api_url) {
+async function createLayerAircrafts(aircrafts_api_url) {
     d3.json(aircrafts_api_url).then((flightData) => {
         aircraftLayer(flightData);
         createDropdownMenu(flightData);
@@ -228,17 +241,32 @@ function createDropdownMenuAirPort(importData) {
 
 }
 
+// function closeModal() { $('#exampleModal').modal('toggle'); };
+
 // Initialize the map once the page loads for the first time
 function initMap() {
     // Initialize the page
     // Load only Brazil fligths to speed the page loading
 
     createAirportsLayer("/airtraffic/api/v1.0/airports-data/United%20States");
-    createLayerAircrafts("/airtraffic/api/v1.0/aircrafts-data/ALL");
-    loadDropdownAirport();
 
+    // $(async function () {
+    //     await createLayerAircrafts("/airtraffic/api/v1.0/aircrafts-data/ALL");
+    //     $(function () { $('#exampleModal').modal('toggle'); });
+    // });
+
+    createLayerAircrafts("/airtraffic/api/v1.0/aircrafts-data/ALL");
+
+    loadDropdownAirport();
+    // $('#exampleModal').modal('toggle');
+
+    // closeModal()
     // Load all fligths
     // createLayerAircrafts("/airtraffic/api/v1.0/aircrafts-data/ALL");
+
+
+
+
 }
 
 

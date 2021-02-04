@@ -61,3 +61,17 @@ class CountryLatLon(models.Model):
         return "<Name: {}, ID: {}, City: {}>".format(
             self.name, self.countryID, self.country
         )
+
+
+# Class to create the model to save the visitor's ip address
+class ClientIPAddress(models.Model):
+    id = models.AutoField(auto_created=True, primary_key=True)
+    ip_address = models.CharField(max_length=120, blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self,):
+        return "%s viewed: %s" % (self.ip_address, self.timestamp)
+
+    class Meta:
+        ordering = ["-timestamp"]
+

@@ -1,5 +1,21 @@
 {% extends "airtrafficapp/base.html" %}
 {% block content %}
+<!-- Modal for loading spinner -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="d-flex align-items-center">
+                    <div class="spinner-border" role="status" aria-hidden="true"></div>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <h1>Loading... Please Wait!</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal for loading spinner -->
+
 <div class="container">
     <div class="row">
         <div class="col-12 col-xl-7">
@@ -89,6 +105,11 @@
     </div>
 </div>
 
+<div style="text-align: center; margin-bottom:0%">
+    <hr>
+    <span id="pageVisits" style="color:gray; font-weight: bold;"></span> visitors since February 2021.
+</div>
+
 <!-- footer -->
 <div>
     <footer class="footer">
@@ -113,6 +134,8 @@
 <!-- {% for aircraft in aircraftdata %}
 <p>{{ aircraft.icao24 }}</p>
 {% endfor %} -->
+
+<!-- Script to load the Modal Loading Spiner -->
 
 
 

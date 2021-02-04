@@ -27,7 +27,13 @@ urlpatterns = [
         "api/v1.0/country-coordinates/<country>/",
         views.country_coordinates,
         name="country_coordinates",
-    )
+    ),
+    # Show IP Address or the count of IPs
+    path(
+        "analytics/show-visitors/<granularity>/",
+        views.show_visitors_ip,
+        name="show_visitors_ip",
+    ),
     # Using Rest Framework
     # path("api/v1.0/aircrafts-data/<Country>/", include(router.urls)),
     # path("api/v1.0/aircrafts-data/<username>/", AircraftsView.as_view()),

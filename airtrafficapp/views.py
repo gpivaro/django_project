@@ -5,6 +5,7 @@ from .serializers import AircraftsSerializer
 from rest_framework import viewsets
 from django.db.models import Count
 from datetime import datetime, timedelta
+from .utils import get_client_ip
 
 # Main page of the application
 def index(request):
@@ -102,6 +103,17 @@ def aircrafts_delete(request):
     )
 
 
+# Show all visitors' IP address
+def show_visitors_ip(request, granularity):
+
+    if granularity == "all":
+        data = list(ClientIPAddress.objects.all().values())
+    elif granularity == "count":
+        data = {"visits": ClientIPAddress.objects.count()}
+
+    return JsonResponse(data, safe=False)
+
+
 # Return the APIs route available
 def api_routes(request):
 
@@ -115,30 +127,3 @@ def api_routes(request):
         f"/api/v1.0/country-coordinates/enter_country_name<br/>"
         f"/api/v1.0/aircrafts-delete"
     )
-
-
-# Get IP address
-def get_client_ip(request):
-    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(",")[0]
-    else:
-        ip = request.META.get("REMOTE_ADDR")
-
-    if ip and ip != "127.0.0.1":
-        ClientIPAddress.objects.create(ip_address=ip)
-
-    # data = list(ClientIPAddress.objects.all().values())
-    # return JsonResponse(data, safe=False)
-
-
-# Show all visitors' IP address
-def show_visitors_ip(request, granularity):
-
-    if granularity == "all":
-        data = list(ClientIPAddress.objects.all().values())
-    elif granularity == "count":
-        data = {"visits": ClientIPAddress.objects.count()}
-
-    return JsonResponse(data, safe=False)
-

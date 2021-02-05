@@ -23,7 +23,7 @@ def get_client_ip(request):
         response = requests.get(ip_url).json()
 
         ClientIPAddress.objects.create(
-            ipaddress=response["ip"],
+            ip_address=response["ip"],
             country=response["location"]["country"],
             region=response["location"]["region"],
             city=response["location"]["city"],

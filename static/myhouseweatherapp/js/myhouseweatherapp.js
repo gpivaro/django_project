@@ -3,6 +3,8 @@ lastHoursData = 24
 // API weather data
 url_api_data = `/myhouseweather/api/v1.0/weather-data/${lastHoursData}/`
 
+// Responsive chart
+var config = { responsive: true, displayModeBar: false }
 
 d3.json(url_api_data).then((measData) => {
     // console.log(measData)
@@ -26,7 +28,7 @@ d3.json(url_api_data).then((measData) => {
     // Trace1 to display the sensor 13 data
     var trace1 = {
         x: sensor13.map(element => element.meas_time),
-        y: sensor13.map(element => element.temperature),
+        y: sensor13.map(element => (element.temperature * 9 / 5) + 32),
         mode: 'lines',
         name: 'Outdoor',
         line: {
@@ -52,8 +54,7 @@ d3.json(url_api_data).then((measData) => {
     // create an array to be plotted
     var chartData = [trace1, trace2];
 
-    // Responsive chart
-    var config = { responsive: true }
+
 
     var layout = {
         title: 'Temperature over Time',
@@ -72,10 +73,10 @@ d3.json(url_api_data).then((measData) => {
             yref: 'paper'
         },
         margin: {
-            l: 40,
-            r: 40,
-            b: 40,
-            t: 50,
+            l: 60,
+            r: 60,
+            b: 60,
+            t: 60,
             pad: 4
         },
     };
@@ -123,10 +124,10 @@ d3.json(url_api_data).then((measData) => {
             yref: 'paper'
         },
         margin: {
-            l: 40,
-            r: 40,
-            b: 40,
-            t: 50,
+            l: 60,
+            r: 60,
+            b: 60,
+            t: 60,
             pad: 4
         },
     };
@@ -172,9 +173,9 @@ d3.json(url_api_data).then((measData) => {
 
     var layout = {
         margin: {
-            l: 40,
-            r: 40,
-            b: 40,
+            l: 50,
+            r: 50,
+            b: 50,
             t: 50,
             pad: 4
         },
@@ -203,3 +204,7 @@ d3.json(url_api_data).then((measData) => {
     Plotly.newPlot('AngularGaugeChartOut', data, layout, config);
 });
 
+d3.json('/myhouseweather/analytics/show-visitors/count/').then((visitsData) => {
+    console.log(visitsData.visits)
+    document.getElementById('pageVisits').textContent = `${visitsData.visits}`;
+});

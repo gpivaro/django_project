@@ -111,34 +111,34 @@
 <!-- Other weather data -->
 <div class="container" style="text-align: center;">
     <div class="row">
-        <div class="col-12 col-lg-3">
+        <div class="col-12 col-lg-2">
             <div class="alert alert-primary" role="alert">
-                <h6>clouds:</h6>
-                <h4><span> {{data.clouds}}</span></h4>
+                <h6>Clouds:</h6>
+                <h4><span> {{data.clouds}}</span>%</h4>
             </div>
         </div>
         <div class="col-12 col-lg-2">
             <div class="alert alert-primary" role="alert">
-                <h6>humidity:</h6>
-                <h4><span> {{data.humidity}}</span></h4>
-            </div>
-        </div>
-        <div class="col-12 col-lg-2">
-            <div class="alert alert-primary" role="alert">
-                <h6>visibility:</h6>
-                <h4><span> {{data.visibility}}</span></h4>
-            </div>
-        </div>
-        <div class="col-12 col-lg-2">
-            <div class="alert alert-primary" role="alert">
-                <h6>wind_speed:</h6>
-                <h4><span> {{data.wind_speed}}</span></h4>
+                <h6>Humidity:</h6>
+                <h4><span> {{data.humidity}}</span>%</h4>
             </div>
         </div>
         <div class="col-12 col-lg-3">
             <div class="alert alert-primary" role="alert">
-                <h6>pressure:</h6>
-                <h4><span>{{data.pressure}}</span></h4>
+                <h6>Visibility:</h6>
+                <h4><span> {{data.visibility}}</span> meters </h4>
+            </div>
+        </div>
+        <div class="col-12 col-lg-2">
+            <div class="alert alert-primary" role="alert">
+                <h6>Wind speed:</h6>
+                <h4><span> {{data.wind_speed}}</span> mph</h4>
+            </div>
+        </div>
+        <div class="col-12 col-lg-3">
+            <div class="alert alert-primary" role="alert">
+                <h6>Pressure:</h6>
+                <h4><span>{{data.pressure}} hPa</span></h4>
             </div>
         </div>
     </div>
@@ -169,6 +169,10 @@
     </div>
 </div>
 
+<div style="text-align: center; margin-bottom:0%">
+    <hr>
+    We have received <span id="pageVisits" style="color:gray; font-weight: bold;"></span> visitors since February 2021.
+</div>
 
 
 <script type="text/javascript" src="{% static 'myhouseweatherapp/js/myhouseweatherapp.js' %}"></script>

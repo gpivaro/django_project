@@ -48,12 +48,12 @@ def weather_api(city):
     response = requests.get(query_url + city).json()
 
     return {
-        "temp": response["main"]["temp"],
-        "temp_min": response["main"]["temp_min"],
-        "temp_max": response["main"]["temp_max"],
-        "feels_like": response["main"]["feels_like"],
+        "temp": round(10 * response["main"]["temp"]) / 10,
+        "temp_min": round(10 * response["main"]["temp_min"]) / 10,
+        "temp_max": round(10 * response["main"]["temp_max"]) / 10,
+        "feels_like": round(10 * response["main"]["feels_like"]) / 10,
         "weather_main": response["weather"][0]["main"],
-        "weather_description": response["weather"][0]["description"],
+        "weather_description": (response["weather"][0]["description"]).title(),
         "clouds": response["clouds"]["all"],
         "wind_speed": response["wind"]["speed"],
         "humidity": response["main"]["humidity"],

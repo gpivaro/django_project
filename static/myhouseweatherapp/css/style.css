@@ -1,0 +1,190 @@
+
+#map,
+body,
+html {
+  /* height: 100%; */
+  /* width: 100%; */
+  height: 350px;
+  margin-bottom: 5%;
+}
+
+#mapMap,
+body,
+html {
+  /* height: 100%; */
+  /* width: 100%; */
+  height: 450px;
+  margin-bottom: 5%;
+}
+
+
+
+#container-fluid{
+  background-color: rgb(76, 82, 82); 
+  text-align:center; 
+  color:bisque;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  /* border: 1px solid green;  */
+  margin: 1%;
+}
+
+#myForm{
+  margin-top: 2%;
+  /* margin-bottom: 15%; */
+  /* padding-bottom: 10%; */
+  /* border: 1px solid black; */
+  /* mar */
+}
+
+label{
+  margin: 0.5%;
+}
+
+/* Jumbotron background image */
+.bg-cover {
+  background-attachment: static;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Jumbotron whole page */
+.jumbotron{
+  height: 150%;
+}
+
+/* The code styles the text at the bottom of the footer
+.footer > .bottom {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 5px;
+  background:black;
+  color: white;
+  font-size: medium;
+} */
+
+/* The code styles the text at the bottom of the footer */
+.footer {
+  /* position: absolute; */
+  right: 0;
+  bottom: 0;
+  left: 0;
+  text-align: center;
+  margin-top: 5%;
+  padding: 5px;
+  background-color:#292b2c;
+  color: white;
+}
+
+.navbar-dark{
+  padding: 0px;
+  /* border-style: solid; */
+  /* border-color: tomato; */
+}
+
+.navbar-dark .navbar-brand {
+  /* color: white; */
+  margin-left: 11px;
+  /* border: 1px solid; */
+  /* border-color: tomato; */
+}
+
+/* Style buttons */
+.btn {
+  /* background-color: black; /*background */
+  border: none; /* Remove borders */
+  color: white; /* White text */
+  padding: 12px 16px; /* Some padding */
+  font-size: 16px; /* Set a font size */
+  cursor: pointer; /* Mouse pointer on hover */
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: whitesmoke;
+}
+
+/* Make the image fully responsive */
+.carousel-inner img {
+  width: 100%;
+  /*height: 100%;*/
+}
+
+.navbar-brand{
+  background-color: gray;
+  /* padding: 6px; */
+  /* border: 1px; */
+  padding: 11px;
+  border: 11px;
+}
+
+#navbarSupportedContent{
+  margin-right: 15px;
+}
+
+/* ############################# Media Query ############################# */
+/* ####################################################################### */
+
+
+/* Add media queries: */
+/* When the screen is less than 600 pixels wide, hide all links, except for the first one ("Home"). 
+Show the link that contains should open and close the topnav (.icon) */
+@media screen and (max-width: 992px) {
+  /* .navbar a:not(:first-child) {display: none;} */
+  .navbar a.icon {
+    float: right;
+    display: block;
+  }
+}
+
+/* The "responsive" class is added to the topnav with JavaScript when the user clicks on the icon. 
+This class makes the topnav look good on small screens (display the links vertically instead of horizontally) */
+@media screen and (max-width: 992px) {
+  .navbar.responsive {position: relative;}
+  .navbar.responsive a.icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  .navbar.responsive a {
+    float: none;
+    display: block;
+    text-align: left;
+    color: white;
+  }
+  .nav-link{color: white;}
+}
+
+@media screen and (max-width: 992px) {
+    nav {background-color:darkcyan;}
+    .navbar-dark .navbar-nav .nav-link {
+      /* color: white; */
+      margin-left: 22px;
+  }
+  .navbar-brand{
+    background-color:transparent;
+  }
+
+  img {
+    width: 100%;
+    /* height: 100%; */
+    height: 250px;
+  }
+
+  #map,
+  body,
+  html {
+    /* height: 100%; */
+    /* width: 100%; */
+    height: 250px;
+    margin-bottom: 5%;
+  }
+}

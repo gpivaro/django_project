@@ -38,9 +38,3 @@ urlpatterns = [
     # path("api/v1.0/aircrafts-data/<Country>/", include(router.urls)),
     # path("api/v1.0/aircrafts-data/<username>/", AircraftsView.as_view()),
 ]
-
-
-# /api/v1.0/aircrafts-data/byhour
-# /api/v1.0/aircrafts-data/Brazil
-# /api/v1.0/airports-data/ALL
-# /api/v1.0/airports-data/Brazil

@@ -1,0 +1,178 @@
+{% extends "myhouseweatherapp/base.html" %}
+{% load staticfiles %}
+{% block content %}
+
+<!-- Temperature div -->
+<div class="container" style="text-align: center;margin-top:2%">
+    <div class="row">
+        <div class="col-6 col-lg-3">
+            <div class="alert alert-primary" role="alert">
+                <div class="row">
+                    <div class="col-3">
+                        <i class='fa fa-thermometer-three-quarters' style='font-size:52px'></i>
+                    </div>
+                    <div class="col-9">
+                        <h6>Current temperature:</h6>
+                        <h4><span> {{ data.temp}} °F</span></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="alert alert-primary" role="alert">
+                <div class="row">
+                    <div class="col-3">
+                        <i class='fa fa-thermometer-full' style='font-size:52px'></i>
+                    </div>
+                    <div class="col-9">
+                        <h6> Max temperature:</h6>
+                        <h4><span> {{ data.temp_max}} °F</span></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="alert alert-primary" role="alert">
+                <div class="row">
+                    <div class="col-3">
+                        <i class='fa fa-thermometer-empty' style='font-size:52px'></i>
+                    </div>
+                    <div class="col-9">
+                        <h6>Min temperature:</h6>
+                        <h4><span> {{ data.temp_min}} °F</span></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="alert alert-primary" role="alert">
+                <h6>Feels like:</h6>
+                <h4><span> {{ data.feels_like}} °F</span></h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Gauge Charts -->
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            <div id="AngularGaugeChartOut"></div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div id="AngularGaugeChartIn"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            <div id="plotTemp"></div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div id="overlaidHistogram"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Weather description div -->
+<div class="container" style="text-align: center;">
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            <div class="alert alert-secondary" role="alert">
+                <div class="row">
+                    <div class="col-3">
+                        <img src='{{ data.icon_url}}' height="95%" width="55%">
+                    </div>
+                    <div class="col-9">
+                        <h6>Weather description:</h6>
+                        <h4><span> {{data.weather_description}} </span></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="alert alert-secondary" role="alert">
+                <h6>Weather main:</h6>
+                <h4><span> {{data.weather_main}} </span></h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Other weather data -->
+<div class="container" style="text-align: center;">
+    <div class="row">
+        <div class="col-12 col-lg-3">
+            <div class="alert alert-primary" role="alert">
+                <h6>clouds:</h6>
+                <h4><span> {{data.clouds}}</span></h4>
+            </div>
+        </div>
+        <div class="col-12 col-lg-2">
+            <div class="alert alert-primary" role="alert">
+                <h6>humidity:</h6>
+                <h4><span> {{data.humidity}}</span></h4>
+            </div>
+        </div>
+        <div class="col-12 col-lg-2">
+            <div class="alert alert-primary" role="alert">
+                <h6>visibility:</h6>
+                <h4><span> {{data.visibility}}</span></h4>
+            </div>
+        </div>
+        <div class="col-12 col-lg-2">
+            <div class="alert alert-primary" role="alert">
+                <h6>wind_speed:</h6>
+                <h4><span> {{data.wind_speed}}</span></h4>
+            </div>
+        </div>
+        <div class="col-12 col-lg-3">
+            <div class="alert alert-primary" role="alert">
+                <h6>pressure:</h6>
+                <h4><span>{{data.pressure}}</span></h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Time weather data -->
+<div class="container" style="text-align: center;">
+    <div class="row">
+        <div class="col-12 col-lg-4">
+            <div class="alert alert-primary" role="alert">
+                <h6>Sunrise:</h6>
+                <h4><span> {{data.sunrise|date:"P"}}</span></h4>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="alert alert-primary" role="alert">
+                <h6>Sunset:</h6>
+                <h4><span> {{data.sunset|date:"P"}}</span></h4>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="alert alert-primary" role="alert">
+                <h6>Last meas time:</h6>
+                <h4><span> {{data.meastime|date:"P"}}</span></h4>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<script type="text/javascript" src="{% static 'myhouseweatherapp/js/myhouseweatherapp.js' %}"></script>
+
+
+
+{% endblock %}

@@ -70,7 +70,14 @@ d3.json(url_api_data).then((measData) => {
             traceorder: 'reversed',
             font: { size: 16 },
             yref: 'paper'
-        }
+        },
+        margin: {
+            l: 40,
+            r: 40,
+            b: 40,
+            t: 50,
+            pad: 4
+        },
     };
 
     // Render the plot to the div tag id "plot"
@@ -114,7 +121,14 @@ d3.json(url_api_data).then((measData) => {
             traceorder: 'reversed',
             font: { size: 16 },
             yref: 'paper'
-        }
+        },
+        margin: {
+            l: 40,
+            r: 40,
+            b: 40,
+            t: 50,
+            pad: 4
+        },
     };
     Plotly.newPlot('overlaidHistogram', dataChart, layout, config);
 
@@ -155,8 +169,19 @@ d3.json(url_api_data).then((measData) => {
     ];
 
 
-    var layout = { width: 600, height: 400 };
-    Plotly.newPlot('AngularGaugeChartIn', data, layout);
+
+    var layout = {
+        margin: {
+            l: 40,
+            r: 40,
+            b: 40,
+            t: 50,
+            pad: 4
+        },
+    };
+
+
+    Plotly.newPlot('AngularGaugeChartIn', data, layout, config);
 
     var data = [
         {
@@ -166,7 +191,7 @@ d3.json(url_api_data).then((measData) => {
             title: { text: "Outdoor Temperature" },
             type: "indicator",
             mode: "gauge+number",
-            delta: { reference: 100 },
+            delta: { reference: 80 },
             gauge: {
                 axis: { range: [null, 120] }, bar: { color: colorPicker((sensor13[0].temperature * 9 / 5) + 32) }
             }
@@ -174,7 +199,7 @@ d3.json(url_api_data).then((measData) => {
     ];
 
 
-    var layout = { width: 600, height: 400 };
-    Plotly.newPlot('AngularGaugeChartOut', data, layout);
+
+    Plotly.newPlot('AngularGaugeChartOut', data, layout, config);
 });
 

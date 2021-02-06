@@ -6,20 +6,20 @@
 <div class="container" style="text-align: center;margin-top:2%">
     <div class="row">
         <div class="col-6 col-lg-3">
-            <div class="alert alert-primary" role="alert">
+            <div class="alert alert-secondary" role="alert">
                 <div class="row">
                     <div class="col-3">
                         <i class='fa fa-thermometer-three-quarters' style='font-size:52px'></i>
                     </div>
                     <div class="col-9">
-                        <h6>Current temperature:</h6>
+                        <h6>Temperature:</h6>
                         <h4><span> {{ data.temp}} °F</span></h4>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="alert alert-primary" role="alert">
+            <div class="alert alert-secondary" role="alert">
                 <div class="row">
                     <div class="col-3">
                         <i class='fa fa-thermometer-full' style='font-size:52px'></i>
@@ -32,7 +32,7 @@
             </div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="alert alert-primary" role="alert">
+            <div class="alert alert-secondary" role="alert">
                 <div class="row">
                     <div class="col-3">
                         <i class='fa fa-thermometer-empty' style='font-size:52px'></i>
@@ -45,7 +45,7 @@
             </div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="alert alert-primary" role="alert">
+            <div class="alert alert-secondary" role="alert">
                 <h6>Feels like:</h6>
                 <h4><span> {{ data.feels_like}} °F</span></h4>
             </div>
@@ -59,10 +59,10 @@
 <!-- Gauge Charts -->
 <div class="container">
     <div class="row">
-        <div class="col-12 col-lg-6">
+        <div class="col-12 col-lg-6 alert alert-secondary" style="padding: 1%;">
             <div id="AngularGaugeChartOut"></div>
         </div>
-        <div class="col-12 col-lg-6">
+        <div class="col-12 col-lg-6 alert alert-secondary" style=" padding: 1%;">
             <div id="AngularGaugeChartIn"></div>
         </div>
     </div>
@@ -71,10 +71,10 @@
 <!-- Charts -->
 <div class="container">
     <div class="row">
-        <div class="col-12 col-lg-6">
+        <div class="col-12 col-lg-6 alert alert-secondary" style=" padding: 1%;">
             <div id="plotTemp"></div>
         </div>
-        <div class="col-12 col-lg-6">
+        <div class="col-12 col-lg-6 alert alert-secondary" style=" padding: 1%;">
             <div id="overlaidHistogram"></div>
         </div>
     </div>

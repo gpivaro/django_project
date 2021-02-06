@@ -19,6 +19,8 @@ html {
 
 
 
+
+
 #container-fluid{
   background-color: rgb(76, 82, 82); 
   text-align:center; 
@@ -56,7 +58,7 @@ label{
 
 /* Jumbotron whole page */
 .jumbotron{
-  height: 150%;
+  /* height: 150%; */
 }
 
 /* The code styles the text at the bottom of the footer

@@ -79,6 +79,13 @@ d3.json(url_api_data).then((measData) => {
             t: 60,
             pad: 4
         },
+        font: {
+            // family: 'Courier New, monospace',
+            size: 16,
+            color: '#000000'
+        },
+        paper_bgcolor: "rgba(0,0,0,0)",
+        plot_bgcolor: 'rgba(0,0,0,0)'
     };
 
     // Render the plot to the div tag id "plot"
@@ -130,6 +137,13 @@ d3.json(url_api_data).then((measData) => {
             t: 60,
             pad: 4
         },
+        font: {
+            // family: 'Courier New, monospace',
+            size: 18,
+            color: '#000000'
+        },
+        paper_bgcolor: "rgba(0,0,0,0)",
+        plot_bgcolor: 'rgba(0,0,0,0)'
     };
     Plotly.newPlot('overlaidHistogram', dataChart, layout, config);
 
@@ -179,6 +193,12 @@ d3.json(url_api_data).then((measData) => {
             t: 50,
             pad: 4
         },
+        paper_bgcolor: "rgba(0,0,0,0)",
+        font: {
+            // family: 'Courier New, monospace',
+            size: 18,
+            color: '#000000'
+        }
     };
 
 

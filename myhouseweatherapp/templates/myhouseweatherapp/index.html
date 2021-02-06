@@ -2,52 +2,79 @@
 {% load staticfiles %}
 {% block content %}
 
-<!-- Temperature div -->
+<!-- <div class="jumbotron jumbotron-fluid"> -->
+<div class="container" style="margin-top: 2%;">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-4">Welcome to Home Weather</h1>
+            <p class="lead">This application shows live data of the temperature at home and compares it with the
+                Houston's current weather.</p>
+        </div>
+    </div>
+</div>
+<!-- </div> -->
+
+
 <div class="container" style="text-align: center;margin-top:2%">
     <div class="row">
-        <div class="col-6 col-lg-3">
-            <div class="alert alert-secondary" role="alert">
+        <div class="col-12">
+            <h4>Houston, Tx</h4>
+            <!-- Temperature div -->
+            <div class="container" style="text-align: center;margin-top:2%">
                 <div class="row">
-                    <div class="col-3">
-                        <i class='fa fa-thermometer-three-quarters' style='font-size:52px'></i>
+                    <div class="col-6 col-lg-3">
+                        <div>
+                            <div class="row">
+                                <div class="col-3">
+                                    <i class='fa fa-thermometer-three-quarters' style='font-size:52px'></i>
+                                </div>
+                                <div class="col-9">
+                                    <h6>Temperature:</h6>
+                                    <h4><span> {{ data.temp}} °F</span></h4>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-9">
-                        <h6>Temperature:</h6>
-                        <h4><span> {{ data.temp}} °F</span></h4>
+                    <div class="col-6 col-lg-3">
+                        <div>
+                            <div class="row">
+                                <div class="col-3">
+                                    <i class='fa fa-thermometer-full' style='font-size:52px'></i>
+                                </div>
+                                <div class="col-9">
+                                    <h6> Max temperature:</h6>
+                                    <h4><span> {{ data.temp_max}} °F</span></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div>
+                            <div class="row">
+                                <div class="col-3">
+                                    <i class='fa fa-thermometer-empty' style='font-size:52px'></i>
+                                </div>
+                                <div class="col-9">
+                                    <h6>Min temperature:</h6>
+                                    <h4><span> {{ data.temp_min}} °F</span></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div>
+                            <div class="row">
+                                <div class="col-3">
+                                    <i class='fa fa-thermometer-quarter' style='font-size:52px'></i>
+                                </div>
+                                <div class="col-9">
+                                    <h6>Min temperature:</h6>
+                                    <h4><span> {{ data.feels_like}} °F</span></h4>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-6 col-lg-3">
-            <div class="alert alert-secondary" role="alert">
-                <div class="row">
-                    <div class="col-3">
-                        <i class='fa fa-thermometer-full' style='font-size:52px'></i>
-                    </div>
-                    <div class="col-9">
-                        <h6> Max temperature:</h6>
-                        <h4><span> {{ data.temp_max}} °F</span></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-lg-3">
-            <div class="alert alert-secondary" role="alert">
-                <div class="row">
-                    <div class="col-3">
-                        <i class='fa fa-thermometer-empty' style='font-size:52px'></i>
-                    </div>
-                    <div class="col-9">
-                        <h6>Min temperature:</h6>
-                        <h4><span> {{ data.temp_min}} °F</span></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-lg-3">
-            <div class="alert alert-secondary" role="alert">
-                <h6>Feels like:</h6>
-                <h4><span> {{ data.feels_like}} °F</span></h4>
             </div>
         </div>
     </div>
@@ -56,13 +83,16 @@
 
 
 
+
+
+
 <!-- Gauge Charts -->
 <div class="container">
     <div class="row">
-        <div class="col-12 col-lg-6 alert alert-secondary" style="padding: 1%;">
+        <div class="col-12 col-lg-6" style="padding: 1%;">
             <div id="AngularGaugeChartOut"></div>
         </div>
-        <div class="col-12 col-lg-6 alert alert-secondary" style=" padding: 1%;">
+        <div class="col-12 col-lg-6" style=" padding: 1%;">
             <div id="AngularGaugeChartIn"></div>
         </div>
     </div>
@@ -71,107 +101,196 @@
 <!-- Charts -->
 <div class="container">
     <div class="row">
-        <div class="col-12 col-lg-6 alert alert-secondary" style=" padding: 1%;">
+        <div class="col-12 col-lg-6" style=" padding: 1%;background: rgba(2, 117, 216, .3)">
             <div id="plotTemp"></div>
         </div>
-        <div class="col-12 col-lg-6 alert alert-secondary" style=" padding: 1%;">
+        <div class="col-12 col-lg-6" style=" padding: 1%;background: rgba(2, 117, 216, .3)">
             <div id="overlaidHistogram"></div>
         </div>
     </div>
 </div>
 
 
-
-
-<!-- Weather description div -->
-<div class="container" style="text-align: center;">
+<div class="container" style="text-align: center;margin-top:2%">
     <div class="row">
-        <div class="col-12 col-lg-6">
-            <div class="alert alert-secondary" role="alert">
+        <div class="col-12">
+            <h4>More about the Houston, Tx weather at this moment.</h4>
+
+
+            <!-- Weather description div -->
+            <div class="container" style="text-align: center;opacity:.6">
                 <div class="row">
-                    <div class="col-3">
-                        <img src='{{ data.icon_url}}' height="95%" width="55%">
+                    <div class="col-12 col-lg-6">
+                        <div class="alert alert-secondary" role="alert">
+                            <div class="row">
+                                <div class="col-3">
+                                    <img src='{{ data.icon_url}}' height="95%" width="55%">
+                                </div>
+                                <div class="col-9">
+                                    <h6>Weather description:</h6>
+                                    <h4><span> {{data.weather_description}} </span></h4>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-9">
-                        <h6>Weather description:</h6>
-                        <h4><span> {{data.weather_description}} </span></h4>
+                    <div class="col-12 col-lg-6">
+                        <div class="alert alert-secondary" role="alert">
+                            <h6>Weather main:</h6>
+                            <h4><span> {{data.weather_main}} </span></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Other weather data -->
+            <div class="container" style="text-align: center;margin-top:1%">
+                <div class="row">
+                    <div class="col-12 col-lg-2">
+                        <div class="col-12 col-lg-12" style=" padding: 1%;background: rgba(2, 117, 216, .1)">
+                            <h6>Clouds:</h6>
+                            <h4><span> {{data.clouds}}</span>%</h4>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-2">
+                        <div style=" padding: 1%;background: rgba(2, 117, 216, .1)">
+                            <h6>Humidity:</h6>
+                            <h4><span> {{data.humidity}}</span>%</h4>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-3">
+                        <div style=" padding: 1%;background: rgba(2, 117, 216, .1)">
+                            <h6>Visibility:</h6>
+                            <h4><span> {{data.visibility}}</span> meters </h4>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-2">
+                        <div style=" padding: 1%;background: rgba(2, 117, 216, .1)">
+                            <h6>Wind speed:</h6>
+                            <h4><span> {{data.wind_speed}}</span> mph</h4>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-3">
+                        <div style=" padding: 1%;background: rgba(2, 117, 216, .1)">
+                            <h6>Pressure:</h6>
+                            <h4><span>{{data.pressure}} hPa</span></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time weather data -->
+            <div class="container" style="text-align: center;margin-top:1%">
+                <div class="row">
+                    <div class="col-12 col-lg-4">
+                        <div class="col-12 col-lg-12" style=" padding: 1%;background: rgba(2, 117, 216, .1)">
+                            <h6>Sunrise:</h6>
+                            <h4><span> {{data.sunrise|date:"P"}}</span></h4>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <div style=" padding: 1%;background: rgba(2, 117, 216, .1)">
+                            <h6>Sunset:</h6>
+                            <h4><span> {{data.sunset|date:"P"}}</span></h4>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <div style=" padding: 1%;background: rgba(2, 117, 216, .1)">
+                            <h6>Last meas time:</h6>
+                            <h4><span> {{data.meastime|date:"P"}}</span></h4>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-lg-6">
-            <div class="alert alert-secondary" role="alert">
-                <h6>Weather main:</h6>
-                <h4><span> {{data.weather_main}} </span></h4>
-            </div>
-        </div>
     </div>
 </div>
 
-<!-- Other weather data -->
-<div class="container" style="text-align: center;">
-    <div class="row">
-        <div class="col-12 col-lg-2">
-            <div class="alert alert-primary" role="alert">
-                <h6>Clouds:</h6>
-                <h4><span> {{data.clouds}}</span>%</h4>
-            </div>
-        </div>
-        <div class="col-12 col-lg-2">
-            <div class="alert alert-primary" role="alert">
-                <h6>Humidity:</h6>
-                <h4><span> {{data.humidity}}</span>%</h4>
-            </div>
-        </div>
-        <div class="col-12 col-lg-3">
-            <div class="alert alert-primary" role="alert">
-                <h6>Visibility:</h6>
-                <h4><span> {{data.visibility}}</span> meters </h4>
-            </div>
-        </div>
-        <div class="col-12 col-lg-2">
-            <div class="alert alert-primary" role="alert">
-                <h6>Wind speed:</h6>
-                <h4><span> {{data.wind_speed}}</span> mph</h4>
-            </div>
-        </div>
-        <div class="col-12 col-lg-3">
-            <div class="alert alert-primary" role="alert">
-                <h6>Pressure:</h6>
-                <h4><span>{{data.pressure}} hPa</span></h4>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Time weather data -->
-<div class="container" style="text-align: center;">
-    <div class="row">
-        <div class="col-12 col-lg-4">
-            <div class="alert alert-primary" role="alert">
-                <h6>Sunrise:</h6>
-                <h4><span> {{data.sunrise|date:"P"}}</span></h4>
-            </div>
-        </div>
-        <div class="col-12 col-lg-4">
-            <div class="alert alert-primary" role="alert">
-                <h6>Sunset:</h6>
-                <h4><span> {{data.sunset|date:"P"}}</span></h4>
-            </div>
-        </div>
-        <div class="col-12 col-lg-4">
-            <div class="alert alert-primary" role="alert">
-                <h6>Last meas time:</h6>
-                <h4><span> {{data.meastime|date:"P"}}</span></h4>
-            </div>
-        </div>
 
+
+<!-- About -->
+<div class="container" style="text-align: center;margin-top:2%">
+    <div class="row">
+        <div class="col-12">
+            <h4>About this project: </h4>
+            <div class="container" style="text-align:justify;margin-top:2%;">
+                <div class="row">
+                    <div class="col-12 col-lg-12" style=" padding: 1%;background: rgba(2, 117, 216, .1)">
+                        <div>
+                            <div class="row">
+                                <div class="col-6" style="color:black;">
+                                    <p>This application has as the main data source two DHT11 temperature and humidity
+                                        sensors at my
+                                        home
+                                        (one indoor and
+                                        one outdoor). I used a Raspberry Pi (single board computer running Linux
+                                        Raspbian) to
+                                        control the
+                                        sensor and collect
+                                        data every minute using a Python script running as a Linux cronjob. Once the
+                                        data is
+                                        acquired, the
+                                        Raspberry Pi uses
+                                        another.py script to connect and write the data to a MySQL database running on
+                                        my web server
+                                        on the
+                                        Linode cloud. To
+                                        write the backend of this application, I used Django and query the database
+                                        using the ORM
+                                        capabilities of Django. I
+                                        created some APIs endpoints so I could access the data in JSON format at the
+                                        fronted of the
+                                        application. Using D3.js
+                                        to query the APIs, I then wrote JavaScript code to plot the data using the
+                                        Plotly.js
+                                        library. </p>
+                                </div>
+                                <div class="col-6" style="color:black;">
+                                    <p>
+                                        For
+                                        styling and
+                                        organizing the web page I used bootstrap and CSS. Finally, to get local weather
+                                        data, I
+                                        wrote a
+                                        Python script to get
+                                        data from the openweathermap API. I finished the application by creating a
+                                        visitors’ tracker
+                                        to
+                                        check the number of
+                                        visitors and getting the geolocation of the IP address that access this
+                                        application. So, I
+                                        can
+                                        generate and analyze
+                                        my website data without handling this important data to the Google Analytics for
+                                        example. I
+                                        hope you
+                                        enjoy
+                                        navigating through this project. I would like to hear some feedback and discuss
+                                        some other
+                                        ideas to
+                                        implement. An
+                                        opportunity to expand this project is to integrate an automation system to
+                                        control the AC
+                                        temperature remotely. It
+                                        is possible to send commands via the website to a device connected to the AC
+                                        control panel.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <div style="text-align: center; margin-bottom:0%">
     <hr>
-    We have received <span id="pageVisits" style="color:gray; font-weight: bold;"></span> visitors since February 2021.
+    We have received <strong><span id="pageVisits" style="color:black; font-weight: bold;"></span></strong> visitors
+    since February
+    2021.
 </div>
 
 

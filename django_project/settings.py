@@ -27,17 +27,23 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = config["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+try:
+    # Check for env variable in the development env
+    DEBUG = config["Django_Debug"]
 
-# For use in development
-ALLOWED_HOSTS = [
-    config["ALLOWED_HOSTS_1"],
-    config["ALLOWED_HOSTS_2"],
-    config["ALLOWED_HOSTS_3"],
-]
+    if DEBUG:
+        # For use in development
+        ALLOWED_HOSTS = []
+except:
+    DEBUG = False
 
-# For use in development
-# ALLOWED_HOSTS = []
+    # For use in development
+    ALLOWED_HOSTS = [
+        config["ALLOWED_HOSTS_1"],
+        config["ALLOWED_HOSTS_2"],
+        config["ALLOWED_HOSTS_3"],
+    ]
+
 
 # Application definition
 

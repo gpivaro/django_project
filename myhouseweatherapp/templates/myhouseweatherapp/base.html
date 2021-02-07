@@ -43,6 +43,18 @@
             background-attachment: fixed;
             background-size: 100% 100%;
         }
+
+        @media screen and (max-width: 992px) {
+
+            body {
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-size: 105%;
+                background-color: rgba(2, 117, 216, 1)
+            }
+
+
+        }
     </style>
 
 </head>
@@ -59,6 +71,9 @@
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'api_routes' %}">API</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#AboutText">About</a>
                 </li>
             </ul>
         </div>

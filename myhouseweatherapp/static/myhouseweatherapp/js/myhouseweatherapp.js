@@ -57,7 +57,7 @@ d3.json(url_api_data).then((measData) => {
 
 
     var layout = {
-        title: 'Temperature over Time',
+        title: 'Temperature Over Time (24 h) ',
         yaxis: {
             // Degree symbol 'Option + Shift + 8'
             title: 'Temperature (°F)',
@@ -85,7 +85,8 @@ d3.json(url_api_data).then((measData) => {
             color: '#000000'
         },
         paper_bgcolor: "rgba(0,0,0,0)",
-        plot_bgcolor: 'rgba(0,0,0,0)'
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        hovermode: false,
     };
 
     // Render the plot to the div tag id "plot"
@@ -117,11 +118,15 @@ d3.json(url_api_data).then((measData) => {
     var dataChart = [trace1, trace2];
     var layout = {
         barmode: "overlay",
-        title: 'Temperature Distribution',
+        title: 'Temperature Distribution (24 h)',
         xaxis: {
             // Degree symbol 'Option + Shift + 8'
             title: 'Temperature (°F)',
             range: [0, 120]
+        },
+        yaxis: {
+            // Degree symbol 'Option + Shift + 8'
+            title: 'Data points',
         },
         legend: {
             xanchor: 'right',
@@ -139,11 +144,12 @@ d3.json(url_api_data).then((measData) => {
         },
         font: {
             // family: 'Courier New, monospace',
-            size: 18,
+            size: 16,
             color: '#000000'
         },
         paper_bgcolor: "rgba(0,0,0,0)",
-        plot_bgcolor: 'rgba(0,0,0,0)'
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        hovermode: false,
     };
     Plotly.newPlot('overlaidHistogram', dataChart, layout, config);
 
@@ -228,3 +234,176 @@ d3.json('/myhouseweather/analytics/show-visitors/count/').then((visitsData) => {
     console.log(visitsData.visits)
     document.getElementById('pageVisits').textContent = `${visitsData.visits}`;
 });
+
+
+
+
+// Event listen to update page based on the dropdown selection
+function updatePage() {
+
+    var dropdown = d3.select('#selDataset');
+    var dropdownValue = dropdown.property('value');
+    console.log(dropdownValue);
+
+    // Parse the dropdown values as integer
+    var timeSpan = parseInt(dropdownValue);
+
+    // Build the plot with the new stock
+    buildPlot(timeSpan);
+};
+
+// Create the main function to get the data and generate the plots
+function buildPlot(timeSpan) {
+    // Use D3 fetch to read the JSON file
+    d3.json(`/myhouseweather/api/v1.0/weather-data/${timeSpan}/`).then((measData) => {
+
+        // Separate data into two arrays one for each sensor
+        var sensor13 = []
+        var sensor16 = []
+        measData.forEach(element => {
+            if (element.sensor === 13) {
+                sensor13.push(element)
+            }
+            else {
+                sensor16.push(element)
+            }
+        })
+
+
+
+        // Line Chart
+
+        // Trace1 to display the sensor 13 data
+        var trace1 = {
+            x: sensor13.map(element => element.meas_time),
+            y: sensor13.map(element => (element.temperature * 9 / 5) + 32),
+            mode: 'lines',
+            name: 'Outdoor',
+            line: {
+                // dash: 'dashdot',
+                color: 'rgb(255, 195, 0)',
+                width: 3
+            }
+        };
+
+        // Trace2 to display the sensor 13 data
+        var trace2 = {
+            x: sensor16.map(element => element.meas_time),
+            y: sensor16.map(element => (element.temperature * 9 / 5) + 32),
+            mode: 'lines',
+            name: 'Indoor',
+            line: {
+                // dash: 'dot',
+                color: 'rgb(144, 12, 63)',
+                width: 3
+            }
+        };
+
+        // create an array to be plotted
+        var chartData = [trace1, trace2];
+
+
+
+        var layout = {
+            title: `Temperature Over Time (${timeSpan} h) `,
+            yaxis: {
+                // Degree symbol 'Option + Shift + 8'
+                title: 'Temperature (°F)',
+                range: [0, 120]
+            },
+
+            showlegend: true,
+            legend: {
+                xanchor: 'right',
+                // y: 0.5,
+                traceorder: 'reversed',
+                font: { size: 16 },
+                yref: 'paper'
+            },
+            margin: {
+                l: 60,
+                r: 60,
+                b: 60,
+                t: 60,
+                pad: 4
+            },
+            font: {
+                // family: 'Courier New, monospace',
+                size: 16,
+                color: '#000000'
+            },
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            hovermode: false,
+        };
+
+        // Render the plot to the div tag id "plot"
+        Plotly.newPlot("plotTemp", chartData, layout, config);
+
+
+        //  Overlaid Histogram
+
+
+        var trace1 = {
+            x: sensor13.map(element => (element.temperature * 9 / 5) + 32),
+            type: "histogram",
+            opacity: 1,
+            marker: {
+                color: 'rgb(255, 195, 0)',
+            },
+            name: 'Outdoor',
+        };
+        var trace2 = {
+            x: sensor16.map(element => (element.temperature * 9 / 5) + 32),
+            type: "histogram",
+            opacity: 1,
+            marker: {
+                color: 'rgb(144, 12, 63)',
+            },
+            name: 'Indoor',
+        };
+
+        var dataChart = [trace1, trace2];
+        var layout = {
+            barmode: "overlay",
+            title: `Temperature Distribution (${timeSpan} h)`,
+            xaxis: {
+                // Degree symbol 'Option + Shift + 8'
+                title: 'Temperature (°F)',
+                range: [0, 120]
+            },
+            yaxis: {
+                // Degree symbol 'Option + Shift + 8'
+                title: 'Data points',
+            },
+            legend: {
+                xanchor: 'right',
+                // y: 0.5,
+                traceorder: 'reversed',
+                font: { size: 16 },
+                yref: 'paper'
+            },
+            margin: {
+                l: 60,
+                r: 60,
+                b: 60,
+                t: 60,
+                pad: 4
+            },
+            font: {
+                // family: 'Courier New, monospace',
+                size: 16,
+                color: '#000000'
+            },
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            hovermode: false,
+        };
+        Plotly.newPlot('overlaidHistogram', dataChart, layout, config);
+
+    })
+}
+
+
+// Handler for the dropdown change
+d3.select('#selDataset').on('change', updatePage);

@@ -1,4 +1,5 @@
 
+
 #map,
 body,
 html {
@@ -188,5 +189,13 @@ This class makes the topnav look good on small screens (display the links vertic
     /* width: 100%; */
     height: 250px;
     margin-bottom: 5%;
+  }
+
+  #weatherIcon {
+    /* height:35% */
+  } 
+
+  #heardIcon{
+    margin-top: 11%;
   }
 }

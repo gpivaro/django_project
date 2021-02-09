@@ -30,8 +30,7 @@ def get_client_ip(request):
     # only add visitor if not active in the last hour
     if verify_ip_last_1h == 0:
 
-        # if ip and ip != "127.0.0.1":
-        if ip:
+        if ip and ip != "127.0.0.1":
             ip_url = (
                 f"https://geo.ipify.org/api/v1?apiKey={Geo_IPIFY_API}&ipAddress={ip}"
             )

@@ -9,7 +9,7 @@ function myFunction() {
     return x
 }
 
-if (myFunction() < 768) {
+if (myFunction() <= 414) {
     var heightSize = 270
 } else {
     var heightSize = 450

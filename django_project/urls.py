@@ -78,6 +78,8 @@ urlpatterns = [
     path("airtraffic/", include("airtrafficapp.urls")),
     # urls for the myhouseweather app
     path("houseweather/", include("myhouseweatherapp.urls")),
+    # urls for the Analyticsapp
+    path("analytics/", include("analyticsapp.urls")),
 ]
 
 if settings.DEBUG:

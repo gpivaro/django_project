@@ -48,6 +48,8 @@ except:
 # Application definition
 
 INSTALLED_APPS = [
+    # Analytics app
+    "analyticsapp.apps.AnalyticsappConfig",
     # House Weather app
     "myhouseweatherapp.apps.MyhouseweatherappConfig",
     # Airtraffic site app

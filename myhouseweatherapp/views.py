@@ -55,7 +55,7 @@ def api_routes(request):
         f"<h3>API end points available:</h3>"
         f"api/v1.0/weather-data/last_hours/<br/>"
         f"api/v1.0/weather-api/city/<br/><br/>"
-        f"<a href ='/myhouseweather'>Home</a>"
+        f"<a href ='/houseweather'>Home</a>"
     )
 
 
@@ -63,3 +63,14 @@ def api_routes(request):
 # from datetime import datetime, timedelta
 # from django.utils import timezone
 # Weather.objects.filter(meas_time__gt=timezone.now() + timedelta(hours=1)).count()
+
+
+# from myhouseweatherapp.models import ClientIPAddress
+# from datetime import datetime, timedelta
+# from django.utils import timezone
+# ClientIPAddress.objects.all().values()
+# ClientIPAddress.objects.filter(timestamp__gt=timezone.now() + timedelta(hours=1)).all().values()
+
+
+# ClientIPAddress.objects.filter(ip_address='127.0.0.1').delete()
+# ClientIPAddress.objects.filter(ip_address='107.128.116.227').delete()

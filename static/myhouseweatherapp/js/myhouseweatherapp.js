@@ -1,7 +1,20 @@
 // Filter the data to load
 lastHoursData = 24
 // API weather data
-url_api_data = `/myhouseweather/api/v1.0/weather-data/${lastHoursData}/`
+url_api_data = `/houseweather/api/v1.0/weather-data/${lastHoursData}/`
+
+function myFunction() {
+    var x = parseInt(screen.availWidth);
+    console.log(x)
+    return x
+}
+
+if (myFunction() < 768) {
+    var heightSize = 270
+} else {
+    var heightSize = 450
+}
+
 
 // Responsive chart
 var config = { responsive: true, displayModeBar: false }
@@ -179,7 +192,7 @@ d3.json(url_api_data).then((measData) => {
             domain: { x: [0, 1], y: [0, 1] },
             value: (sensor16[0].temperature * 9 / 5) + 32,
             number: { suffix: "°F" },
-            title: { text: "Indoor Temperature" },
+            title: { text: "Indoor Temperature<sup>2</sup>" },
             type: "indicator",
             mode: "gauge+number",
             delta: { reference: 100 },
@@ -192,6 +205,7 @@ d3.json(url_api_data).then((measData) => {
 
 
     var layout = {
+        height: heightSize,
         margin: {
             l: 50,
             r: 50,
@@ -215,7 +229,7 @@ d3.json(url_api_data).then((measData) => {
             domain: { x: [0, 1], y: [0, 1] },
             value: (sensor13[0].temperature * 9 / 5) + 32,
             number: { suffix: "°F" },
-            title: { text: "Outdoor Temperature" },
+            title: { text: "Outdoor Temperature<sup>1</sup>" },
             type: "indicator",
             mode: "gauge+number",
             delta: { reference: 80 },
@@ -230,7 +244,7 @@ d3.json(url_api_data).then((measData) => {
     Plotly.newPlot('AngularGaugeChartOut', data, layout, config);
 });
 
-d3.json('/myhouseweather/analytics/show-visitors/count/').then((visitsData) => {
+d3.json('/houseweather/analytics/show-visitors/count/').then((visitsData) => {
     console.log(visitsData.visits)
     document.getElementById('pageVisits').textContent = `${visitsData.visits}`;
 });
@@ -255,7 +269,7 @@ function updatePage() {
 // Create the main function to get the data and generate the plots
 function buildPlot(timeSpan) {
     // Use D3 fetch to read the JSON file
-    d3.json(`/myhouseweather/api/v1.0/weather-data/${timeSpan}/`).then((measData) => {
+    d3.json(`/houseweather/api/v1.0/weather-data/${timeSpan}/`).then((measData) => {
 
         // Separate data into two arrays one for each sensor
         var sensor13 = []

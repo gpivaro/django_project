@@ -29,8 +29,21 @@
                                     <i class='fa fa-thermometer-three-quarters' style='font-size:52px'></i>
                                 </div>
                                 <div class="col-9">
-                                    <h6>Current temperature:</h6>
+                                    <h6>Temperature:</h6>
                                     <h4><span> {{ data.temp}} °F</span></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div>
+                            <div class="row">
+                                <div class="col-3">
+                                    <i class='fa fa-thermometer-quarter' style='font-size:52px'></i>
+                                </div>
+                                <div class="col-9">
+                                    <h6>Feels like:</h6>
+                                    <h4><span> {{ data.feels_like}} °F</span></h4>
                                 </div>
                             </div>
                         </div>
@@ -61,19 +74,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 col-lg-3">
-                        <div>
-                            <div class="row">
-                                <div class="col-3">
-                                    <i class='fa fa-thermometer-quarter' style='font-size:52px'></i>
-                                </div>
-                                <div class="col-9">
-                                    <h6>Feels like:</h6>
-                                    <h4><span> {{ data.feels_like}} °F</span></h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -86,9 +86,16 @@
     <div class="row">
         <div class="col-12 col-lg-6" style="padding: 1%;">
             <div id="AngularGaugeChartOut"></div>
+            <div style="padding: 3%;text-align:center"><span>1-This sensor is placed outdoor and there is direct
+                    sunlight in
+                    the
+                    mornings.</span>
+            </div>
         </div>
         <div class="col-12 col-lg-6" style=" padding: 1%;">
             <div id="AngularGaugeChartIn"></div>
+            <div style="padding: 3%;text-align:center"><span>2-This sensor is placed indoor.</span>
+            </div>
         </div>
     </div>
 </div>
@@ -96,9 +103,9 @@
 
 
 <!-- Charts -->
-<div class="container">
+<div class="container" style="text-align: center;margin-top:3%">
     <div>
-        <label for="selDataset">Choose a timespan to display in the charts below:</label>
+        <label for="selDataset">Select a timespan to the next charts:</label>
         <select id="selDataset">
             <option value="1">1h</option>
             <option value="12">12h</option>
@@ -118,7 +125,7 @@
 </div>
 
 
-<div class="container" style="text-align: center;margin-top:2%">
+<div class="container" style="text-align: center;margin-top:3%">
     <div class="row">
         <div class="col-12">
             <h5>Additional information about the weather in Houston, Tx at this moment.</h5>
@@ -208,7 +215,7 @@
 
 
 <!-- About -->
-<div class="container" style="text-align: center;margin-top:2%" id="AboutText">
+<div class="container" style="text-align: center;margin-top:3%" id="AboutText">
     <div class="row">
         <div class="col-12">
             <h4>About this project: </h4>

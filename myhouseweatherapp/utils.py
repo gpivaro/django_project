@@ -30,20 +30,23 @@ def get_client_ip(request):
     # only add visitor if not active in the last hour
     if verify_ip_last_1h == 0:
 
-        if ip and ip != "127.0.0.1":
+        # if ip and ip != "127.0.0.1":
+        if ip:
             ip_url = (
                 f"https://geo.ipify.org/api/v1?apiKey={Geo_IPIFY_API}&ipAddress={ip}"
             )
             response = requests.get(ip_url).json()
 
+            latitude = response["location"]["lat"]
+            longitude = response["location"]["lng"]
+
             ClientIPAddress.objects.create(
                 ip_address=response["ip"],
-                host_address=request.headers["Host"],
                 country=response["location"]["country"],
                 region=response["location"]["region"],
                 city=response["location"]["city"],
-                latitude=response["location"]["lat"],
-                longitude=response["location"]["lng"],
+                latitude=latitude,
+                longitude=longitude,
                 map_link=f"https://www.openstreetmap.org/?mlat={latitude}&mlon={longitude}#map=15/{latitude}/{longitude}",
                 absolute_uri=request.build_absolute_uri(),
                 path=request.path,

@@ -5,13 +5,11 @@ from .serializers import AircraftsSerializer
 from rest_framework import viewsets
 from django.db.models import Count
 from datetime import datetime, timedelta
-from .utils import get_client_ip
+from analyticsapp.utils import get_client_ip
 
 # Main page of the application
 def index(request):
-    # aircraftdata = Aircrafts.objects.order_by("-time")
-    # context = {"aircraftdata": aircraftdata}
-    get_client_ip(request)
+    get_client_ip(request, True)
     return render(request, "airtrafficapp/index_Gabriel_v4.html")
 
 

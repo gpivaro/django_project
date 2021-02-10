@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
@@ -9,10 +10,11 @@ from django.views.generic import (
     DeleteView,
 )
 from .models import Post
-import datetime
+from analyticsapp.utils import get_client_ip
 
 # Create your views here.
 def home(request):
+    get_client_ip(request, True)
     # key name posts will be accessible from the .html
     context = {"posts": Post.objects.all()}
     return render(request, "blog/home.html", context)
@@ -77,6 +79,7 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 def about(request):
+    get_client_ip(request, True)
     return render(request, "blog/about.html", {"title": "About"})
 
 

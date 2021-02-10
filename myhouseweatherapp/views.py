@@ -1,14 +1,15 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from .models import Weather, ClientIPAddress
-from .utils import get_client_ip, weather_api
+from .utils import weather_api
 from datetime import datetime, timedelta
 from django.utils import timezone
+from analyticsapp.utils import get_client_ip
 
 
 # Main page of the application
 def index(request):
-    get_client_ip(request)
+    get_client_ip(request, True)
     data = weather_api("Houston")
     return render(request, "myhouseweatherapp/index.html", {"data": data})
 

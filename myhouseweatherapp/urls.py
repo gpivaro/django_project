@@ -3,9 +3,9 @@ from . import views
 
 urlpatterns = [
     # path for the index page
-    path("", views.index, name="index"),
+    path("", views.index, name="myhouseweather-index"),
     # path for API routes
-    path("api-routes", views.api_routes, name="api_routes"),
+    path("api-routes", views.api_routes, name="myhouseweather-api-routes"),
     # path for all json data
     path(
         "api/v1.0/weather-data/<int:last_hours>/",

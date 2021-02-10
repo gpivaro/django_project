@@ -1,7 +1,7 @@
 // Filter the data to load
 lastHoursData = 24
 // API weather data
-url_api_data = `/houseweather/api/v1.0/weather-data/${lastHoursData}/`
+url_api_data = `/homeweather/api/v1.0/weather-data/${lastHoursData}/`
 
 function myFunction() {
     var x = parseInt(screen.availWidth);
@@ -244,7 +244,7 @@ d3.json(url_api_data).then((measData) => {
     Plotly.newPlot('AngularGaugeChartOut', data, layout, config);
 });
 
-d3.json('/houseweather/analytics/show-visitors/count/').then((visitsData) => {
+d3.json('/homeweather/analytics/show-visitors/count/').then((visitsData) => {
     console.log(visitsData.visits)
     document.getElementById('pageVisits').textContent = `${visitsData.visits}`;
 });
@@ -269,7 +269,7 @@ function updatePage() {
 // Create the main function to get the data and generate the plots
 function buildPlot(timeSpan) {
     // Use D3 fetch to read the JSON file
-    d3.json(`/houseweather/api/v1.0/weather-data/${timeSpan}/`).then((measData) => {
+    d3.json(`/homeweather/api/v1.0/weather-data/${timeSpan}/`).then((measData) => {
 
         // Separate data into two arrays one for each sensor
         var sensor13 = []

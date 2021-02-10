@@ -1,7 +1,4 @@
 
-
-
-
 #container-fluid{
   background-color: rgb(76, 82, 82); 
   text-align:center; 
@@ -37,22 +34,18 @@ label{
   background-size: cover;
 }
 
-/* Jumbotron whole page */
-.jumbotron{
-  /* height: 150%; */
+
+/* Make the image fully responsive */
+.carousel-inner img {
+  width: 100%;
+  /*height: 100%;*/
 }
 
-/* The code styles the text at the bottom of the footer
-.footer > .bottom {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: 5px;
-  background:black;
-  color: white;
-  font-size: medium;
-} */
+
+#logo{
+  /* margin-left: 16px; */
+  margin-right: 1%;
+}
 
 /* The code styles the text at the bottom of the footer */
 .footer {
@@ -67,51 +60,7 @@ label{
   color: white;
 }
 
-.navbar-dark{
-  padding: 0px;
-  /* border-style: solid; */
-  /* border-color: tomato; */
-}
 
-.navbar-dark .navbar-brand {
-  /* color: white; */
-  margin-left: 11px;
-  /* border: 1px solid; */
-  /* border-color: tomato; */
-}
-
-/* Style buttons */
-.btn {
-  /* background-color: black; /*background */
-  border: none; /* Remove borders */
-  color: white; /* White text */
-  padding: 12px 16px; /* Some padding */
-  font-size: 16px; /* Set a font size */
-  cursor: pointer; /* Mouse pointer on hover */
-}
-
-/* Darker background on mouse-over */
-.btn:hover {
-  background-color: whitesmoke;
-}
-
-/* Make the image fully responsive */
-.carousel-inner img {
-  width: 100%;
-  /*height: 100%;*/
-}
-
-.navbar-brand{
-  background-color: gray;
-  /* padding: 6px; */
-  /* border: 1px; */
-  padding: 11px;
-  border: 11px;
-}
-
-#navbarSupportedContent{
-  margin-right: 15px;
-}
 
 /* ############################# Media Query ############################# */
 /* ####################################################################### */
@@ -150,7 +99,7 @@ This class makes the topnav look good on small screens (display the links vertic
     nav {background-color:darkcyan;}
     .navbar-dark .navbar-nav .nav-link {
       /* color: white; */
-      margin-left: 22px;
+      /* margin-left: 22px; */
   }
   .navbar-brand{
     background-color:transparent;
@@ -162,3 +111,4 @@ This class makes the topnav look good on small screens (display the links vertic
     margin-top: 11%;
   }
 }
+

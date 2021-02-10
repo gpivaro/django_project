@@ -36,6 +36,11 @@
     <!-- Plotly -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
+    <!-- Leaflet.fullscreen https://github.com/Leaflet/Leaflet.fullscreen-->
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css'
+        rel='stylesheet' />
+
 
     <!-- Leaflet.Terminator https://github.com/joergdietrich/Leaflet.Terminator -->
     <!-- <script src="https://unpkg.com/leaflet"></script> -->
@@ -51,16 +56,16 @@
 <body>
     <!-- nav bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="/">Air Traffic Tracker</a>
+        <a id="logo" href="{% url 'resumesite-home' %}"><img src="{% static 'airtrafficapp/images/favicon.ico' %}"></a>
+        <a class="navbar-brand" href="{% url 'airtraffic-index' %}">Air Traffic Tracker</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'api_routes'%}">API</a>
+                    <a class="nav-link" href="{% url 'airtraffic-api-routes'%}">API</a>
                 </li>
                 <li class=" nav-item">
                     <a class="nav-link" href="https://github.com/gpivaro/project_2/">About</a>

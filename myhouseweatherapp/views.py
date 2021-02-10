@@ -55,7 +55,7 @@ def api_routes(request):
         f"<h3>API end points available:</h3>"
         f"api/v1.0/weather-data/last_hours/<br/>"
         f"api/v1.0/weather-api/city/<br/><br/>"
-        f"<a href ='/houseweather'>Home</a>"
+        f"<a href ='/homeweather'>Home</a>"
     )
 
 

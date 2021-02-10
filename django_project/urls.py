@@ -77,7 +77,7 @@ urlpatterns = [
     # urls for the airtraffic app
     path("airtraffic/", include("airtrafficapp.urls")),
     # urls for the myhouseweather app
-    path("houseweather/", include("myhouseweatherapp.urls")),
+    path("homeweather/", include("myhouseweatherapp.urls")),
     # urls for the Analyticsapp
     path("analytics/", include("analyticsapp.urls")),
 ]

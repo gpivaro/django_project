@@ -55,7 +55,8 @@ var mapAirplanes = L.map("mapAircraft", {
     layers: [
         layersRightMap.RoutePoints,
         layersRightMap.RouteLines
-    ]
+    ],
+    fullscreenControl: true,
 });
 
 // Add our tile layer to the map

@@ -8,7 +8,7 @@ from .views import AircraftsView
 
 urlpatterns = [
     # path for the index page
-    path("", views.index, name="index"),
+    path("", views.index, name="airtraffic-index"),
     # path for: /api/v1.0/aircrafts-data/ALL   /api/v1.0/aircrafts-data/Brazil
     path("api/v1.0/aircrafts-data/<country>/", views.aircrafts, name="aircrafts"),
     # path for icao24
@@ -21,7 +21,7 @@ urlpatterns = [
     # Delete entries
     path("api/v1.0/aircrafts-delete", views.aircrafts_delete, name="aircrafts_delete"),
     # API routes
-    path("api-routes", views.api_routes, name="api_routes"),
+    path("api-routes", views.api_routes, name="airtraffic-api-routes"),
     # Return Country coordinates
     path(
         "api/v1.0/country-coordinates/<country>/",

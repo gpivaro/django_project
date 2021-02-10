@@ -65,7 +65,8 @@ var myMap = L.map("map", {
     layers: [
         layersLeftMap.Aircrafts,
         layersLeftMap.Airports
-    ]
+    ],
+    fullscreenControl: true,
 });
 
 // Add our tile layer to the map

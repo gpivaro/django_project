@@ -3,6 +3,5 @@ from . import views
 
 urlpatterns = [
     # path for the index page
-    path("", views.index, name="index")
+    path("", views.index, name="analytics-index")
 ]
-

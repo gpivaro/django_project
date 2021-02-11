@@ -56,23 +56,21 @@ def get_client_ip(request, Save=False):
             "useragent": request.headers["User-Agent"],
         }
 
-        # only add visitor if not active in the last hour
-        if verify_ip_last_1h == 0:
-            # Save the client access data to the database if Save == True
-            if Save:
-                ClientIPAddress.objects.create(
-                    ip_address=response_dict["ip_address"],
-                    country=response_dict["country"],
-                    region=response_dict["region"],
-                    city=response_dict["city"],
-                    latitude=response_dict["latitude"],
-                    longitude=response_dict["longitude"],
-                    map_link=response_dict["map_link"],
-                    absolute_uri=response_dict["absolute_uri"],
-                    path=response_dict["path"],
-                    issecure=response_dict["issecure"],
-                    useragent=response_dict["useragent"],
-                )
+        # Save the client access data to the database if Save == True
+        if Save:
+            ClientIPAddress.objects.create(
+                ip_address=response_dict["ip_address"],
+                country=response_dict["country"],
+                region=response_dict["region"],
+                city=response_dict["city"],
+                latitude=response_dict["latitude"],
+                longitude=response_dict["longitude"],
+                map_link=response_dict["map_link"],
+                absolute_uri=response_dict["absolute_uri"],
+                path=response_dict["path"],
+                issecure=response_dict["issecure"],
+                useragent=response_dict["useragent"],
+            )
 
     return response_dict
 

@@ -2,40 +2,60 @@
 {% load staticfiles %}
 {% block content %}
 
-<!-- About Section-->
-<section class="masthead bg-primary text-white mb-0" id="about">
-    <div class="container">
-        <!-- About Section Heading-->
-        <h2 class="page-section-heading text-center text-uppercase text-white">About Me</h2>
-        <!-- Icon Divider-->
-        <div class="divider-custom divider-light">
-            <div class="divider-custom-line"></div>
-            <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-            <div class="divider-custom-line"></div>
-        </div>
-        <!-- About Section Content-->
+<!-- Masthead-->
+<header class="masthead bg-primary text-white text-center">
+    <div class="container d-flex align-items-center flex-column">
         <div class="row">
-            <div class="col-lg-8 ml-auto mr-auto">
-                <p class="lead" style="text-align: justify;">Data analyst with a Bachelors's in Math and Ph.D. in
-                    Electrical Engineering. Received certification in data analytics from Rice University with advanced
-                    skills in Python, MATLAB, SQL database implementation, web application. Proven records of applying
-                    statistical analysis and predictive modeling to generate simulations to support academic research
-                    and business analysis. Excellent written, oral communication, and presentation skills. Enthusiastic
-                    to solve complex problems that require mathematical modeling and hardware integration.
-
-                </p>
+            <div class="col-12 col-lg-4">
+                <!-- Masthead Avatar Image-->
+                <!--<img class="masthead-avatar mb-5" src="{% static 'resumesite/assets/img/avataaars.svg' %}" alt="" />-->
+                <img class="masthead-avatar mb-5" src="{% static 'resumesite/assets/img/angela-gabriel-eng-097.jpg' %}"
+                    alt="My picture" />
+                <!-- Masthead Heading-->
+                <!-- <h3 class="masthead-heading text-uppercase mb-0">Hi, I am Gabriel.</h3> -->
+                <!-- Icon Divider-->
+                <!-- <div class="divider-custom divider-light">
+                    <div class="divider-custom-line"></div>
+                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                    <div class="divider-custom-line"></div>
+                </div>
+                Masthead Subheading -->
+                <!-- <p class="masthead-subheading font-weight-light mb-0">Data Analyst | Ph.D. Electrical Engineer</p> -->
             </div>
+            <div class="col-12 col-lg-8" id="about">
+                <!-- About Section Heading-->
+                <h2 class="page-section-heading text-center text-uppercase text-white">About Me</h2>
+                <!-- Icon Divider-->
+                <!-- <div class="divider-custom divider-light">
+                    <div class="divider-custom-line"></div>
+                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                    <div class="divider-custom-line"></div>
+                </div> -->
+                <!-- About Section Content-->
+                <div class="row">
+                    <div class="col-lg-10 ml-auto mr-auto">
+                        <p class="lead" style="text-align: justify;">Data analyst with a Bachelors's in Math and Ph.D.
+                            in
+                            Electrical Engineering. Received certification in data analytics from Rice University with
+                            advanced
+                            skills in Python, MATLAB, SQL database implementation, web application. Proven records of
+                            applying
+                            statistical analysis and predictive modeling to generate simulations to support academic
+                            research
+                            and business analysis. Excellent written, oral communication, and presentation skills.
+                            Enthusiastic
+                            to solve complex problems that require mathematical modeling and hardware integration.
 
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <!-- About Section Button
-        <div class="text-center mt-4">
-            <a class="btn btn-xl btn-outline-light" href="https://startbootstrap.com/themes/freelancer/'%}'">
-                <i class="fas fa-download mr-2"></i>
-                Free Download!
-            </a>
-        </div> -->
     </div>
-</section>
+</header>
+
+
+
 <!-- Portfolio Section-->
 <section class="page-section portfolio" id="portfolio">
     <div class="container">
@@ -50,48 +70,27 @@
         <!-- Portfolio Grid Items-->
         <div class="row">
             <div class="col-lg-8 ml-auto mr-auto">
-                <ul style="list-style-type:none;">
-                    <li><a class="dropdown-item" href="{% url 'airtraffic-index' %}">
-                            <h4 class="text-center text-uppercase text-secondary">Air Traffic Tracker</h4>
-                        </a>
-                    </li>
-                    <li><a class="dropdown-item" href="{% url 'myhouseweather-index' %}">
-                            <h4 class="text-center text-uppercase text-secondary">Home Weather</h4>
-                        </a>
-                    </li>
-                    <li><a class="dropdown-item" href="{% url 'analytics-index' %}">
-                            <h4 class="text-center text-uppercase text-secondary">Analytics</h4>
-                        </a>
-                    </li>
-                    <li><a class="dropdown-item" href="http://find-your-dream-home.herokuapp.com/">
-                            <h4 class="text-center text-uppercase text-secondary">Find Your Dream Home</h4>
-                        </a>
-                    </li>
-                </ul>
+                <p class="lead"><a class="dropdown-item" href="{% url 'airtraffic-index' %}">
+                        <h4 class="text-center text-uppercase text-secondary">Air Traffic Tracker</h4>
+                    </a>
+                </p>
+                <p><a class="dropdown-item" href="{% url 'myhouseweather-index' %}">
+                        <h4 class="text-center text-uppercase text-secondary">Home Weather</h4>
+                    </a>
+                </p>
+                <p><a class="dropdown-item" href="{% url 'analytics-index' %}">
+                        <h4 class="text-center text-uppercase text-secondary">Analytics</h4>
+                    </a>
+                </p>
+                <p><a class="dropdown-item" href="http://find-your-dream-home.herokuapp.com/">
+                        <h4 class="text-center text-uppercase text-secondary">Find Your Dream Home</h4>
+                    </a>
+                </p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Masthead-->
-<header class="masthead bg-primary text-white text-center">
-    <div class="container d-flex align-items-center flex-column">
-        <!-- Masthead Avatar Image-->
-        <!--<img class="masthead-avatar mb-5" src="{% static 'resumesite/assets/img/avataaars.svg' %}" alt="" />-->
-        <img class="masthead-avatar mb-5" src="{% static 'resumesite/assets/img/angela-gabriel-eng-097.jpg' %}"
-            alt="" />
-        <!-- Masthead Heading-->
-        <h3 class="masthead-heading text-uppercase mb-0">Hi, I am Gabriel.</h3>
-        <!-- Icon Divider-->
-        <div class="divider-custom divider-light">
-            <div class="divider-custom-line"></div>
-            <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-            <div class="divider-custom-line"></div>
-        </div>
-        <!-- Masthead Subheading-->
-        <p class="masthead-subheading font-weight-light mb-0">Data Analyst | Ph.D. Electrical Engineer</p>
-    </div>
-</header>
 
 
 
@@ -145,246 +144,6 @@
             class="fa fa-chevron-up"></i></a>
 </div>
 
-<!-- Portfolio Modals-->
-<!-- Portfolio Modal 1-->
-<div class="portfolio-modal modal fade" id="portfolioModal1" tabindex="-1" role="dialog"
-    aria-labelledby="portfolioModal1Label" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"><i class="fas fa-times"></i></span>
-            </button>
-            <div class="modal-body text-center">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-8">
-                            <!-- Portfolio Modal - Title-->
-                            <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0"
-                                id="portfolioModal1Label">Log Cabin</h2>
-                            <!-- Icon Divider-->
-                            <div class="divider-custom">
-                                <div class="divider-custom-line"></div>
-                                <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                                <div class="divider-custom-line"></div>
-                            </div>
-                            <!-- Portfolio Modal - Image-->
-                            <img class="img-fluid rounded mb-5"
-                                src="{% static 'resumesite/assets/img/portfolio/cabin.png'%}" alt="" />
-                            <!-- Portfolio Modal - Text-->
-                            <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque
-                                assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam
-                                velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.
-                            </p>
-                            <button class="btn btn-primary" data-dismiss="modal">
-                                <i class="fas fa-times fa-fw"></i>
-                                Close Window
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Portfolio Modal 2-->
-<div class="portfolio-modal modal fade" id="portfolioModal2" tabindex="-1" role="dialog"
-    aria-labelledby="portfolioModal2Label" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"><i class="fas fa-times"></i></span>
-            </button>
-            <div class="modal-body text-center">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-8">
-                            <!-- Portfolio Modal - Title-->
-                            <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0"
-                                id="portfolioModal2Label">Tasty Cake</h2>
-                            <!-- Icon Divider-->
-                            <div class="divider-custom">
-                                <div class="divider-custom-line"></div>
-                                <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                                <div class="divider-custom-line"></div>
-                            </div>
-                            <!-- Portfolio Modal - Image-->
-                            <img class="img-fluid rounded mb-5"
-                                src="{% static 'resumesite/assets/img/portfolio/cake.png'%}" alt="" />
-                            <!-- Portfolio Modal - Text-->
-                            <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque
-                                assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam
-                                velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.
-                            </p>
-                            <button class="btn btn-primary" data-dismiss="modal">
-                                <i class="fas fa-times fa-fw"></i>
-                                Close Window
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Portfolio Modal 3-->
-<div class="portfolio-modal modal fade" id="portfolioModal3" tabindex="-1" role="dialog"
-    aria-labelledby="portfolioModal3Label" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"><i class="fas fa-times"></i></span>
-            </button>
-            <div class="modal-body text-center">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-8">
-                            <!-- Portfolio Modal - Title-->
-                            <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0"
-                                id="portfolioModal3Label">Circus Tent</h2>
-                            <!-- Icon Divider-->
-                            <div class="divider-custom">
-                                <div class="divider-custom-line"></div>
-                                <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                                <div class="divider-custom-line"></div>
-                            </div>
-                            <!-- Portfolio Modal - Image-->
-                            <img class="img-fluid rounded mb-5"
-                                src="{% static 'resumesite/assets/img/portfolio/circus.png'%}" alt="" />
-                            <!-- Portfolio Modal - Text-->
-                            <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque
-                                assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam
-                                velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.
-                            </p>
-                            <button class="btn btn-primary" data-dismiss="modal">
-                                <i class="fas fa-times fa-fw"></i>
-                                Close Window
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Portfolio Modal 4-->
-<div class="portfolio-modal modal fade" id="portfolioModal4" tabindex="-1" role="dialog"
-    aria-labelledby="portfolioModal4Label" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"><i class="fas fa-times"></i></span>
-            </button>
-            <div class="modal-body text-center">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-8">
-                            <!-- Portfolio Modal - Title-->
-                            <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0"
-                                id="portfolioModal4Label">Controller</h2>
-                            <!-- Icon Divider-->
-                            <div class="divider-custom">
-                                <div class="divider-custom-line"></div>
-                                <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                                <div class="divider-custom-line"></div>
-                            </div>
-                            <!-- Portfolio Modal - Image-->
-                            <img class="img-fluid rounded mb-5"
-                                src="{% static 'resumesite/assets/img/portfolio/game.png'%}" alt="" />
-                            <!-- Portfolio Modal - Text-->
-                            <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque
-                                assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam
-                                velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.
-                            </p>
-                            <button class="btn btn-primary" data-dismiss="modal">
-                                <i class="fas fa-times fa-fw"></i>
-                                Close Window
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Portfolio Modal 5-->
-<div class="portfolio-modal modal fade" id="portfolioModal5" tabindex="-1" role="dialog"
-    aria-labelledby="portfolioModal5Label" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"><i class="fas fa-times"></i></span>
-            </button>
-            <div class="modal-body text-center">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-8">
-                            <!-- Portfolio Modal - Title-->
-                            <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0"
-                                id="portfolioModal5Label">Locked Safe</h2>
-                            <!-- Icon Divider-->
-                            <div class="divider-custom">
-                                <div class="divider-custom-line"></div>
-                                <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                                <div class="divider-custom-line"></div>
-                            </div>
-                            <!-- Portfolio Modal - Image-->
-                            <img class="img-fluid rounded mb-5"
-                                src="{% static 'resumesite/assets/img/portfolio/safe.png'%}" alt="" />
-                            <!-- Portfolio Modal - Text-->
-                            <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque
-                                assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam
-                                velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.
-                            </p>
-                            <button class="btn btn-primary" data-dismiss="modal">
-                                <i class="fas fa-times fa-fw"></i>
-                                Close Window
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Portfolio Modal 6-->
-<div class="portfolio-modal modal fade" id="portfolioModal6" tabindex="-1" role="dialog"
-    aria-labelledby="portfolioModal6Label" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true"><i class="fas fa-times"></i></span>
-            </button>
-            <div class="modal-body text-center">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-8">
-                            <!-- Portfolio Modal - Title-->
-                            <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0"
-                                id="portfolioModal6Label">Submarine</h2>
-                            <!-- Icon Divider-->
-                            <div class="divider-custom">
-                                <div class="divider-custom-line"></div>
-                                <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                                <div class="divider-custom-line"></div>
-                            </div>
-                            <!-- Portfolio Modal - Image-->
-                            <img class="img-fluid rounded mb-5"
-                                src="{% static 'resumesite/assets/img/portfolio/submarine.png'%}" alt="" />
-                            <!-- Portfolio Modal - Text-->
-                            <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque
-                                assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam
-                                velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.
-                            </p>
-                            <button class="btn btn-primary" data-dismiss="modal">
-                                <i class="fas fa-times fa-fw"></i>
-                                Close Window
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 {% endblock content%}

@@ -3,12 +3,12 @@ document.getElementById('totalNumAirports').textContent = "Wait... Loading";
 document.getElementById('totalAircraftDatabase').textContent = "Wait... Loading";
 
 
-
-
-d3.json('/airtraffic/analytics/show-visitors/count/').then((visitsData) => {
-    console.log(visitsData.visits)
+d3.json('/analytics/show-visitors/airtraffic').then((visitsData) => {
+    // console.log(visitsData.visits)
     document.getElementById('pageVisits').textContent = `${visitsData.visits}`;
 });
+
+
 // $(function () { $('#exampleModal').modal('show'); });
 
 

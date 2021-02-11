@@ -13,9 +13,17 @@ def index(request):
 # Show all visitors' IP address
 def show_visitors_ip(request, granularity):
 
+    # show details about all visitors
     if granularity == "all":
         data = list(ClientIPAddress.objects.all().values())
+    # count all visitors in total
     elif granularity == "count":
         data = {"visits": ClientIPAddress.objects.count()}
-
+    # count visitors based on the path
+    else:
+        data = {
+            "visits": ClientIPAddress.objects.filter(
+                path__contains=f"{granularity}"
+            ).count()
+        }
     return JsonResponse(data, safe=False)

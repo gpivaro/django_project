@@ -3,6 +3,14 @@ lastHoursData = 24
 // API weather data
 url_api_data = `/homeweather/api/v1.0/weather-data/${lastHoursData}/`
 
+
+d3.json('/analytics/show-visitors/homeweather').then((visitsData) => {
+    console.log(visitsData.visits)
+    document.getElementById('pageVisits').textContent = `${visitsData.visits}`;
+});
+
+
+
 function myFunction() {
     var x = parseInt(screen.availWidth);
     console.log(x)
@@ -244,10 +252,7 @@ d3.json(url_api_data).then((measData) => {
     Plotly.newPlot('AngularGaugeChartOut', data, layout, config);
 });
 
-d3.json('/homeweather/analytics/show-visitors/count/').then((visitsData) => {
-    console.log(visitsData.visits)
-    document.getElementById('pageVisits').textContent = `${visitsData.visits}`;
-});
+
 
 
 

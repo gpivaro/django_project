@@ -40,18 +40,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item  mx-0 mx-lg-1 dropdown active">
-                        <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger dropdown-toggle" href="#"
-                            id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true"
-                            aria-expanded="false">
-                            Projects
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item py-3" href="{% url 'airtraffic-index' %}">Air Traffic Tracker</a>
-                            <a class="dropdown-item py-3" href="{% url 'myhouseweather-index' %}">Home Weather</a>
-                            <a class="dropdown-item py-3" href="{% url 'analytics-index' %}">Analytics</a>
-                        </div>
-                    </li>
+                    <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger"
+                            href="{% url 'resumesite-home'%}#portfolio">Portfolio</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger"
                             href="{% url 'resumesite-home'%}#about">About</a></li>
                     <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger"

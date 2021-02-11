@@ -9,8 +9,8 @@
             <div class="col-12 col-lg-4">
                 <!-- Masthead Avatar Image-->
                 <!--<img class="masthead-avatar mb-5" src="{% static 'resumesite/assets/img/avataaars.svg' %}" alt="" />-->
-                <img class="masthead-avatar mb-5" src="{% static 'resumesite/assets/img/angela-gabriel-eng-097.jpg' %}"
-                    alt="My picture" />
+                <img class="masthead-avatar mt-3 mb-4"
+                    src="{% static 'resumesite/assets/img/angela-gabriel-eng-097.jpg' %}" alt="My picture" />
                 <!-- Masthead Heading-->
                 <!-- <h3 class="masthead-heading text-uppercase mb-0">Hi, I am Gabriel.</h3> -->
                 <!-- Icon Divider-->
@@ -26,11 +26,11 @@
                 <!-- About Section Heading-->
                 <h2 class="page-section-heading text-center text-uppercase text-white">About Me</h2>
                 <!-- Icon Divider-->
-                <!-- <div class="divider-custom divider-light">
+                <div class="divider-custom divider-light">
                     <div class="divider-custom-line"></div>
                     <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
                     <div class="divider-custom-line"></div>
-                </div> -->
+                </div>
                 <!-- About Section Content-->
                 <div class="row">
                     <div class="col-lg-10 ml-auto mr-auto">
@@ -70,22 +70,42 @@
         <!-- Portfolio Grid Items-->
         <div class="row">
             <div class="col-lg-8 ml-auto mr-auto">
-                <p class="lead"><a class="dropdown-item" href="{% url 'airtraffic-index' %}">
+                <p class="lead"><a class="dropdown-item" href="{% url 'airtraffic-index' %}" target="_blank">
                         <h4 class="text-center text-uppercase text-secondary">Air Traffic Tracker</h4>
                     </a>
                 </p>
-                <p><a class="dropdown-item" href="{% url 'myhouseweather-index' %}">
+                <p><a class="dropdown-item" href="{% url 'myhouseweather-index' %}" target="_blank">
                         <h4 class="text-center text-uppercase text-secondary">Home Weather</h4>
                     </a>
                 </p>
-                <p><a class="dropdown-item" href="{% url 'analytics-index' %}">
-                        <h4 class="text-center text-uppercase text-secondary">Analytics</h4>
-                    </a>
-                </p>
-                <p><a class="dropdown-item" href="http://find-your-dream-home.herokuapp.com/">
+                <p><a class="dropdown-item" href="http://find-your-dream-home.herokuapp.com/" target="_blank">
                         <h4 class="text-center text-uppercase text-secondary">Find Your Dream Home</h4>
                     </a>
                 </p>
+                <p><a class="dropdown-item" href="{% url 'analytics-index' %}" target="_blank">
+                        <h4 class="text-center text-uppercase text-secondary">Discover Your IP Address</h4>
+                    </a>
+                </p>
+                <p><a class="dropdown-item" href="https://gpivaro.github.io/D3-Challenge/" target="_blank">
+                        <h4 class="text-center text-uppercase text-secondary">Interactive Visualizations</h4>
+                    </a>
+                </p>
+                <p><a class="dropdown-item" href="https://gpivaro.github.io/Interactive-Visualizations/"
+                        target="_blank">
+                        <h4 class="text-center text-uppercase text-secondary">Belly Button Biodiversity Dashboard</h4>
+                    </a>
+                </p>
+                <p><a class="dropdown-item"
+                        href="https://gpivaro.github.io/javascript-challenge/UFO-level-2/index_level_2.html"
+                        target="_blank">
+                        <h4 class="text-center text-uppercase text-secondary">UFO Sightings</h4>
+                    </a>
+                </p>
+                <p><a class="dropdown-item" href="https://etl-sp500.herokuapp.com/" target="_blank">
+                        <h4 class="text-center text-uppercase text-secondary">ETL Project S&P 500</h4>
+                    </a>
+                </p>
+
             </div>
         </div>
     </div>
@@ -111,7 +131,7 @@
                 </p>
             </div>
             <!-- Footer Social Icons-->
-            <div class="col-lg-4 mb-5 mb-lg-0">
+            <div class="col-lg-4 mb-5 mb-lg-0" id="aroundweb">
                 <h4 class="text-uppercase mb-4">Around the Web</h4>
                 <a class="btn btn-outline-light btn-social mx-1" href="https://github.com/gpivaro"><i
                         class="fab fa-fw fa-github"></i></a>

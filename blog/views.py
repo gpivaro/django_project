@@ -27,12 +27,11 @@ class PostListView(ListView):
     ordering = ["-date_posted"]  # query database
     paginate_by = 5
 
-    # def get(self, request, *args, **kwargs):
-    #     print("--" * 25)
-    #     print(f"Requested path: {request.path}")
-    #     print("--" * 25)
-    #     # posts = self.model(context_object_name=self.context_object_name)
-    #     return render(request, self.template_name, {"posts": Post.objects.all()})
+    # Attempting to get the request to look up for the ip address
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        get_client_ip(self.request, True)
+        return context
 
 
 class UserPostListView(ListView):

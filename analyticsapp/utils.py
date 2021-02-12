@@ -97,10 +97,10 @@ def get_client_ip(request, Save=False):
     #     .count()
     # )
 
-    response_dict = ipapi(request, ip)
-
     # if ip:
     if ip and ip != "127.0.0.1":
+
+        response_dict = ipapi(request, ip)
 
         # Save the client access data to the database if Save == True
         if Save:

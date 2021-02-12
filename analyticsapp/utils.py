@@ -12,6 +12,72 @@ with open("/etc/config.json") as config_file:
 Geo_IPIFY_API = config["Geo_IPIFY_API"]
 weather_api_key = config["OPENWEATHERMAP_API_KEY"]
 
+
+# Get IP address info. Used as the first option but does not bring accurrate info
+def GeoIPIFY(request, ip):
+
+    ip_url = f"https://geo.ipify.org/api/v1?apiKey={Geo_IPIFY_API}&ipAddress={ip}"
+
+    # Get the the ipaddress info from the geo.ipify API
+    response = requests.get(ip_url).json()
+
+    # Create a variable for lat and lon
+    latitude = response["location"]["lat"]
+    longitude = response["location"]["lng"]
+
+    # Create a dictionary with all the info about the client access
+    response_dict_GeoIPIFY = {
+        "ip_address": response["ip"],
+        "country": response["location"]["country"],
+        "region": response["location"]["region"],
+        "city": response["location"]["city"],
+        "latitude": latitude,
+        "longitude": longitude,
+        "map_link": f"https://www.openstreetmap.org/?mlat={latitude}&mlon={longitude}#map=15/{latitude}/{longitude}",
+        "absolute_uri": request.build_absolute_uri(),
+        "path": request.path,
+        "issecure": request.is_secure(),
+        "useragent": request.headers["User-Agent"],
+    }
+
+    return response_dict_GeoIPIFY
+
+
+# Get IP address info. Used as the second option with more accurate
+def ipapi(request, ip):
+
+    ip_url = f"http://ip-api.com/json/{ip}"
+
+    # Get the the ipaddress info from the geo.ipify API
+    response = requests.get(ip_url).json()
+
+    # Create a variable for lat and lon
+    latitude = response["lat"]
+    longitude = response["lon"]
+
+    response_dict_ipapi = {
+        "ip_address": ip,
+        "country": response["country"],
+        "region": response["region"],
+        "city": response["city"],
+        "countryCode": response["countryCode"],
+        "regionName": response["regionName"],
+        "zip": response["zip"],
+        "isp": response["isp"],
+        "org": response["org"],
+        "as": response["as"],
+        "latitude": latitude,
+        "longitude": longitude,
+        "map_link": f"https://www.openstreetmap.org/?mlat={latitude}&mlon={longitude}#map=15/{latitude}/{longitude}",
+        "absolute_uri": request.build_absolute_uri(),
+        "path": request.path,
+        "issecure": request.is_secure(),
+        "useragent": request.headers["User-Agent"],
+    }
+
+    return response_dict_ipapi
+
+
 # Get IP address
 def get_client_ip(request, Save=False):
 
@@ -25,36 +91,16 @@ def get_client_ip(request, Save=False):
         ip = request.META.get("REMOTE_ADDR")
 
     # check if the same ip was saved in the last hour
-    verify_ip_last_1h = (
-        ClientIPAddress.objects.filter(ip_address=ip)
-        .filter(timestamp__gt=timezone.now() - timedelta(hours=6) + timedelta(hours=1))
-        .count()
-    )
+    # verify_ip_last_1h = (
+    #     ClientIPAddress.objects.filter(ip_address=ip)
+    #     .filter(timestamp__gt=timezone.now() - timedelta(hours=6) + timedelta(hours=1))
+    #     .count()
+    # )
+
+    response_dict = ipapi(request, ip)
 
     # if ip:
     if ip and ip != "127.0.0.1":
-        ip_url = f"https://geo.ipify.org/api/v1?apiKey={Geo_IPIFY_API}&ipAddress={ip}"
-        # Get the the ipaddress info from the geo.ipify API
-        response = requests.get(ip_url).json()
-
-        # Create a variable for lat and lon
-        latitude = response["location"]["lat"]
-        longitude = response["location"]["lng"]
-
-        # Create a dictionary with all the info about the client access
-        response_dict = {
-            "ip_address": response["ip"],
-            "country": response["location"]["country"],
-            "region": response["location"]["region"],
-            "city": response["location"]["city"],
-            "latitude": latitude,
-            "longitude": longitude,
-            "map_link": f"https://www.openstreetmap.org/?mlat={latitude}&mlon={longitude}#map=15/{latitude}/{longitude}",
-            "absolute_uri": request.build_absolute_uri(),
-            "path": request.path,
-            "issecure": request.is_secure(),
-            "useragent": request.headers["User-Agent"],
-        }
 
         # Save the client access data to the database if Save == True
         if Save:

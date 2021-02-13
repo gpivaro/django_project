@@ -1,4 +1,21 @@
 
+.parallax {
+    background-image: url("../images/clouds-3837043_1920.jpg");
+    min-height: 200%;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+}
+
+.MainContent {
+    background-color: rgba(2, 117, 216, .5)
+}
+
+
+
+
 #container-fluid{
   background-color: rgb(76, 82, 82); 
   text-align:center; 

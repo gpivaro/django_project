@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     # path for the index page
-    path("", views.index, name="analytics-index"),
+    path("my-ip-info/", views.index, name="analytics-index"),
     # path to show IP Address or the count of IPs
     path(
         "show-visitors/<str:granularity>/",

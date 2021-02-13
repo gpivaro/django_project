@@ -24,7 +24,13 @@ class ClientIPAddress(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self,):
-        return "%s viewed: %s" % (self.ip_address, self.timestamp)
+        return "%s | %s | %s | %s | %s " % (
+            self.ip_address,
+            self.path,
+            self.country,
+            self.city,
+            self.timestamp,
+        )
 
     class Meta:
         ordering = ["-timestamp"]

@@ -6,9 +6,10 @@ from django.urls import reverse
 # Create your models here.
 class Post(models.Model):
     title = models.CharField(max_length=100)
-    content = models.TextField()
+    content = models.TextField(blank=True, null=True)
     date_posted = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    url_info = models.URLField(max_length=350, blank=True, null=True)
 
     def __str__(self):
         return self.title

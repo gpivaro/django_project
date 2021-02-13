@@ -12,7 +12,7 @@ from django.views.generic import (
 from .models import Post
 from analyticsapp.utils import get_client_ip
 
-# Create your views here.
+# Create your views here. Function based view. Replaced by the more moder class based view below.
 def home(request):
     get_client_ip(request, True)
     # key name posts will be accessible from the .html
@@ -88,6 +88,9 @@ def about(request):
     get_client_ip(request, True)
     return render(request, "blog/about.html", {"title": "About"})
 
+
+# Check this to change this part:
+# https://stackoverflow.com/questions/14077799/django-filter-by-specified-month-and-year-in-date-range
 
 # Views that will allow to pass database data to the javascript
 # application that will handle some plots

@@ -1,0 +1,41 @@
+{% extends "myfinances/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    /* The code styles the text at the bottom of the footer */
+    .footer {
+        position: absolute;
+    }
+</style>
+
+<div class="jumbotron" id="jumbotron">
+    <h1 class="display-4">Welcome to My-Finances</h1>
+    <p class="lead">Here you will find the right tools to categorize your bank statements and analyze your expenses in
+        detail.</p>
+    <hr class="my-4">
+    <p class="lead">
+        <a class="btn btn-primary btn-lg" href="{% url 'myfinances:statement_upload' %}" role="button">Get
+            started</a>
+    </p>
+</div>
+
+
+<!-- <div style="height: 165px;visibility: hidden;">.</div> -->
+
+
+<script>
+    function removeById(element) {
+        var myobj = document.getElementById(element);
+        myobj.remove();
+    }
+
+    // Remove nav bar links not used in this page
+    removeById("linksCharts");
+    removeById("linksTable");
+    removeById("linksTotal");
+    removeById("linksSample");
+</script>
+
+{% endblock %}

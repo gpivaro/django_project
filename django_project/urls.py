@@ -80,6 +80,8 @@ urlpatterns = [
     path("homeweather/", include("myhouseweatherapp.urls")),
     # urls for the Analyticsapp
     path("analytics/", include("analyticsapp.urls")),
+    # urls for the Myfinances
+    path("myfinances/", include("myfinances.urls")),
 ]
 
 if settings.DEBUG:

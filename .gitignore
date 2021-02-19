@@ -142,3 +142,8 @@ cython_debug/
 
 # backup posts
 backup_posts.csv
+
+
+.DS_Store
+*.DS_Store
+*DS_Store

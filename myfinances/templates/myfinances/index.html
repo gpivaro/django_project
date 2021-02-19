@@ -1,0 +1,229 @@
+{% extends "myfinances/base.html" %}
+{% load static %}
+{% block content %}
+
+
+<!-- header -->
+<div class="container alert-secondary mt-1 p-3">
+    <div class="row">
+        <div class="col-12 mx-auto">
+            <h1 class="display-4 ml-4">Transactions Categorization</h1>
+            <div>
+                {% if messages %}
+                {% for message in messages %}
+                <div>
+                    <!--                | means OR operator-->
+                    <strong>{{message|safe}}</strong>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 ml-2">
+                            <span class="order">{{order}}</span>
+                            <form class="form-inline" action="" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="form-group mb-2 mr-4">
+                                    <input class="form-control-file" type="file" id="file1" name="file" required>
+                                </div>
+                                <div class="form-group mx-sm-5 mb-2">
+                                    <label for="start_date"><strong>From:</strong></label>
+                                    <input class="form-control form-control-sm" type="date" id="start_date"
+                                        name="start_date">
+                                </div>
+                                <div class="form-group mb-2 ml-auto mr-4">
+                                    <label for="end_date"><strong>To:</strong></label>
+                                    <input class="form-control form-control-sm" type="date" id="end_date"
+                                        name="end_date">
+                                </div>
+                                <button class="btn btn-secondary mb-2" type="submit">Categorize</button>
+                                <!-- <span>Only accepts CSV files</span> -->
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- jumbotron -->
+
+<!-- Plot -->
+<div class="container mt-2 mb-2" id="charts">
+    <div class="row">
+        <div class="col-6 p-2">
+            <div id="barChartOut"></div>
+        </div>
+        <div class="col-6 p-2" style="border-left: 1px solid lightgray;">
+            <div id="pieChartOut"></div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-12 p-2">
+            <div id="barChartOutvsIn"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Go to the top buttom -->
+<button class="btn btn-lg" onclick="topFunction()" id="topBtn" title="Go to top"><i class="fa fa-arrow-up"></i></button>
+
+<!-- Go to the bottom buttom -->
+<button class="btn btn-lg" onclick="bottomFunction()" id="bottomBtn" title="Go to bottom"><i
+        class="fa fa-arrow-down"></i></button>
+
+<!-- table -->
+{% if transactions_list %}
+<div class="container mt-4">
+    <div class="row p-2">
+        <span style="font-size:2.5em; margin-top:1%;margin-left:1%">Transactions</span>
+        <!-- Filter Table -->
+        <div class="col-2 align-self-end ml-auto mb-2">
+            <!-- https://www.geeksforgeeks.org/how-to-convert-html-table-into-excel-spreadsheet-using-jquery/ -->
+            <button class="btn btn-secondary btn-lg align-bottom" onclick="exportTable()">
+                Save to Excel
+            </button>
+        </div>
+        <div class="col-3 input-group align-self-end mb-2">
+            <input class="form-control form-control-lg" type="text" id="myInput" onkeyup="filterTable()"
+                placeholder="Filter categories..">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="clearBtn" onclick="clearText()">X</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 mx-auto mb-2">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover" id="tblData">
+                    <thead class="thead-dark text-uppercase">
+                        <tr>
+                            <th onclick="sortTable(0)">Date</th>
+                            <th onclick="sortTable(1)">Details</th>
+                            <th onclick="sortTable(2)">Description</th>
+                            <th onclick="sortTableNumeric(3)">Amount</th>
+                            <!-- <th>Type</th> -->
+                            <!-- <th>Check</th> -->
+                            <!-- <th>Balance</th> -->
+                            <th onclick="sortTable(4)">Category</th>
+                            <th class="noExport">Change Category</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transactions in transactions_list %}
+                        <tr id="{{ forloop.counter }}">
+                            <td>{{transactions.Date|date:"SHORT_DATE_FORMAT"}}</td>
+                            <td>{{transactions.Details}}</td>
+                            <td>{{transactions.Description}}</td>
+                            <td>{{ transactions.Amount}}</td>
+                            <!-- <td>{{transactions.Type}}</td> -->
+                            <!-- <td>{{transactions.Check}}</td> -->
+                            <!-- <td>$ {{transactions.Balance}}</td> -->
+                            <td>{{transactions.Category}}</td>
+                            <td>
+                                <select onchange="changeCategory(this.value)" class="noExport selDataset"
+                                    name="selDataset">
+                                    <option value="" disabled selected hidden>Choose a category</option>
+                                    {% for category in categories_list %}
+                                    <option value="{{ forloop.parentloop.counter }}|{{category}}">{{category}}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+<div class="container mt-1">
+    <div class="row">
+        <div class="col-12 mx-auto mb-4">
+            <div class="table-responsive">
+                <table class="table table-dark table-bordered table-hover text-uppercase" id="tblTotal">
+                    <thead class="thead-dark text-uppercase">
+                        <tr style="display: none;"></tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container alert-secondary mt-4 mb-4 p-5" id="about">
+    <h1 class="display-4">About</h1>
+    <div class="row">
+        <div class="col-12 col-lg-6 newspaper1" style="text-align: justify;">
+            <p>Thanks for stopping by to know more about My-Finance. I developed this application to solve a personal
+                problem and help my wife to manage our personal finances. The problem: (1) our bank categorizes our
+                transactions in a standard way that sometimes does not reflect what the transaction was really about.
+                For example, a purchase in a given gas station. Most of the time, it can be gas. However, we all know
+                that gas stations in the U.S most of the time have a convenience store. Therefore, using a debit card to
+                purchase something at the convenience store will be classified as gas. Even worst, most of the time, the
+                description of the store is the same as the gas station, making it almost impossible to distinguish
+                between a simple stop for snacks or a stop for gas; (2) the classification, at latest for our bank at
+                this moment, stays in the bank online banking or mobile banking, meaning that once we download the
+                statement it does not come with the assumed categories. To solve this problem, I first created a macro
+                using VBA to organize the data in the Excel spreadsheet. It did work decent but I was not entirely
+                satisfied.
+            </p>
+        </div>
+        <div class="col-12 col-lg-6" style="text-align: justify;">
+            <p>
+                Sometime after, I was introduced to Python. After
+                playing with it for some time, I challenged myself to migrate the macro to a Python script to categorize
+                and clean the data. The result was great. I had much more control of the process, experimenting with
+                much more freedom to play with the data using Pandas. However, I still have a problem that bugged me for
+                months. I ran the script on my laptop, and then I transfer the output Excel file, with the cleaned data
+                and transactions categorized, to my wife's computer. I did that using some knowledge of computer
+                networking. But the process was so tedious that I was not happy. The solution: build a web application
+                that I can host online on our home network even on the internet that my wife can access directly on her
+                computer, IPad or iPhone. That was my challenge. I embraced that challenge with some of my just learned
+                new skills in full-stack web development. Using Django as backend and HTLM, CSS, and JavaScript as
+                frontend, I build this application. Hope you like using the sample file to see how this application can
+                help you manage your personal finances.
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="{% static 'myfinances/js/sortTable.js' %}"></script>
+<script type="text/javascript" src="{% static 'myfinances/js/filterTable.js' %}"></script>
+<script type="text/javascript" src="{% static 'myfinances/js/changeCategory.js' %}"></script>
+<script type="text/javascript" src="{% static 'myfinances/js/exportTable.js' %}"></script>
+<script type="text/javascript" src="{% static 'myfinances/js/calculateTable.js' %}"></script>
+<script type="text/javascript" src="{% static 'myfinances/js/topBottomButton.js' %}"></script>
+<script type="text/javascript" src="{% static 'myfinances/js/totalRow.js' %}"></script>
+<!-- To Access Jinja Variable on JS -->
+<!-- <script>console.log("{{transactions_list}}")</script> -->
+
+<!-- Libraries to export Table -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
+
+{% if transactions_list %}
+<script>
+    // Load the page and calculate the the table totals to generate the plot
+    calculateTable();
+
+    // Call the function to filter and recalculate
+    filterTable();
+
+    // Call function to clear the categories input search field
+    function clearText() {
+        document.querySelector('#myInput').value = "";
+        filterTable();
+    }
+
+</script>
+{% endif %}
+{% endblock %}

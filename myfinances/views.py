@@ -27,7 +27,9 @@ def statement_upload(request):
     csv_file = request.FILES["file"]
 
     # let's check if it is a csv file
-    if not csv_file.name.endswith(".CSV"):
+    if csv_file.name.endswith(".CSV") or csv_file.name.endswith(".csv"):
+        pass
+    else:
         messages.error(request, "THIS IS NOT A CSV FILE")
     data_set = csv_file.read().decode("UTF-8")
     # setup a stream which is when we loop through each line we are able to handle a data in a stream
@@ -63,5 +65,17 @@ def statement_upload(request):
         "categories_list": labeled_transactions["categories_list"],
         "table_row_id": table_row_id,
     }
+
+    selected_end_date = labeled_transactions["statement_dict"][0]["Date"].strftime(
+        "%m/%d/%Y"
+    )
+    selected_start_date = labeled_transactions["statement_dict"][
+        len(labeled_transactions["statement_dict"]) - 1
+    ]["Date"].strftime("%m/%d/%Y")
+
+    messages.success(
+        request,
+        f"You have uploaded {csv_file} and selected {selected_start_date} to {selected_end_date}.",
+    )
     return render(request, template, context)
 

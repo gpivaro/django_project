@@ -23,10 +23,12 @@ function totalRowCalc(total) {
     // Add some text to the new cells:
     // cell1.innerHTML = "---";
     // cell2.innerHTML = "---";
-    cell1.innerHTML = "TOTALS";
-    cell2.innerHTML = `$${(Math.round(100 * total) / 100).toLocaleString()}`;
+    cell1.innerHTML = "<strong>TOTALS</strong>";
+    cell2.innerHTML = `<strong>$${(Math.round(100 * total) / 100).toLocaleString()}</strong>`;
     // cell5.innerHTML = "---";
     // cell6.innerHTML = "---";
+
+
 }
 
 function myDeleteFunction() {

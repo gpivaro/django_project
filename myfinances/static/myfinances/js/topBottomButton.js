@@ -1,11 +1,13 @@
 // Get the button
 var topButton = document.getElementById("topBtn");
 
+var visiblePixels = 400;
+
 // When user scrolls down 600px from the top of the document, show the button
 window.onscroll = function () { scrollFunction() };
 
 function scrollFunction() {
-    if (document.body.scrollTop > 600 || document.documentElement.scrollTop > 600) {
+    if (document.body.scrollTop > visiblePixels || document.documentElement.scrollTop > visiblePixels) {
         topButton.style.display = "block";
     } else {
         topButton.style.display = "none";
@@ -24,7 +26,7 @@ function topFunction() {
 var bottomButton = document.getElementById("bottomBtn");
 
 function scrollFunction() {
-    if (document.body.scrollTop > 600 || document.documentElement.scrollTop > 600) {
+    if (document.body.scrollTop > visiblePixels || document.documentElement.scrollTop > visiblePixels) {
         topButton.style.display = "block";
         bottomButton.style.display = "block";
     } else {

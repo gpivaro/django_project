@@ -35,7 +35,7 @@ try:
         # For use in development
         ALLOWED_HOSTS = []
 except:
-    DEBUG = False
+    DEBUG = True
 
     # For use in development
     ALLOWED_HOSTS = [

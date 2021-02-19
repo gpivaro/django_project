@@ -5,7 +5,7 @@ import re
 
 # List of categorized transactions
 categories_words_cleaned_file = os.path.join(
-    "myfinances", "static", "myfinances", "resources", "categories_words.csv"
+    "static", "myfinances", "resources", "categories_words.csv"
 )
 
 

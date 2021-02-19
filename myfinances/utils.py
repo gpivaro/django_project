@@ -4,9 +4,11 @@ import numpy as np
 import re
 
 # List of categorized transactions
-categories_words_cleaned_file = os.path.join(
-    "static", "myfinances", "resources", "categories_words.csv"
-)
+# categories_words_cleaned_file = os.path.join(
+#     "static", "myfinances", "resources", "categories_words.csv"
+# )
+
+categories_words_cleaned_file = "static/myfinances/resources/categories_words.csv"
 
 
 def label_transactions(data, start_date="", end_date=""):

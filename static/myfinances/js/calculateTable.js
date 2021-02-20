@@ -69,19 +69,21 @@ function generatePlot(dataIn) {
     var InTotal = [{ "category": "Deposits", "amount": Math.round(totalIn) }];
     var OutTotal = [{ "category": "Withdrawals", "amount": Math.round(totalOut) }];
 
-    console.log(OutTotal);
 
 
     // Plot
     var dataBarPlotOut = [
         {
             y: outValues.map(element => element.category),
-            x: outValues.map(element => element.amount),
+            x: outValues.map(element => -1 * element.amount),
             type: 'bar',
             orientation: 'h',
             number: { prefix: "$" },
-            hovertemplate: 'Total: %{x:$.2f}<extra></extra>'
-        }
+            hovertemplate: 'Total: %{x:$,2f}<extra></extra>',
+            marker: {
+                color: 'red', opacity: .6
+            }
+        },
     ];
 
 
@@ -97,6 +99,7 @@ function generatePlot(dataIn) {
             t: 40,
             pad: 4
         },
+        hoverlabel: { bgcolor: "#FFF" },
     };
 
 
@@ -110,18 +113,28 @@ function generatePlot(dataIn) {
 
     top10SelSamples = top10SelSamples.slice(0, 10)
 
+    var ultimateColors = [
+        ['#003f5c', '#2f4b7c', '#665191', '#a05195', '#d45087', '#f95d6a', '#ff7c43', '#ffa600'],
+    ];
 
     var data = [{
         type: "pie",
+        hole: .4,
         values: top10SelSamples.map(element => -1 * element.amount),
         labels: top10SelSamples.map(element => element.category),
         textinfo: "label+percent",
         textposition: "outside",
         automargin: true,
-    }]
+        marker: {
+            colors: ultimateColors[0]
+        },
+        // text: $top10SelSamples.map(element => -1 * element.amount)
+    }];
+
+    // data.hoverinfo = 'text';
 
     var layout = {
-        title: "Top 10 Category Expenses",
+        title: "Proportion of Expenses by Category",
         // height: 400,
         // width: 400,
         margin: {
@@ -131,7 +144,18 @@ function generatePlot(dataIn) {
             t: 40,
             pad: 2
         },
-        showlegend: false
+        showlegend: false,
+        annotations: [
+            {
+                font: {
+                    size: 20
+                },
+                showarrow: false,
+                text: 'Top 10',
+                x: 0.5,
+                y: 0.5
+            }
+        ],
     }
 
     Plotly.newPlot('pieChartOut', data, layout, config)
@@ -147,9 +171,9 @@ function generatePlot(dataIn) {
             number: { prefix: "$" },
             hovertemplate: 'Total: %{x:$,2f}<extra></extra>',
             marker: {
-                color: 'blue'
+                color: 'blue', opacity: .6
             },
-            name: 'Withdrawals'
+            name: 'Deposits'
         },
         {
             y: OutTotal.map(element => element.category),
@@ -159,9 +183,9 @@ function generatePlot(dataIn) {
             number: { prefix: "$" },
             hovertemplate: 'Total: %{x:$,2f}<extra></extra>',
             marker: {
-                color: 'red'
+                color: 'red', opacity: .6
             },
-            name: 'Deposits'
+            name: 'Withdrawals'
         }
     ];
 
@@ -179,6 +203,7 @@ function generatePlot(dataIn) {
             t: 40,
             pad: 4
         },
+        hoverlabel: { bgcolor: "#FFF" }
         // hovermode: false,
 
     };
@@ -188,6 +213,31 @@ function generatePlot(dataIn) {
     Plotly.newPlot('barChartOutvsIn', dataBarPlotOut, layout, config);
 
 
+
+    // Create a object list with the target data columns
+    var cleanData = [];
+    for (var i = 0; i < outValues.length; i++) {
+        cleanData.push({
+            "category": outValues[i].category,
+            "amount": -1 * outValues[i].amount
+        });
+    };
+
+    console.log(cleanData);
+
+    // Insert a table
+    d3.select("#categoryTable")
+        .select("table")
+        .html('<th>Category</th> <th>Amount</th>')
+        .append("tbody")
+        .selectAll("tr")
+        .data(cleanData)
+        .enter()
+        .append("tr")
+        .html(function (d) {
+            return `<td>${d["category"]}</td>
+            <td>$${d["amount"]}</td>`;
+        });
 
 
 }

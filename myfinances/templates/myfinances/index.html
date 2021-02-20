@@ -61,11 +61,31 @@
     </div>
     <hr>
     <div class="row">
-        <div class="col-12 p-2">
-            <div id="barChartOutvsIn"></div>
+        <div class="col-12 col-lg-6">
+            <div class="row">
+                <div class="col-12">
+                    <div id="barChartOutvsIn"></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div id="scatterExpenseDay"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4 ml-auto mr-auto" style="align-content: center;">
+            <div class="table-responsive" id="categoryTable" style="height:480px;">
+                <table class="table table-bordered" style="width: 100%;">
+                </table>
+            </div>
         </div>
     </div>
+    <hr>
 </div>
+
+
+
+
 
 <!-- Go to the top buttom -->
 <button class="btn btn-lg" onclick="topFunction()" id="topBtn" title="Go to top"><i class="fa fa-arrow-up"></i></button>
@@ -157,17 +177,6 @@
     </div>
 </div>
 
-<div class="container" id="totalCategoryDiv">
-    <div class="row">
-        <div class="col-12 col-lg-4 mx-auto">
-            <div class="table-responsive" id="categoryTable" style="height:350px;overflow:auto;">
-                <table class="table table-bordered" style="width: 30%;">
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- table -->
 
 <div class="container alert-secondary mt-4 mb-4 p-5" id="about">
     <h1 class="display-4">About</h1>

@@ -11,12 +11,12 @@ function calculateTable() {
     tr = table.getElementsByTagName("tr");
 
     // Loop through all table rows, and hide those who don't match the search query
-    var categoriesArray = []
-    var totalCategoriesArray = []
+    var categoriesArray = []; var totalCategoriesArray = []; var expensesArray = [];
     for (i = 0; i < tr.length; i++) {
         td = tr[i].getElementsByTagName("td")[4];
         if (td) {
             txtValue = td.textContent || td.innerText;
+            expensesArray.push({ "date": (tr[i].getElementsByTagName("td")[0].innerText), "amount": parseFloat(tr[i].getElementsByTagName("td")[3].innerText) });
             if (categoriesArray.includes(txtValue)) {
                 // categoriesArray.push[txtValue];
                 var jj = 0;
@@ -33,14 +33,14 @@ function calculateTable() {
     };
 
     // Generate plot
-    generatePlot(totalCategoriesArray);
+    generatePlot(totalCategoriesArray, expensesArray);
 
 
 }
 
 
 
-function generatePlot(dataIn) {
+function generatePlot(dataIn, expensesArray) {
 
     // Sort the samples in descending order of amount
     dataIn.sort((a, b) => b.amount - a.amount);
@@ -169,7 +169,7 @@ function generatePlot(dataIn) {
             type: 'bar',
             orientation: 'h',
             number: { prefix: "$" },
-            hovertemplate: 'Total: %{x:$,2f}<extra></extra>',
+            hovertemplate: 'Total: %{y:$,2f}<extra></extra>',
             marker: {
                 color: 'blue', opacity: .6
             },
@@ -181,7 +181,7 @@ function generatePlot(dataIn) {
             type: 'bar',
             orientation: 'h',
             number: { prefix: "$" },
-            hovertemplate: 'Total: %{x:$,2f}<extra></extra>',
+            hovertemplate: 'Total: %{y:$,2f}<extra></extra>',
             marker: {
                 color: 'red', opacity: .6
             },
@@ -197,9 +197,9 @@ function generatePlot(dataIn) {
         // width: 500,
         height: 200,
         margin: {
-            l: 110,
+            l: 100,
             r: 20,
-            b: 20,
+            b: 30,
             t: 40,
             pad: 4
         },
@@ -211,6 +211,50 @@ function generatePlot(dataIn) {
 
 
     Plotly.newPlot('barChartOutvsIn', dataBarPlotOut, layout, config);
+
+
+    var expensesDateOut = [];
+    expensesArray.forEach(element => {
+        if (element.amount < 0) {
+            expensesDateOut.push(element);
+        }
+    });
+
+    // console.log((new Date(Date.parse(expensesDateOut[1].date))).getDay());
+
+    var trace1 = {
+        x: expensesDateOut.map(element => (new Date(Date.parse(element.date)))),
+        y: expensesDateOut.map(element => -1 * element.amount),
+        mode: 'markers',
+        type: 'scatter',
+        marker: {
+            color: 'red', opacity: .6
+        },
+    };
+
+    var layout = {
+        title: 'Transactions by Date',
+        showlegend: false,
+        // autosize: true,
+        // width: 500,
+        height: 200,
+        margin: {
+            l: 100,
+            r: 20,
+            b: 60,
+            t: 40,
+            pad: 4
+        },
+        hoverlabel: { bgcolor: "#FFF" }
+        // hovermode: false,
+
+    };
+
+    var data = [trace1];
+
+    Plotly.newPlot('scatterExpenseDay', data, layout, config);
+
+
 
 
 
@@ -228,16 +272,33 @@ function generatePlot(dataIn) {
     // Insert a table
     d3.select("#categoryTable")
         .select("table")
-        .html('<th>Category</th> <th>Amount</th>')
+        // .append("thead")
+        // .selectAll("tr")
+        // .append("tr")
+        .html('<th style="padding:0px; margin:0px;" onclick="sortTable(0)">Category</th> <th style="padding:0px; margin:0px;" onclick="sortTableNumeric(1)">Amount</th>')
         .append("tbody")
         .selectAll("tr")
         .data(cleanData)
         .enter()
         .append("tr")
+        .style('height', '2px')
+        // .append("hr")
+        // .html('<hr style="padding:0px; margin:0px;">')
         .html(function (d) {
-            return `<td>${d["category"]}</td>
-            <td>$${d["amount"]}</td>`;
-        });
+            return `<td style="padding:0px; margin:0px;">${d["category"]}</span></td>
+            <td style="padding:0px; margin:0px;">$${d["amount"]}</td>`;
+        })
+        .style('height', '2px')
+        .style('font-size', '10pt')
+        .style('padding', '0px')
+        .style('margin', '0px');
+
 
 
 }
+
+// tr {
+//     overflow: hidden;
+//     height: 14px;
+//     white-space: nowrap;
+//   }

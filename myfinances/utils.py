@@ -3,19 +3,13 @@ import pandas as pd
 import numpy as np
 import re
 
-# List of categorized transactions
-# categories_words_cleaned_file = os.path.join(
-#     "static", "myfinances", "resources", "categories_words.csv"
-# )
-
-categories_words_cleaned_file = "static/myfinances/resources/categories_words.csv"
+""" Received the transactions data, the list of categorized transactions, the start and end date.
+    Adjust the list of transactions of the data, clean the data and categorize it. 
+    Return the transactions categorized and the categories list.
+"""
 
 
-def label_transactions(data, start_date="", end_date=""):
-
-    # Select the start and end dates periodo to analyze
-    # start_date = ""
-    # end_date = ""
+def label_transactions(data, categories_words_cleaned_df, start_date="", end_date=""):
 
     # Convert the input data in a dataframe
     chase_df = pd.DataFrame(data)
@@ -59,7 +53,7 @@ def label_transactions(data, start_date="", end_date=""):
     month_transactions.drop(columns=["index"], inplace=True)
 
     # Import cleaned expressions and groups
-    categories_words_cleaned_df = pd.read_csv(categories_words_cleaned_file)
+    # categories_words_cleaned_df = pd.read_csv(categories_words_cleaned_file)
     categories_words_cleaned_df.sort_values("Expression", inplace=True)
 
     # Get list of categories
@@ -83,4 +77,3 @@ def label_transactions(data, start_date="", end_date=""):
     statement_dict = month_transactions.to_dict("records")
 
     return {"statement_dict": statement_dict, "categories_list": categories_list}
-

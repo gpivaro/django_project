@@ -33,7 +33,7 @@ try:
 
     if DEBUG:
         # For use in development
-        ALLOWED_HOSTS = []
+        ALLOWED_HOSTS = ["192.168.1.92"]
 except:
     DEBUG = False
 

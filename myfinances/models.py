@@ -16,3 +16,13 @@ class Statement(models.Model):
     class Meta:
         ordering = ["-Posting_Date"]
 
+
+class Categories(models.Model):
+    Group = models.TextField()
+    Expression = models.TextField()
+
+    def __str__(self):
+        return f"{self.Group} | {self.Expression}"
+
+    class Meta:
+        ordering = ["Group"]

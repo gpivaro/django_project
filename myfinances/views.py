@@ -1,9 +1,11 @@
 import csv, io
-from django.shortcuts import render
+from django.shortcuts import render, reverse
 from django.contrib import messages
-from .models import Statement
+from .models import Statement, Categories
 from django.http import JsonResponse
 from .utils import label_transactions
+import requests
+import pandas as pd
 
 # Create your views here.
 # one parameter named request
@@ -54,8 +56,14 @@ def statement_upload(request):
             }
         )
 
+    # Query database for list of categories and convert to dataframe
+    categories = Categories.objects.all().values()
+    categories_df = pd.DataFrame(categories)
+
     # Call function to label the transactions
-    labeled_transactions = label_transactions(transactions_list, start_date, end_date)
+    labeled_transactions = label_transactions(
+        transactions_list, categories_df, start_date, end_date
+    )
 
     # Create a table row ID for table classification purpouses
     table_row_id = list(range(len(labeled_transactions["statement_dict"])))
@@ -79,3 +87,7 @@ def statement_upload(request):
     )
     return render(request, template, context)
 
+
+def categories(request):
+    data = list(Categories.objects.all().values())
+    return JsonResponse(data, safe=False)

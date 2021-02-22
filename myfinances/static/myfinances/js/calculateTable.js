@@ -169,7 +169,7 @@ function generatePlot(dataIn, expensesArray) {
             type: 'bar',
             orientation: 'h',
             number: { prefix: "$" },
-            hovertemplate: 'Total: %{y:$,2f}<extra></extra>',
+            hovertemplate: 'Total: %{x:$,2f}<extra></extra>',
             marker: {
                 color: 'blue', opacity: .6
             },
@@ -181,7 +181,7 @@ function generatePlot(dataIn, expensesArray) {
             type: 'bar',
             orientation: 'h',
             number: { prefix: "$" },
-            hovertemplate: 'Total: %{y:$,2f}<extra></extra>',
+            hovertemplate: 'Total: %{x:$,2f}<extra></extra>',
             marker: {
                 color: 'red', opacity: .6
             },
@@ -240,7 +240,7 @@ function generatePlot(dataIn, expensesArray) {
         height: 200,
         margin: {
             l: 100,
-            r: 20,
+            r: 60,
             b: 60,
             t: 40,
             pad: 4
@@ -275,7 +275,7 @@ function generatePlot(dataIn, expensesArray) {
         // .append("thead")
         // .selectAll("tr")
         // .append("tr")
-        .html('<th style="padding:0px; margin:0px;" onclick="sortTable(0)">Category</th> <th style="padding:0px; margin:0px;" onclick="sortTableNumeric(1)">Amount</th>')
+        .html('<th style="padding:0px; margin:0px;" onclick="sortTable(0, \'tableCategoryExpenses\')">Category</th> <th style="padding:0px; margin:0px;" onclick="sortTableNumeric(1,\'tableCategoryExpenses\')">Amount</th>')
         .append("tbody")
         .selectAll("tr")
         .data(cleanData)
@@ -285,8 +285,8 @@ function generatePlot(dataIn, expensesArray) {
         // .append("hr")
         // .html('<hr style="padding:0px; margin:0px;">')
         .html(function (d) {
-            return `<td style="padding:0px; margin:0px;">${d["category"]}</span></td>
-            <td style="padding:0px; margin:0px;">$${d["amount"]}</td>`;
+            return `<td style="padding:0px; margin:0px;">${d["category"]}</td>
+            <td style="padding:0px; margin:0px;">${d["amount"]}</td>`;
         })
         .style('height', '2px')
         .style('font-size', '10pt')

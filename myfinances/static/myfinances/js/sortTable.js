@@ -1,7 +1,7 @@
 // Source: https://www.w3schools.com/howto/howto_js_sort_table.asp
-function sortTable(n) {
+function sortTable(n, tableId) {
     var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-    table = document.getElementById("tblData");
+    table = document.getElementById(tableId);
     switching = true;
     // Set the sorting direction to ascending:
     dir = "asc";
@@ -55,9 +55,9 @@ function sortTable(n) {
 }
 
 // For numeric values | used parseFloat()
-function sortTableNumeric(n) {
+function sortTableNumeric(n, tableId) {
     var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-    table = document.getElementById("tblData");
+    table = document.getElementById(tableId);
     switching = true;
     // Set the sorting direction to ascending:
     dir = "asc";

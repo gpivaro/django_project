@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import json
+from .utils import getHostIp
 
 with open("/etc/config.json") as config_file:
     config = json.load(config_file)
@@ -33,7 +34,10 @@ try:
 
     if DEBUG:
         # For use in development
-        ALLOWED_HOSTS = ["192.168.1.92"]
+        hostIP = getHostIp()  # get local IP to avoid not allowed host
+        ALLOWED_HOSTS = [f"{hostIP['Hostname']}", "127.0.0.1"]
+
+
 except:
     DEBUG = False
 

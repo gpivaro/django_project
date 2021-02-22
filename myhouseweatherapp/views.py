@@ -53,9 +53,9 @@ def get_weather_api_data(request, city):
 def api_routes(request):
 
     return HttpResponse(
-        f"<h3>API end points available:</h3>"
-        f"api/v1.0/weather-data/last_hours/<br/>"
-        f"api/v1.0/weather-api/city/<br/><br/>"
+        f"<h3>API endpoints available:</h3>"
+        f"<li>api/v1.0/weather-data/last_hours/&nbsp <a href ='api/v1.0/weather-data/1/'>Last 1h</a></li><br/>"
+        f"<li>api/v1.0/weather-api/city/ &nbsp <a href ='api/v1.0/weather-api/Houston/'>Houston, Tx weather</a></li><br/><br/>"
         f"<a href ='/homeweather'>Home</a>"
     )
 

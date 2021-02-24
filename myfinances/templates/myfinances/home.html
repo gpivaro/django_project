@@ -16,7 +16,7 @@
         detail.</p>
     <hr class="my-4">
     <p class="lead">
-        <a class="btn btn-primary btn-lg" href="{% url 'myfinances:statement_upload' %}" role="button">Get
+        <a class="btn btn-primary btn-lg" href="{% url 'myfinances:statement' %}" role="button">Get
             started</a>
     </p>
 </div>
@@ -37,6 +37,8 @@
     removeById("linksTotal");
     removeById("linksCategoryTable");
     removeById("linksSample");
+    removeById("linksAPI");
+
 </script>
 
 {% endblock %}

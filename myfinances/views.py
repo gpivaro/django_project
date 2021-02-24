@@ -1,11 +1,15 @@
 import csv, io
 from django.shortcuts import render, reverse
 from django.contrib import messages
-from .models import Statement, Categories
+from .models import Statement, Categories, Users
 from django.http import JsonResponse
 from .utils import label_transactions
 import requests
 import pandas as pd
+
+# To create API using rest framework
+from rest_framework import viewsets
+from .serializers import CategoriesSerializer, UsersSerializer
 
 # Create your views here.
 # one parameter named request
@@ -13,10 +17,27 @@ def home(request):
     return render(request, "myfinances/home.html")
 
 
+# Json version of all available categories
+def categories(request):
+    data = list(Categories.objects.all().values())
+    return JsonResponse(data, safe=False)
+
+
+# Using rest framework out of the box view that handles CRUD
+class CategoriesView(viewsets.ModelViewSet):
+    queryset = Categories.objects.all()
+    serializer_class = CategoriesSerializer
+
+# Using rest framework out of the box view that handles CRUD
+class UsersView(viewsets.ModelViewSet):
+    queryset = Users.objects.all()
+    serializer_class = UsersSerializer
+
+
 # one parameter named request
-def statement_upload(request):
+def statement(request):
     # declaring template
-    template = "myfinances/index.html"
+    template = "myfinances/statement.html"
     data = Statement.objects.all()
     # prompt is a context variable that can have different values      depending on their context
     prompt = {
@@ -87,7 +108,3 @@ def statement_upload(request):
     )
     return render(request, template, context)
 
-
-def categories(request):
-    data = list(Categories.objects.all().values())
-    return JsonResponse(data, safe=False)

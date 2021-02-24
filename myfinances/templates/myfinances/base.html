@@ -51,23 +51,26 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item" id="linksCharts">
-                    <a class="nav-link" href="{% url 'myfinances:statement_upload' %}#charts">Charts</a>
+                    <a class="nav-link" href="{% url 'myfinances:statement' %}#charts">Charts</a>
                 </li>
                 <li class="nav-item" id="linksTable">
-                    <a class="nav-link" href="{% url 'myfinances:statement_upload' %}#statmentsTable">Transactions</a>
+                    <a class="nav-link" href="{% url 'myfinances:statement' %}#statmentsTable">Transactions</a>
                 </li>
                 <li class="nav-item" id="linksTotal">
-                    <a class="nav-link" href="{% url 'myfinances:statement_upload' %}#totalsRow">Totals</a>
+                    <a class="nav-link" href="{% url 'myfinances:statement' %}#totalsRow">Totals</a>
                 </li>
                 <li class="nav-item" id="linksCategoryTable">
-                    <a class="nav-link" href="{% url 'myfinances:statement_upload' %}#categoryTable">Category Totals</a>
+                    <a class="nav-link" href="{% url 'myfinances:statement' %}#categoryTable">Category Totals</a>
                 </li>
                 <li class="nav-item" id="linksSample">
                     <a class="nav-link" href="{% static 'myfinances/resources/Statement.CSV'%}" download>Sample
                         Statement</a>
                 </li>
+                <li class="nav-item" id="linksAPI">
+                    <a class="nav-link" href="/myfinances/api/">API</a>
+                </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'myfinances:statement_upload' %}#about">About</a>
+                    <a class="nav-link" href="{% url 'myfinances:statement' %}#about">About</a>
                 </li>
             </ul>
         </div>

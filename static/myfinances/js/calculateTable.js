@@ -241,10 +241,10 @@ function generatePlot(dataIn, expensesArray) {
     };
 
     var layout = {
-        title: 'Transactions by Date',
+        title: 'Expenses Distribution by Date',
         yaxis: {
             title: "Amount ($)",
-            automargin: true,
+            // automargin: true,
         },
         showlegend: false,
         // autosize: true,
@@ -306,7 +306,7 @@ function generatePlot(dataIn, expensesArray) {
         .style('padding', '0px')
         .style('margin', '0px');
 
-    document.getElementById('tableTitle').textContent = "Expense by Category";
+    document.getElementById('tableTitle').textContent = "Totals Expenses by Category";
 
 
 

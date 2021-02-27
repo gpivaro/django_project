@@ -287,8 +287,8 @@ function generatePlot(dataIn, expensesArray) {
         // .append("thead")
         // .selectAll("tr")
         // .append("tr")
-        .html(`<th class="alert-dark text-uppercase" style="padding:0px; margin:0px;" onclick="sortTable(0, \'tableCategoryExpenses\')">Category</th> 
-                <th class="alert-dark text-uppercase" style="padding:0px; margin:0px;" onclick="sortTableNumeric(1,\'tableCategoryExpenses\')">Amount ($)</th>`)
+        .html(`<th class="alert-dark text-uppercase" style="padding:0px; margin:0px;" onclick="sortTable(0, \'tableCategoryExpenses\')">Category &nbsp;<i class="fa fa-fw fa-sort"></i></th> 
+                <th class="alert-dark text-uppercase" style="padding:0px; margin:0px;" onclick="sortTableNumeric(1,\'tableCategoryExpenses\')">Amount ($) &nbsp;<i class="fa fa-fw fa-sort"></i></th>`)
         .append("tbody")
         .selectAll("tr")
         .data(cleanData)

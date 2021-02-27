@@ -28,6 +28,7 @@ class CategoriesView(viewsets.ModelViewSet):
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
 
+
 # Using rest framework out of the box view that handles CRUD
 class UsersView(viewsets.ModelViewSet):
     queryset = Users.objects.all()
@@ -63,7 +64,7 @@ def statement(request):
     io_string = io.StringIO(data_set)
     next(io_string)
     transactions_list = []
-    for column in csv.reader(io_string, delimiter=",", quotechar="|"):
+    for column in csv.reader(io_string, delimiter=","):
 
         transactions_list.append(
             {
@@ -104,7 +105,7 @@ def statement(request):
 
     messages.success(
         request,
-        f"You have uploaded {csv_file} and selected {selected_start_date} to {selected_end_date}.",
+        f"You have uploaded {csv_file} from {selected_start_date} to {selected_end_date}.",
     )
     return render(request, template, context)
 

@@ -23,7 +23,7 @@ function calculateTable() {
                 while (totalCategoriesArray[jj].category !== txtValue) {
                     jj++;
                 }
-                totalCategoriesArray[jj].amount = Math.round(100 * (totalCategoriesArray[jj].amount + parseFloat(tr[i].getElementsByTagName("td")[3].innerText))) / 100
+                totalCategoriesArray[jj].amount = Math.round(1000 * (totalCategoriesArray[jj].amount + parseFloat(tr[i].getElementsByTagName("td")[3].innerText))) / 1000
             } else {
                 categoriesArray.push(txtValue);
                 totalCategoriesArray.push({ "category": txtValue, "amount": parseFloat(tr[i].getElementsByTagName("td")[3].innerText) });
@@ -89,6 +89,10 @@ function generatePlot(dataIn, expensesArray) {
 
     var layout = {
         title: 'Expenses by Category',
+        xaxis: {
+            title: "Amount ($)",
+            automargin: true,
+        },
         // autosize: true,
         // width: 500,
         // height: 500,
@@ -192,6 +196,10 @@ function generatePlot(dataIn, expensesArray) {
 
     var layout = {
         title: 'Total Deposits and Withdrawals',
+        xaxis: {
+            title: "Amount ($)",
+            automargin: true,
+        },
         showlegend: false,
         // autosize: true,
         // width: 500,
@@ -234,6 +242,10 @@ function generatePlot(dataIn, expensesArray) {
 
     var layout = {
         title: 'Transactions by Date',
+        yaxis: {
+            title: "Amount ($)",
+            automargin: true,
+        },
         showlegend: false,
         // autosize: true,
         // width: 500,
@@ -275,7 +287,8 @@ function generatePlot(dataIn, expensesArray) {
         // .append("thead")
         // .selectAll("tr")
         // .append("tr")
-        .html('<th style="padding:0px; margin:0px;" onclick="sortTable(0, \'tableCategoryExpenses\')">Category</th> <th style="padding:0px; margin:0px;" onclick="sortTableNumeric(1,\'tableCategoryExpenses\')">Amount</th>')
+        .html(`<th class="alert-dark text-uppercase" style="padding:0px; margin:0px;" onclick="sortTable(0, \'tableCategoryExpenses\')">Category</th> 
+                <th class="alert-dark text-uppercase" style="padding:0px; margin:0px;" onclick="sortTableNumeric(1,\'tableCategoryExpenses\')">Amount ($)</th>`)
         .append("tbody")
         .selectAll("tr")
         .data(cleanData)
@@ -292,6 +305,8 @@ function generatePlot(dataIn, expensesArray) {
         .style('font-size', '10pt')
         .style('padding', '0px')
         .style('margin', '0px');
+
+    document.getElementById('tableTitle').textContent = "Expense by Category";
 
 
 

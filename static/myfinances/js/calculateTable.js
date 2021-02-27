@@ -299,7 +299,7 @@ function generatePlot(dataIn, expensesArray) {
         // .html('<hr style="padding:0px; margin:0px;">')
         .html(function (d) {
             return `<td style="padding:0px; margin:0px;">${d["category"]}</td>
-            <td style="padding:0px; margin:0px;">${d["amount"]}</td>`;
+            <td style="padding:0px; margin:0px;">${d["amount"]}&nbsp;</td>`;
         })
         .style('height', '2px')
         .style('font-size', '10pt')

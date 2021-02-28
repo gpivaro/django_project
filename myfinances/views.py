@@ -19,8 +19,10 @@ def home(request):
 
 # Json version of all available categories
 def categories(request):
-    data = list(Categories.objects.all().values())
-    return JsonResponse(data, safe=False)
+    # data = list(Categories.objects.all().values())
+    # return JsonResponse(data, safe=False)
+    context = {"categories_list": Categories.objects.order_by("id").all()}
+    return render(request, "myfinances/categories.html", context)
 
 
 # Using rest framework out of the box view that handles CRUD

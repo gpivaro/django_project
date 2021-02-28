@@ -1,0 +1,116 @@
+{% extends "myfinances/base.html" %}
+{% load static %}
+{% block content %}
+
+
+<!-- Go to the top buttom -->
+<button class="btn btn-lg" onclick="topFunction()" id="topBtn" title="Go to top"><i class="fa fa-arrow-up"></i></button>
+
+<!-- Go to the bottom buttom -->
+<button class="btn btn-lg" onclick="bottomFunction()" id="bottomBtn" title="Go to bottom"><i
+        class="fa fa-arrow-down"></i></button>
+
+
+<!-- Create a new category -->
+<div class="container mt-2 mb-2 p-4">
+    <h3>Add a new expression or category</h3>
+    <div class="row">
+        <div class="col-auto">
+            <div class="table-responsive table-striped">
+                <table class="table table-bordered text-uppercase">
+                    <tbody>
+                        <tr id="newCategory">
+                            <td>
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="form-inline">
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                <label for="newCategoryInput">Category: </label>
+                                                <input type="text" class="form-control ml-2" id="newCategoryInput"
+                                                    value="Category">
+                                            </div>
+
+                                            <div class="form-group ml-4">
+                                                <label for="newExpressionInput">Expression: </label>
+                                                <input type="text" class="form-control ml-2" id="newExpressionInput"
+                                                    value="Expression">
+                                            </div>
+
+                                            <button class="btn btn-secondary createButton ml-4">Create</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="alert alert-success d-none" role="alert" id="alertSucces">
+                This is a success alert—check it out!
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update -->
+<div class="container mt-2 mb-2 p-4">
+    <h3>List of Categories and Expressions</h3>
+    <div class="row">
+        <div class="col-auto">
+            <div class="table-responsive table-striped">
+                <table class="table table-bordered text-uppercase" id="tableCategories">
+                    <tbody>
+                        {% for category in categories_list %}
+                        <tr id="row_id{{category.id}}">
+                            <td>
+                                <h4>{{category.id}}</h4>
+                            </td>
+                            <td>
+                                <div id="category_id{{category.id}}" class="panel panel-default">
+                                    <!-- <div class="panel-heading">
+                                        <span class="panel-title">Number: <span id="expression{{category.id}}">{{category.id}}</span>
+                                        </span>
+                                    </div> -->
+
+                                    <div class="panel-body">
+                                        <div class="form-inline">
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                <label for="categoryInput{{category.id}}">Category: </label>
+                                                <input type="text" class="form-control ml-2"
+                                                    id="categoryInput{{category.id}}" value="{{category.Group}}">
+                                            </div>
+
+                                            <div class="form-group ml-4">
+                                                <label for="expressionInput{{category.id}}">Expression: </label>
+                                                <input type="text" class="form-control ml-2"
+                                                    id="expressionInput{{category.id}}" value="{{category.Expression}}">
+                                            </div>
+
+                                            <button class="btn btn-warning updateButton ml-4"
+                                                category_id="{{category.id}}">Update</button>
+
+                                            <button class="btn btn-danger deleteButton ml-4"
+                                                category_id="{{category.id}}">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="{% static 'myfinances/js/topBottomButton.js' %}"></script>
+<script src="http://code.jquery.com/jquery.js"></script>
+<script type="text/javascript" src="{% static 'myfinances/js/updateCategories.js' %}"></script>
+
+
+
+{% endblock %}

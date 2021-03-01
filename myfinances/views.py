@@ -1,8 +1,9 @@
 import csv, io
-from django.shortcuts import render, reverse
+from django.shortcuts import render
+from django.urls import reverse
 from django.contrib import messages
 from .models import Statement, Categories, Users
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from .utils import label_transactions
 import requests
 import pandas as pd
@@ -14,6 +15,20 @@ from .serializers import CategoriesSerializer, UsersSerializer
 # Create your views here.
 # one parameter named request
 def home(request):
+    if request.method == "POST":
+        return HttpResponseRedirect(reverse("myfinances:statement"))
+    #     form = UserRegisterForm(request.POST)
+    #     if form.is_valid():
+    #         form.save()
+    #         username = form.cleaned_data.get("username")
+    #         messages.success(
+    #             request, f"Your account has been created! You are able to login."
+    #         )
+    #         return redirect("login")
+    # else:
+    #     form = UserRegisterForm()
+
+    # return render(request, "users/register.html", {"form": form})
     return render(request, "myfinances/home.html")
 
 

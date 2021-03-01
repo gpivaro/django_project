@@ -48,8 +48,10 @@ $(document).ready(function () {
     // Event listener for the delete button
     $('.deleteButton').on('click', function () {
 
+        console.log('Clicked');
         // Get the category ID based on the even
         var category_ID = $(this).attr('category_id');
+
 
 
         // Set the request to the backend using Ajax and PUT method
@@ -112,6 +114,7 @@ $(document).ready(function () {
 
                                                                         <div class="panel-body">
                                                                             <div class="form-inline">
+                                                                                <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
                                                                                 <div class="form-group">
                                                                                     <label for="categoryInput${data.id}">Category: </label>
                                                                                     <input type="text" class="form-control ml-2"
@@ -124,11 +127,6 @@ $(document).ready(function () {
                                                                                         id="expressionInput${data.id}" value="${data.Expression}">
                                                                                 </div>
 
-                                                                                <button class="btn btn-warning updateButton ml-4"
-                                                                                    category_id="${data.id}">Update</button>
-
-                                                                                <button class="btn btn-danger deleteButton ml-4"
-                                                                                    category_id="${data.id}">Delete</button>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -137,28 +135,26 @@ $(document).ready(function () {
                 // Fade out and fade in the section to visualization
 
                 $('#alertSucces').removeClass("d-none");
-                $('#alertSucces').hide().delay(1111).fadeIn(2111).fadeOut(2111);
+                $('#alertSucces').hide().delay(111).fadeIn(1111).fadeOut(5111);
 
 
-                $('#newCategory').fadeOut(111);
+                $('#newCategory').fadeOut(1);
                 $('#newCategoryInput').val("Category");
                 $('#newExpressionInput').val("Expression");
-                $('#newCategory').fadeIn(1111);
+                $('#newCategory').fadeIn(111);
 
             },
             error: function (error) {
                 console.log(error);
+                if (error.responseJSON.Group) {
+                    alert(`Category: ${error.responseJSON.Group}`);
+                }
+
+                if (error.responseJSON.Expression) {
+                    alert(`Expression: ${error.responseJSON.Expression}`);
+                }
             }
         });
-
-
-
-
-
-
-
-
-
 
     });
 

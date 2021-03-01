@@ -3,12 +3,7 @@
 
 {% block content %}
 
-<style>
-    /* The code styles the text at the bottom of the footer */
-    .footer {
-        position: absolute;
-    }
-</style>
+
 
 <div class="jumbotron" id="jumbotron">
     <h1 class="display-4">Welcome to My-Finances</h1>
@@ -46,8 +41,17 @@
                                 <input type="text" id="fname" name="fname" placeholder="Your name" required><br><br>
                                 <input type="text" id="useremail" name="useremail" placeholder="Your email"
                                     required><br><br>
-                                <input class="btn btn-lg bg-primary" type="submit" role="button"
-                                    value="Begin Your Journey!">
+
+                                <!-- <input class="btn btn-lg bg-primary" type="submit" role="button"
+                                    value="Begin Your Journey!"> -->
+
+
+
+                                <button type="submit" class="btn btn-primary btn-lg" data-toggle="modal"
+                                    data-target="#exampleModal">
+                                    Begin Your Journey!
+                                </button>
+
                             </form>
                         </div>
                     </div>
@@ -59,7 +63,40 @@
 
 <!-- <div style="height: 165px;visibility: hidden;">.</div> -->
 
-
+<div class="container alert-secondary mt-5 mb-4 p-5" id="about">
+    <h1 class="display-4">About</h1>
+    <div class="row">
+        <div class="col-12 col-lg-6 newspaper1" style="text-align: justify;">
+            <p>Thanks for stopping by to learn more about My-Finances. I developed this application to solve a personal
+                problem and help my wife manage our personal finances. The problem: (1) our bank categorizes our
+                transactions in a standard way that sometimes does not reflect what the transaction was about. For
+                example, purchases in any given gas station, most of the time, will be gas-related. However, we all know
+                that most gas stations in the U.S have convenience stores. Therefore, using a debit card to purchase
+                something at the convenience store will be classified as gas. Given that the description of the store is
+                the same as the gas station, it will be almost impossible to distinguish between a simple stop for
+                snacks and a stop for gas; (2) the classification, at least for our bank at this moment, stays in the
+                bank’s online banking or mobile banking application, meaning that once we download the statement it does
+                not include the assumed categories. To solve this problem, first I created a macro using VBA to organize
+                the data in the Excel spreadsheet. It worked decently but I was not entirely satisfied.
+            </p>
+        </div>
+        <div class="col-12 col-lg-6" style="text-align: justify;">
+            <p>
+                Sometime after, I was introduced to Python. After playing with it for some time, I challenged myself to
+                migrate the macro to a Python script to categorize and clean the data. The result was great. I had much
+                more control of the process, experimenting with much more freedom to play with the data using Pandas.
+                However, I still had a problem that bugged me for months. I ran the script on my laptop, and then I
+                transferred the output Excel file, with the cleaned data and transactions categorized, to my wife's
+                computer. I did that using some knowledge of computer networking. But the process was so tedious that I
+                was not happy. The solution: build a web application that I can host online so that my wife can access
+                it directly on her computer, iPad, or iPhone. That was my challenge. I embraced that challenge and used
+                some of my just learned new skills in full-stack web development. Using Django as backend and HTML, CSS,
+                and JavaScript as frontend, I built this application. I hope you like using the sample statement to see
+                how this application can help you manage your personal finances.
+            </p>
+        </div>
+    </div>
+</div>
 
 <script>
     function removeById(element) {
@@ -68,6 +105,8 @@
     }
 
     // Remove nav bar links not used in this page
+
+    removeById("linksRestart");
     removeById("linksCharts");
     removeById("linksTable");
     removeById("linksTotal");

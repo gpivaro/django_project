@@ -113,16 +113,23 @@ def statement(request):
         "table_row_id": table_row_id,
     }
 
-    selected_end_date = labeled_transactions["statement_dict"][0]["Date"].strftime(
-        "%m/%d/%Y"
-    )
-    selected_start_date = labeled_transactions["statement_dict"][
-        len(labeled_transactions["statement_dict"]) - 1
-    ]["Date"].strftime("%m/%d/%Y")
+    # If no table rows, then return the error message indication no data for the period selected
+    if table_row_id:
+        selected_end_date = labeled_transactions["statement_dict"][0]["Date"].strftime(
+            "%m/%d/%Y"
+        )
+        selected_start_date = labeled_transactions["statement_dict"][
+            len(labeled_transactions["statement_dict"]) - 1
+        ]["Date"].strftime("%m/%d/%Y")
 
-    messages.success(
-        request,
-        f"You have uploaded {csv_file} from {selected_start_date} to {selected_end_date}.",
-    )
+        messages.success(
+            request,
+            f"You have uploaded {csv_file} from {selected_start_date} to {selected_end_date}.",
+        )
+    else:
+        messages.error(
+            request, f"No data available for the period starting in {start_date}.",
+        )
+
     return render(request, template, context)
 

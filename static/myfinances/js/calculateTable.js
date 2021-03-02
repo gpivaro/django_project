@@ -299,14 +299,14 @@ function generatePlot(dataIn, expensesArray) {
         // .html('<hr style="padding:0px; margin:0px;">')
         .html(function (d) {
             return `<td style="padding:0px; margin:0px;">${d["category"]}</td>
-            <td style="padding:0px; margin:0px;">${d["amount"]}&nbsp;</td>`;
+            <td style="padding:0px; margin:0px; padding-right:6px">${d["amount"]}</td>`;
         })
         .style('height', '2px')
         .style('font-size', '10pt')
         .style('padding', '0px')
         .style('margin', '0px');
 
-    document.getElementById('tableTitle').textContent = "Totals Expenses by Category";
+    document.getElementById('tableTitle').textContent = "Total Expenses by Category";
 
 
 

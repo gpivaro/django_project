@@ -9,7 +9,7 @@ $(document).ready(function () {
     //console.log(`csrftoken=${csrftoken}`);
 
     // Event listener for the update button
-    $('.updateButton').on('click', function () {
+    $(document).on('click', '.updateButton', function () {
 
         // Get the category ID based on the even
         var category_ID = $(this).attr('category_id');
@@ -46,7 +46,7 @@ $(document).ready(function () {
 
 
     // Event listener for the delete button
-    $('.deleteButton').on('click', function () {
+    $(document).on('click', '.deleteButton', function () {
 
         console.log('Clicked');
         // Get the category ID based on the even
@@ -126,6 +126,12 @@ $(document).ready(function () {
                                                                                     <input type="text" class="form-control ml-2"
                                                                                         id="expressionInput${data.id}" value="${data.Expression}">
                                                                                 </div>
+                                                                                
+                                                                                <button class="btn btn-warning updateButton ml-4"
+                                                                                category_id="${data.id}">Update</button>
+                                
+                                                                                <button class="btn btn-danger deleteButton ml-4"
+                                                                                    category_id="${data.id}">Delete</button>
 
                                                                             </div>
                                                                         </div>

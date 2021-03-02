@@ -14,6 +14,11 @@ import os
 import json
 from .utils import getHostIp
 
+# To configure the SDK Sentry:
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+
 with open("/etc/config.json") as config_file:
     config = json.load(config_file)
 
@@ -131,9 +136,9 @@ DATABASES = {
         "PORT": config.get("MYSQL_PORT"),
         # To solve the django.db.utils.OperationalError: (1040, 'ny connections')
         # https://stackoverflow.com/questions/23576853/python-1040-too-many-connections
-        'OPTIONS': {
-           "init_command": "SET GLOBAL max_connections = 100000", #<-- The fix
-    }
+        "OPTIONS": {
+            "init_command": "SET GLOBAL max_connections = 100000",  # <-- The fix
+        },
     }
 }
 
@@ -186,3 +191,13 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config.get("EMAIL_USER")
 EMAIL_HOST_PASSWORD = config.get("EMAIL_PASS")
 
+
+# Sentry website error monitoring
+sentry_sdk.init(
+    dsn="https://0ca087d20e5a4d02b33d81f378ff5aea@o537687.ingest.sentry.io/5655706",
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=1.0,
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True,
+)

@@ -1,0 +1,51 @@
+{% extends "myhouseweatherapp/base.html" %}
+{% load staticfiles %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-8  mt-2 ml-auto mr-auto">
+            <h4 style="text-align: center;">Last 24h of Measurment Data </h4>
+            <table id="myTable" class="display">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Time</th>
+                        <th>Sensor</th>
+                        <th>Temperature (°C)</th>
+                        <th>Humidity (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for measdata in object_list %}
+                    <tr>
+                        <td>{{ measdata.id }}</td>
+                        <td>{{ measdata.meas_time|date:"M-d h:i A" }}</td>
+                        <td>{{ measdata.sensor }}</td>
+                        <td>{{ measdata.temperature }} </td>
+                        <td>{{measdata.humidity }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- https://datatables.net/ -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.js"></script>
+
+<!-- jQuery -->
+<!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> -->
+
+
+<!-- Script to generate table -->
+<script type="text/javascript" src="{% static 'myhouseweatherapp/js/weather_list.js' %}"></script>
+
+
+
+{% endblock %}

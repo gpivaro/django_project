@@ -1,9 +1,14 @@
 from django.urls import path, include
 from . import views
+from .views import DataMeasView
 
 urlpatterns = [
     # path for the index page
     path("", views.index, name="myhouseweather-index"),
+    # path for the data page
+    # path("data/", views.table_page, name="myhouseweather-table-data"),
+    # Class-based view
+    path("data/", DataMeasView.as_view(), name="myhouseweather-table-data"),
     # path for API routes
     path("api-routes", views.api_routes, name="myhouseweather-api-routes"),
     # path for all json data

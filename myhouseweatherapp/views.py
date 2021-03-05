@@ -5,6 +5,10 @@ from .utils import weather_api
 from datetime import datetime, timedelta
 from django.utils import timezone
 from analyticsapp.utils import get_client_ip
+from django.views.generic import ListView
+
+# Num of sensor
+num_sensor = 4
 
 
 # Main page of the application
@@ -12,6 +16,11 @@ def index(request):
     get_client_ip(request, True)
     data = weather_api("Houston")
     return render(request, "myhouseweatherapp/index.html", {"data": data})
+
+
+class DataMeasView(ListView):
+    model = Weather
+    paginate_by = num_sensor * 60 * 24  # To get data for the last 24h
 
 
 # Return json data of last x hours

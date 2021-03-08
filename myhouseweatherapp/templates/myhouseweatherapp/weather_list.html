@@ -2,16 +2,22 @@
 {% load staticfiles %}
 {% block content %}
 
-<div class="container">
+<div class="container mt-4">
+    <h4 style="text-align: center;">Last 24h of Measurment Data </h4>
     <div class="row">
-        <div class="col-8  mt-2 ml-auto mr-auto">
-            <h4 style="text-align: center;">Last 24h of Measurment Data </h4>
+        <div class="col-10 ml-auto mr-auto">
+            <div id="linePlot"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12  mt-2 ml-auto mr-auto">
             <table id="myTable" class="display">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Time</th>
                         <th>Sensor</th>
+                        <th>Location</th>
                         <th>Temperature (°C)</th>
                         <th>Humidity (%)</th>
                     </tr>
@@ -22,6 +28,7 @@
                         <td>{{ measdata.id }}</td>
                         <td>{{ measdata.meas_time|date:"M-d h:i A" }}</td>
                         <td>{{ measdata.sensor }}</td>
+                        <td>{{ measdata.sensor_name }}</td>
                         <td>{{ measdata.temperature }} </td>
                         <td>{{measdata.humidity }}</td>
                     </tr>
@@ -35,17 +42,22 @@
 
 
 
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+
 <!-- https://datatables.net/ -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.css">
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.js"></script>
 
-<!-- jQuery -->
-<!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> -->
 
 
 <!-- Script to generate table -->
 <script type="text/javascript" src="{% static 'myhouseweatherapp/js/weather_list.js' %}"></script>
 
+
+
+<script type="text/javascript" src="{% static 'myhouseweatherapp/js/plot24h.js' %}"></script>
 
 
 {% endblock %}

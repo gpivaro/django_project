@@ -6,16 +6,25 @@ class Weather(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True)
     meas_time = models.DateTimeField(auto_now_add=True)
     sensor = models.IntegerField()
+    sensor_name = models.CharField(max_length=55, default="Unknown")
     temperature = models.FloatField()
     humidity = models.FloatField()
 
     def __str__(self):
-        return "<Time: {}, ID: {}, Sensor: {}, temperature: {}, humidity: {}>".format(
-            self.meas_time, self.id, self.sensor, self.temperature, self.humidity
+        return "<Time: {}, Sensor: {}, Location: {}, temperature: {}>".format(
+            self.meas_time, self.sensor, self.sensor_name, self.temperature
         )
 
     class Meta:
         ordering = ["-meas_time"]
+
+
+## Example of query for the model Weather using shell
+# from myhouseweatherapp.models import Weather
+# Weather.objects.all()
+# weather = Weather.objects.all().first()
+# weather.sensor_name
+# Weather.objects.filter(sensor_name='Pi0W-Kitchen').all()
 
 
 # Class to create the model to save the visitor's ip address

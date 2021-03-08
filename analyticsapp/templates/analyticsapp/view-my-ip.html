@@ -23,9 +23,9 @@
 
 <body>
     <div class="container mt-2 mb-2">
+        <h4 style="text-align: center;">What I know based on your current connetion:</h4>
         <div class="row">
-            <div class="col-8 ml-auto mr-auto">
-                <h4 style="text-align: center;">What I know based on your current connetion:</h4>
+            <div class="col-8 mt-2 ml-auto mr-auto">
                 <p>IP address: {{client_access_info.ip_address}}</p>
                 <p>Country: {{client_access_info.country}}</p>
                 <p>Region: {{client_access_info.region}}</p>
@@ -38,7 +38,7 @@
                 <p>As name: {{client_access_info.asname}}</p>
                 <p>Latitude: {{client_access_info.latitude}}</p>
                 <p>Longitude: {{client_access_info.longitude}}</p>
-                <p>Map: {{client_access_info.map_link}}</p>
+                <p>Map: <a href="{{client_access_info.map_link}}" target="_blank">click to see location</a></p>
                 <p>URI: {{client_access_info.absolute_uri}}</p>
                 <p>Path: {{client_access_info.path}}</p>
                 <p>Secure connection: {{client_access_info.issecure}}</p>

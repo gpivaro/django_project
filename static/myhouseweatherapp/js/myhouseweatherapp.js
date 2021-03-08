@@ -37,7 +37,7 @@ d3.json(url_api_data).then((measData) => {
         if (element.sensor === 13) {
             sensor13.push(element)
         }
-        else {
+        else if (element.sensor === 16) {
             sensor16.push(element)
         }
     })

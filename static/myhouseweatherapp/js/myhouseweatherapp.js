@@ -32,13 +32,13 @@ d3.json(url_api_data).then((measData) => {
 
     // Separate data into two arrays one for each sensor
     var sensor13 = []
-    var sensor26 = []
+    var sensor16 = []
     measData.forEach(element => {
         if (element.sensor === 13) {
             sensor13.push(element)
         }
         else {
-            sensor26.push(element)
+            sensor16.push(element)
         }
     })
 
@@ -61,8 +61,8 @@ d3.json(url_api_data).then((measData) => {
 
     // Trace2 to display the sensor 13 data
     var trace2 = {
-        x: sensor26.map(element => element.meas_time),
-        y: sensor26.map(element => (element.temperature * 9 / 5) + 32),
+        x: sensor16.map(element => element.meas_time),
+        y: sensor16.map(element => (element.temperature * 9 / 5) + 32),
         mode: 'lines',
         name: 'Indoor',
         line: {
@@ -127,7 +127,7 @@ d3.json(url_api_data).then((measData) => {
         name: 'Outdoor',
     };
     var trace2 = {
-        x: sensor26.map(element => (element.temperature * 9 / 5) + 32),
+        x: sensor16.map(element => (element.temperature * 9 / 5) + 32),
         type: "histogram",
         opacity: 1,
         marker: {
@@ -198,14 +198,14 @@ d3.json(url_api_data).then((measData) => {
     var data = [
         {
             domain: { x: [0, 1], y: [0, 1] },
-            value: (sensor26[0].temperature * 9 / 5) + 32,
+            value: (sensor16[0].temperature * 9 / 5) + 32,
             number: { suffix: "°F" },
             title: { text: "Indoor Temperature<sup>2</sup>" },
             type: "indicator",
             mode: "gauge+number",
             delta: { reference: 100 },
             gauge: {
-                axis: { range: [null, 120] }, bar: { color: colorPicker((sensor26[0].temperature * 9 / 5) + 32) },
+                axis: { range: [null, 120] }, bar: { color: colorPicker((sensor16[0].temperature * 9 / 5) + 32) },
             }
         }
     ];
@@ -278,13 +278,13 @@ function buildPlot(timeSpan) {
 
         // Separate data into two arrays one for each sensor
         var sensor13 = []
-        var sensor26 = []
+        var sensor16 = []
         measData.forEach(element => {
             if (element.sensor === 13) {
                 sensor13.push(element)
             }
             else {
-                sensor26.push(element)
+                sensor16.push(element)
             }
         })
 
@@ -307,8 +307,8 @@ function buildPlot(timeSpan) {
 
         // Trace2 to display the sensor 13 data
         var trace2 = {
-            x: sensor26.map(element => element.meas_time),
-            y: sensor26.map(element => (element.temperature * 9 / 5) + 32),
+            x: sensor16.map(element => element.meas_time),
+            y: sensor16.map(element => (element.temperature * 9 / 5) + 32),
             mode: 'lines',
             name: 'Indoor',
             line: {
@@ -373,7 +373,7 @@ function buildPlot(timeSpan) {
             name: 'Outdoor',
         };
         var trace2 = {
-            x: sensor26.map(element => (element.temperature * 9 / 5) + 32),
+            x: sensor16.map(element => (element.temperature * 9 / 5) + 32),
             type: "histogram",
             opacity: 1,
             marker: {

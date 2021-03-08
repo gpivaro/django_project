@@ -7,7 +7,7 @@ from .models import ClientIPAddress
 # Create your views here.
 def index(request):
     client_access_info = get_client_ip(request, False)
-    context = {"client_access_info": "text"}
+    context = {"client_access_info": client_access_info}
     return render(request, "analyticsapp/view-my-ip.html", context)
     # return JsonResponse(client_access_info, safe=False)
 

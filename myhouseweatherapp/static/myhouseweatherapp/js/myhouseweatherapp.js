@@ -283,7 +283,8 @@ function buildPlot(timeSpan) {
             if (element.sensor === 13) {
                 sensor13.push(element)
             }
-            else {
+            else (element.sensor === 16)
+            {
                 sensor16.push(element)
             }
         })

@@ -119,7 +119,9 @@ function generatePlotlyPlot(weatherData) {
             b: 160,
             t: 60,
             pad: 4
-        }
+        },
+        showlegend: true,
+        legend: { "orientation": "h" }
     };
 
     // Responsive chart

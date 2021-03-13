@@ -34,3 +34,14 @@ class ClientIPAddress(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
+
+
+# from analyticsapp.models import ClientIPAddress
+# from datetime import datetime, timedelta
+# from django.utils import timezone
+# ClientIPAddress.objects.all().values()
+# ClientIPAddress.objects.filter(timestamp__gt=timezone.now() + timedelta(hours=1)).all().values()
+
+
+# ClientIPAddress.objects.filter(ip_address='127.0.0.1').delete()
+# ClientIPAddress.objects.filter(ip_address='107.128.116.227').delete()

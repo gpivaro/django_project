@@ -126,8 +126,8 @@ function aircraftLayer(flightData) {
         marker = L.marker([element.latitude, element.longitude], {
             icon: aircraftIcon,
         }).bindPopup(`<h5>AirCraft Information</h5><hr>
-                ICAO24 / Mode S Code (hex): <a href='https://opensky-network.org/aircraft-profile?icao24=${element["icao24"]}' target="_blank">${element["icao24"]}</a><br/>
-                Callsign: <a href='https://flightaware.com/live/flight/${element["callsign"]}' target="_blank">${element["callsign"]}</a><br/>
+                ICAO24 / Mode S Code (hex): <a href='https://opensky-network.org/aircraft-profile?icao24=${element["icao24"]}' target="_blank">${element["icao24"]}</a> | <button onclick="getDataICAO('${element["icao24"]}')">View route</button><br/>
+                Callsign: <a href='https://flightaware.com/live/flight/${element["callsign"]}' target="_blank">${element["callsign"]}</a> | <button onclick="getDataCallsign('${element["callsign"]}')">View route</button><br/>
                 Origin country: ${element["origin_country"]}<br/>
                 Time of position update: ${formatDate(element["time_position"])}<br/>
                 Time of last update: ${formatDate(element["last_contact"])}<br/>
@@ -413,14 +413,22 @@ function generateAirCraftPlots(flightData) {
 
     var layout = {
         title: 'Aircraft Position Source',
-        height: 300,
-        width: 500,
-        margin: { "t": 35, "b": 0, "l": 0, "r": 10 },
+        // height: 300,
+        // width: 500,
+        margin: {
+            l: 10,
+            r: 10,
+            b: 10,
+            t: 40,
+            pad: 2
+        },
         showlegend: true,
         legend: { "orientation": "h" },
         // paper_bgcolor: "slategrey"
         // grid: { rows: 1, columns: 1 }
     };
+
+
 
     Plotly.newPlot('positionSourcePlot', data, layout, config);
 

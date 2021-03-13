@@ -62,10 +62,12 @@ def get_weather_api_data(request, city):
 def api_routes(request):
 
     return HttpResponse(
-        f"<h3>API endpoints available:</h3>"
-        f"<li>api/v1.0/weather-data/last_hours/&nbsp <a href ='api/v1.0/weather-data/1/'>Last 1h</a></li><br/>"
-        f"<li>api/v1.0/weather-api/city/ &nbsp <a href ='api/v1.0/weather-api/Houston/'>Houston, Tx weather</a></li><br/><br/>"
-        f"<a href ='/homeweather'>Home</a>"
+        f"<h3><a href ='/homeweather'>Home Weather</a> | API endpoints: </h3>"
+        f"<li>api/v1.0/weather-data/last_hours/&nbsp</li>"
+        f"<ul><li>Example: <a href ='api/v1.0/weather-data/1/'>Last 1h measurements</a></li></ul>"
+        f"<ul><li>Example: <a href ='api/v1.0/weather-data/24/'>Last 24h measurements</a></li></ul>"
+        f"<li>api/v1.0/weather-api/city/ &nbsp </li>"
+        f"<ul><li>Example: <a href ='api/v1.0/weather-api/Houston/'>Houston, Tx weather</a></li></ul>"
     )
 
 
@@ -75,12 +77,4 @@ def api_routes(request):
 # Weather.objects.filter(meas_time__gt=timezone.now() + timedelta(hours=1)).count()
 
 
-# from myhouseweatherapp.models import ClientIPAddress
-# from datetime import datetime, timedelta
-# from django.utils import timezone
-# ClientIPAddress.objects.all().values()
-# ClientIPAddress.objects.filter(timestamp__gt=timezone.now() + timedelta(hours=1)).all().values()
 
-
-# ClientIPAddress.objects.filter(ip_address='127.0.0.1').delete()
-# ClientIPAddress.objects.filter(ip_address='107.128.116.227').delete()

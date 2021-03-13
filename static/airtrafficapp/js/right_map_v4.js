@@ -214,7 +214,7 @@ function createMarker(data) {
             color: "red"
         }).bindPopup(`<h5>Aircraft Info:</h5><hr>
         ICAO24 / Mode S Code (hex): <a href='https://opensky-network.org/aircraft-profile?icao24=${element["icao24"]}' target="_blank">${element["icao24"]}</a><br/>
-                    Callsign: <a href='https://flightaware.com/resources/registration/${element["callsign"]}' target="_blank">${element["callsign"]}</a><br/>
+                    Callsign: <a href='https://flightaware.com/live/flight/${element["callsign"]}' target="_blank">${element["callsign"]}</a><br/>
                     Origin country: ${element["origin_country"]}<br/>
                     Time of position update: ${formatDate(element["time_position"])}<br/>
                     Time of last update: ${formatDate(element["last_contact"])}<br/>
@@ -284,7 +284,7 @@ function createMarker(data) {
 
 // Initialize the map
 // getDataICAO('ace6e2');
-getDataCallsign('AAL2028')
+getDataCallsign('AAL2028');
 
 // loadDropdown();
 

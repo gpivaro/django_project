@@ -107,7 +107,7 @@ d3.json(url_api_data).then((measData) => {
         },
         paper_bgcolor: "rgba(0,0,0,0)",
         plot_bgcolor: 'rgba(0,0,0,0)',
-        hovermode: false,
+        hovermode: true,
     };
 
     // Render the plot to the div tag id "plot"
@@ -405,7 +405,7 @@ function buildPlot(timeSpan) {
             margin: {
                 l: 60,
                 r: 60,
-                b: 60,
+                b: 0,
                 t: 60,
                 pad: 4
             },

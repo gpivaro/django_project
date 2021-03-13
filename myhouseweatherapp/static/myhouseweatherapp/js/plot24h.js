@@ -45,7 +45,7 @@ function generatePlotlyPlot(weatherData) {
         else if (element.sensor === 16) {
             sensor16.push(element);
         }
-        else if (element.sensor === 26) {
+        else if (element.sensor === 17) {
             sensor26.push(element);
         }
     });
@@ -107,7 +107,9 @@ function generatePlotlyPlot(weatherData) {
             showgrid: false,
             zeroline: false,
             autorange: 'reversed',
-            tickformat: '%H:%M'
+            tickformat: '%H:%M',
+            automargin: true,
+
         },
         yaxis: {
             title: 'Temperature (°C)',
@@ -116,12 +118,14 @@ function generatePlotlyPlot(weatherData) {
         margin: {
             l: 60,
             r: 60,
-            b: 160,
+            b: 190,
             t: 60,
             pad: 4
         },
         showlegend: true,
-        legend: { "orientation": "h" }
+        // legend: { "orientation": "h", },
+        legend: { x: 0, y: .1 }
+
     };
 
     // Responsive chart

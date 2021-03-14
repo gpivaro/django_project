@@ -34,10 +34,11 @@ def home(request):
 
 # Json version of all available categories
 def categories(request):
-    # data = list(Categories.objects.all().values())
-    # return JsonResponse(data, safe=False)
-    context = {"categories_list": Categories.objects.order_by("id").all()}
-    return render(request, "myfinances/categories.html", context)
+    data = list(Categories.objects.order_by("Group").all().values())
+    return JsonResponse(data, safe=False)
+    # context = {"categories_list": Categories.objects.order_by("id").all()}
+    # return render(request, "myfinances/categories.html", context)
+    # return JsonResponse(request, "myfinances/categories.html", context)
 
 
 # Using rest framework out of the box view that handles CRUD
@@ -111,6 +112,7 @@ def statement(request):
         "transactions_list": labeled_transactions["statement_dict"],
         "categories_list": labeled_transactions["categories_list"],
         "table_row_id": table_row_id,
+        "categories_list": Categories.objects.order_by("id").all(),
     }
 
     # If no table rows, then return the error message indication no data for the period selected

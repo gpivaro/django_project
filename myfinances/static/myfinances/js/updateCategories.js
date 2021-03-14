@@ -103,9 +103,6 @@ $(document).ready(function () {
                 // Update table with new data
                 $('#tableCategories tr:last').after(`<tr id="row_id${data.id}">
                                                                 <td>
-                                                                    <h4>${data.id}</h4>
-                                                                </td>
-                                                                <td>
                                                                     <div id="category_id${data.id}" class="panel panel-default">
                                                                         <!-- <div class="panel-heading">
                                                                             <span class="panel-title">Number: <span id="expression${data.id}">${data.id}</span>
@@ -116,13 +113,13 @@ $(document).ready(function () {
                                                                             <div class="form-inline">
                                                                                 <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}">
                                                                                 <div class="form-group">
-                                                                                    <label for="categoryInput${data.id}">Category: </label>
+                                                                                    <label for="categoryInput${data.id}"></label>
                                                                                     <input type="text" class="form-control ml-2"
                                                                                         id="categoryInput${data.id}" value="${data.Group}">
                                                                                 </div>
 
                                                                                 <div class="form-group ml-4">
-                                                                                    <label for="expressionInput${data.id}">Expression: </label>
+                                                                                    <label for="expressionInput${data.id}"></label>
                                                                                     <input type="text" class="form-control ml-2"
                                                                                         id="expressionInput${data.id}" value="${data.Expression}">
                                                                                 </div>

@@ -1,9 +1,9 @@
 // Get the button
 var topButton = document.getElementById("topBtn");
 
-var visiblePixels = 400;
+var visiblePixels = 550;
 
-// When user scrolls down 600px from the top of the document, show the button
+// When user scrolls down 550px from the top of the document, show the button
 window.onscroll = function () { scrollFunction() };
 
 function scrollFunction() {

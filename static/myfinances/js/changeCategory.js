@@ -12,6 +12,9 @@
 function changeCategory(val) {
     console.log(val);
     newValue = val.split("|")[1];
+
+    // console.log(btnNumber.split("_")[1]);
+    // var trIndex = parseInt(btnNumber.split("_")[1]);
     var trIndex = parseInt(val);
     table = document.getElementById("tblData");
     tr = table.getElementsByTagName("tr");

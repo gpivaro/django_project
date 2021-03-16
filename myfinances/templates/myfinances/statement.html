@@ -138,8 +138,8 @@
                             <!-- <th>Check</th> -->
                             <!-- <th>Balance</th> -->
                             <th onclick="sortTable(4,'tblData')">Category &nbsp;<i class="fa fa-fw fa-sort"></i></th>
-                            <th class="noExport">Re-categorize</th>
-                            <th class="noExport">Re-categorize</th>
+                            <!-- <th class="noExport">Re-categorize</th> -->
+                            <th class="noExport">Edit category</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -153,7 +153,7 @@
                             <!-- <td>{{transactions.Check}}</td> -->
                             <!-- <td>$ {{transactions.Balance}}</td> -->
                             <td>{{transactions.Category}}</td>
-                            <td>
+                            <!-- <td>
                                 <select onchange="changeCategory(this.value)" class="noExport selDataset"
                                     name="selDataset">
                                     <option value="" disabled selected hidden>Choose a category</option>
@@ -162,12 +162,47 @@
                                     </option>
                                     {% endfor %}
                                 </select>
-                            </td>
+                            </td> -->
                             <td>
-                                <button type="button" class="btn btn-secondary align-bottom" data-toggle="modal"
-                                    data-target="#reCategorizeModal">
-                                    Re-categorize
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal"
+                                    data-target="#reCategorizeModal{{ forloop.counter }}"
+                                    id="Btn_{{ forloop.counter }}"><i class="fa fa-fw fa-edit"></i>
                                 </button>
+                                <!-- Modal Re-categorize -->
+                                <div class="modal fade" id="reCategorizeModal{{ forloop.counter }}" tabindex="-1"
+                                    role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Re-categorize Transaction
+                                                </h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Description: {{transactions.Description}} </p>
+                                                <p> Current Category:
+                                                    {{transactions.Category}}</p>
+                                                <select onchange="changeCategory(this.value)"
+                                                    class="noExport selDataset" name="selDataset">
+                                                    <option value="" disabled selected hidden>Choose a category</option>
+                                                    {% for category in categories_list %}
+                                                    <option value="{{ forloop.parentloop.counter }}|{{category}}">
+                                                        {{category}}
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">Close</button>
+                                                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
@@ -324,33 +359,6 @@
 
 
 
-<!-- Modal Re-categorize -->
-<div class="modal fade" id="reCategorizeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Re-categorize Transaction</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <select onchange="changeCategory(this.value)" class="noExport selDataset" name="selDataset">
-                    <option value="" disabled selected hidden>Choose a category</option>
-                    {% for category in categories_list %}
-                    <option value="{{ forloop.parentloop.counter }}|{{category}}">{{category}}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="changeCategory(this.value)">Save changes</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script type="text/javascript" src="{% static 'myfinances/js/sortTable.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/filterTable.js' %}"></script>
@@ -390,4 +398,14 @@
 <!-- Add / Update Categories -->
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/updateCategories.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.btn-sm').on('click', function () {
+            $(this).css({ "color": "red" })
+        });
+    });
+</script>
+
+
 {% endblock %}

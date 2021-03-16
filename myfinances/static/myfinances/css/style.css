@@ -21,6 +21,7 @@ td:nth-child(3) + td { text-align: right; }
 #tableCategoryExpenses td:nth-child(1) + td { text-align: right; }  
 
 
+
 /* Top button styling */
 #topBtn{
   display: none;

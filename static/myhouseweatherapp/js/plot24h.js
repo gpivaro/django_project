@@ -12,7 +12,7 @@ $(document).ready(function () {
 
     // Set the request to the backend using Ajax and GET request
     req = $.ajax({
-        url: '/homeweather/api/v1.0/weather-data/1/',
+        url: '/homeweather/api/v1.0/weather-data/24/',
         type: 'GET',
 
         success: function (weatherData) {
@@ -54,44 +54,48 @@ function generatePlotlyPlot(weatherData) {
 
 
     var trace1 = {
-        x: sensor4.map(element => {
-            var myDate = new Date(element.meas_time);
-            var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
-            return newDate
-        }),
+        // x: sensor4.map(element => {
+        //     var myDate = new Date(element.meas_time);
+        //     var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
+        //     return newDate
+        // }),
+        x: sensor26.map(element => element.meas_time),
         y: sensor4.map(element => element.temperature),
         type: 'scatter',
         name: sensor4[0].sensor_name
     };
 
     var trace2 = {
-        x: sensor13.map(element => {
-            var myDate = new Date(element.meas_time);
-            var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
-            return newDate
-        }),
+        // x: sensor13.map(element => {
+        //     var myDate = new Date(element.meas_time);
+        //     var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
+        //     return newDate
+        // }),
+        x: sensor26.map(element => element.meas_time),
         y: sensor13.map(element => element.temperature),
         type: 'scatter',
         name: sensor13[0].sensor_name
     };
 
     var trace3 = {
-        x: sensor16.map(element => {
-            var myDate = new Date(element.meas_time);
-            var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
-            return newDate
-        }),
+        // x: sensor16.map(element => {
+        //     var myDate = new Date(element.meas_time);
+        //     var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
+        //     return newDate
+        // }),
+        x: sensor26.map(element => element.meas_time),
         y: sensor16.map(element => element.temperature),
         type: 'scatter',
         name: sensor16[0].sensor_name
     };
 
     var trace4 = {
-        x: sensor26.map(element => {
-            var myDate = new Date(element.meas_time);
-            var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
-            return newDate
-        }),
+        // x: sensor26.map(element => {
+        //     var myDate = new Date(element.meas_time);
+        //     var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
+        //     return newDate
+        // }),
+        x: sensor26.map(element => element.meas_time),
         y: sensor26.map(element => element.temperature),
         type: 'scatter',
         name: sensor26[0].sensor_name
@@ -101,30 +105,31 @@ function generatePlotlyPlot(weatherData) {
     var dataPlot = [trace1, trace2, trace3, trace4];
 
     var layout = {
-        title: 'Temperature',
+        // title: 'Temperature',
         xaxis: {
-            title: 'Time',
-            showgrid: false,
+            // title: 'Time',
+            showgrid: true,
             zeroline: false,
-            autorange: 'reversed',
+            // autorange: 'reversed',
             tickformat: '%H:%M',
             automargin: true,
 
         },
         yaxis: {
             title: 'Temperature (°C)',
-            showline: false
+            showline: false,
+            range: [0, 40]
         },
         margin: {
             l: 60,
             r: 60,
-            b: 190,
+            b: 0,
             t: 60,
             pad: 4
         },
         showlegend: true,
-        // legend: { "orientation": "h", },
-        legend: { x: 0, y: .1 }
+        legend: { "orientation": "h" },
+        // legend: { x: 0, y: .1 }
 
     };
 

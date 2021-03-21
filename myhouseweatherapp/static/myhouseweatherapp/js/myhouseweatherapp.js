@@ -403,9 +403,9 @@ function buildPlot(timeSpan) {
                 yref: 'paper'
             },
             margin: {
-                l: 60,
+                l: 80,
                 r: 60,
-                b: 0,
+                b: 60,
                 t: 60,
                 pad: 4
             },

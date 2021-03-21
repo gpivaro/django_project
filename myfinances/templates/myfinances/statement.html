@@ -35,7 +35,7 @@
                         <input class="form-control form-control-sm" type="date" id="end_date" name="end_date">
                         &nbsp;
                     </div>
-                    <button class="btn btn-secondary mb-2" type="submit">Categorize</button>
+                    <button id="btnCategorize" class="btn btn-secondary mb-2" type="submit">Categorize</button>
                     <!-- <span>Only accepts CSV files</span> -->
                 </form>
             </div>
@@ -196,6 +196,10 @@
                                                 </select>
                                             </div>
                                             <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-toggle="modal"
+                                                    data-target="#categoryModal">
+                                                    Edit Categories
+                                                </button>
                                                 <button type="button" class="btn btn-secondary"
                                                     data-dismiss="modal">Close</button>
                                                 <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
@@ -358,6 +362,34 @@
 </div>
 
 
+<button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reCategorizeModal"
+    id="BtnModal"><i class="fa fa-fw fa-edit"></i>
+</button>
+<!-- Modal Re-categorize -->
+<div class="modal fade" id="reCategorizeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Re-categorize Transaction
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <select name="selDataset" id="dropDownCategories">
+                    <option data-option="dropDownOptions" value="" disabled selected hidden>Choose a category</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 <script type="text/javascript" src="{% static 'myfinances/js/sortTable.js' %}"></script>
@@ -367,6 +399,7 @@
 <script type="text/javascript" src="{% static 'myfinances/js/calculateTable.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/topBottomButton.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/totalRow.js' %}"></script>
+<script type="text/javascript" src="{% static 'myfinances/js/loadDropDownCategories.js' %}"></script>
 <!-- To Access Jinja Variable on JS -->
 <!-- <script>console.log("{{transactions_list}}")</script> -->
 
@@ -405,6 +438,28 @@
             $(this).css({ "color": "red" })
         });
     });
+
+
+    // Hide nav bar links once the page loads
+    //$(document).ready(function () {
+    //    $("#linksRestart").hide();
+    //    $("#linksCharts").hide();
+    //    $("#linksTable").hide();
+    //    $("#linksTotal").hide();
+    //});
+
+
+
+    //$(document).ready(function () {
+    //    $('#btnCategorize').on('click', function () {
+    //        $("#linksRestart").show();
+    //        $("#linksCharts").show();
+    //        $("#linksTable").show();
+    //        $("#linksTotal").show();
+    //    }
+    //    )
+    //});
+
 </script>
 
 

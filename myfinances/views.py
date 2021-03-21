@@ -112,7 +112,7 @@ def statement(request):
         "transactions_list": labeled_transactions["statement_dict"],
         "categories_list": labeled_transactions["categories_list"],
         "table_row_id": table_row_id,
-        "categories_list": Categories.objects.order_by("id").all(),
+        "categories_list": Categories.objects.order_by("Group").all(),
     }
 
     # If no table rows, then return the error message indication no data for the period selected

@@ -21,6 +21,13 @@ def index(request):
 class DataMeasView(ListView):
     model = Weather
     paginate_by = num_sensor * 60 * 24  # To get data for the last 24h
+    # queryset = Weather.objects.filter(temperature__gte=25)
+    # queryset = Weather.objects.values_list("temperature", flat=True)
+
+    # Customazing the results
+    # def get_queryset(self):
+    # return Weather.objects.filter(temperature__gte=25)
+    # return Weather.objects.filter(temperature__gte=25)
 
 
 # Return json data of last x hours
@@ -75,6 +82,4 @@ def api_routes(request):
 # from datetime import datetime, timedelta
 # from django.utils import timezone
 # Weather.objects.filter(meas_time__gt=timezone.now() + timedelta(hours=1)).count()
-
-
 

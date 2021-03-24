@@ -37,6 +37,7 @@ class Categories(models.Model):
     Owner = models.ForeignKey(Users, on_delete=models.CASCADE)
 
     def __str__(self):
+        # return f"{self.Group} | {self.Expression}"
         return f"{self.Group} | {self.Expression}"
 
     class Meta:

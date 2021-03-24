@@ -16,7 +16,7 @@ $(document).ready(function () {
         type: 'GET',
 
         success: function (weatherData) {
-            console.log(weatherData);
+            // console.log(weatherData);
 
             // call function to generate plot
             generatePlotlyPlot(weatherData)
@@ -49,7 +49,6 @@ function generatePlotlyPlot(weatherData) {
             sensor26.push(element);
         }
     });
-    console.log(sensor4);
 
 
 

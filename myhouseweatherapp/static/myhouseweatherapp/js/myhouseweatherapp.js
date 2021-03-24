@@ -157,7 +157,7 @@ d3.json(url_api_data).then((measData) => {
             yref: 'paper'
         },
         margin: {
-            l: 60,
+            l: 80,
             r: 60,
             b: 60,
             t: 60,
@@ -353,7 +353,7 @@ function buildPlot(timeSpan) {
             },
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: 'rgba(0,0,0,0)',
-            hovermode: false,
+            hovermode: true,
         };
 
         // Render the plot to the div tag id "plot"
@@ -361,8 +361,6 @@ function buildPlot(timeSpan) {
 
 
         //  Overlaid Histogram
-
-
         var trace1 = {
             x: sensor13.map(element => (element.temperature * 9 / 5) + 32),
             type: "histogram",

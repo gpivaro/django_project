@@ -7,7 +7,7 @@ data to populate the dropdown menus */
 function loadDropdown() {
     url_categories = '/myfinances/categories/'
     d3.json(url_categories).then((importData) => {
-        createDropdownMenu(importData)
+        createDropdownMenu(importData);
     });
 };
 
@@ -19,9 +19,16 @@ function createDropdownMenu(importData) {
     });
     // Remove duplicates by creating a set
     var uniqueCategories = [...new Set(categoryArray)];
+    console.log(uniqueCategories);
+
+    // jQuery to clear the dropdown menu before reload it
+    $('#dropDownCategories').children('option').remove();
 
 
-    selectOptionAddText('#dropDownCategories', uniqueCategories)
+    // Pass the category strings to load the dropdown
+    selectOptionAddText('#dropDownCategories', uniqueCategories);
+
+
 }
 
 
@@ -40,6 +47,5 @@ function selectOptionAddText(domElement, enterData) {
             return data;
         });
 }
-
 
 

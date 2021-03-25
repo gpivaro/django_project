@@ -183,16 +183,26 @@
                                             </div>
                                             <div class="modal-body">
                                                 <p>Description: {{transactions.Description}} </p>
-                                                <p> Current Category:
-                                                    {{transactions.Category}}</p>
-                                                <select onchange="changeCategory(this.value)"
-                                                    class="noExport selDataset" name="selDataset">
+                                                <p> Current Category: <span
+                                                        id="currentCategory_{{ forloop.counter }}"><span></p>
+                                                <!-- <select onchange="changeCategory(this.value)"
+                                                    class="noExport selDataset" name="selDataset"
+                                                    id="Select_{{ forloop.counter }}">
                                                     <option value="" disabled selected hidden>Choose a category</option>
                                                     {% for category in categories_list %}
                                                     <option value="{{ forloop.parentloop.counter }}|{{category}}">
                                                         {{category}}
                                                     </option>
                                                     {% endfor %}
+                                                </select> -->
+                                                <select class="noExport selDataset" name="selDataset"
+                                                    id="Select_{{ forloop.counter }}">
+                                                    <option value="" disabled selected hidden>Choose a category</option>
+                                                    <!-- {% for category in categories_list %} -->
+                                                    <!-- <option value="{{ forloop.parentloop.counter }}|{{category}}">
+                                                        {{category}}
+                                                    </option> -->
+                                                    <!-- {% endfor %} -->
                                                 </select>
                                             </div>
                                             <div class="modal-footer">
@@ -362,11 +372,11 @@
 </div>
 
 
-<button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reCategorizeModal"
+<!-- <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reCategorizeModal"
     id="BtnModal"><i class="fa fa-fw fa-edit"></i>
-</button>
+</button> -->
 <!-- Modal Re-categorize -->
-<div class="modal fade" id="reCategorizeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+<!-- <div class="modal fade" id="reCategorizeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -383,15 +393,15 @@
                 </select>
             </div>
             <div class="modal-footer">
-                <!-- <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#categoryModal">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#categoryModal">
                     Edit Categories
-                </button> -->
+                </button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                <button type="button" class="btn btn-primary">Save changes</button>
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 
 
@@ -434,36 +444,6 @@
 <!-- Add / Update Categories -->
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/updateCategories.js' %}"></script>
-
-<script>
-    $(document).ready(function () {
-        $('.btn-sm').on('click', function () {
-            $(this).css({ "color": "red" })
-        });
-    });
-
-
-    // Hide nav bar links once the page loads
-    //$(document).ready(function () {
-    //    $("#linksRestart").hide();
-    //    $("#linksCharts").hide();
-    //    $("#linksTable").hide();
-    //    $("#linksTotal").hide();
-    //});
-
-
-
-    //$(document).ready(function () {
-    //    $('#btnCategorize').on('click', function () {
-    //        $("#linksRestart").show();
-    //        $("#linksCharts").show();
-    //        $("#linksTable").show();
-    //        $("#linksTotal").show();
-    //    }
-    //    )
-    //});
-
-</script>
 
 
 {% endblock %}

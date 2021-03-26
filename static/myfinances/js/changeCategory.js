@@ -31,6 +31,13 @@ function changeCategory(val) {
     // Update modal current category
     updateModalCurrentCategory(trIndex);
 
+    // Force to close modal after changing category when using filtered table
+    $(document).ready(function () {
+        $('div[class="modal fade show"]').fadeOut(2000);
+        $('div[class="modal-backdrop fade show"]').hide();
+        $('body').removeClass('modal-open');
+    });
+
     // Call the function to calculate the table totals
     calculateTable();
 

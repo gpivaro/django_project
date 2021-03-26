@@ -104,7 +104,7 @@ function generatePlot(dataIn, expensesArray) {
             l: 10,
             r: 10,
             b: 10,
-            t: 0,
+            t: 40,
             pad: 2
         },
         showlegend: false,

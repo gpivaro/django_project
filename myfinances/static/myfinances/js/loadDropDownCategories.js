@@ -1,17 +1,25 @@
+function updateModalCurrentCategory(rowNumber) {
+    // Get table row content to get the current category
+    $tableRowDataCategory = $('#' + rowNumber).children('td:eq(4)').html();
+    $('#currentCategory_' + rowNumber).html($tableRowDataCategory);
+}
+
 
 // Capture the event for the modal button
 $(document).ready(function () {
     $('button[data-toggle="modal"]').on('click', function () {
+        // Get the clicked button row id
         var buttonModalId = $(this).attr('id');
-        //alert(buttonModalId);
         $('#' + buttonModalId).css({ "color": "red" });
 
+        // Save the row number
+        var $rowNumber = buttonModalId.split('_')[1];
+
+        // Get table row content to get the current category to update modal
+        updateModalCurrentCategory($rowNumber);
+
         // Get the ID of the select
-        var $dropdownID = '#Select_' + buttonModalId.split('_')[1];
-        // alert($dropdownID);
-
-        $('#currentCategory_' + buttonModalId.split('_')[1]).html('T');
-
+        var $dropdownID = '#Select_' + $rowNumber;
 
         // Handler for the dropdown change for Callsign
         loadDropdown($dropdownID);

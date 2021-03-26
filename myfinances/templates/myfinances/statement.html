@@ -404,11 +404,12 @@
 </div> -->
 
 
-
+<!-- Add / Update Categories -->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="{% static 'myfinances/js/updateCategories.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/sortTable.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/filterTable.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/changeCategory.js' %}"></script>
-<script type="text/javascript" src="{% static 'myfinances/js/exportTable.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/calculateTable.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/topBottomButton.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/totalRow.js' %}"></script>
@@ -419,6 +420,7 @@
 <!-- Libraries to export Table -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
+<script type="text/javascript" src="{% static 'myfinances/js/exportTable.js' %}"></script>
 
 
 
@@ -440,10 +442,6 @@
 </script>
 {% endif %}
 
-
-<!-- Add / Update Categories -->
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script type="text/javascript" src="{% static 'myfinances/js/updateCategories.js' %}"></script>
 
 
 {% endblock %}

@@ -28,6 +28,9 @@ function changeCategory(val) {
 
     }
 
+    // Update modal current category
+    updateModalCurrentCategory(trIndex);
+
     // Call the function to calculate the table totals
     calculateTable();
 

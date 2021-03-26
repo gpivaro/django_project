@@ -310,10 +310,12 @@ function generatePlot(dataIn, expensesArray) {
 
     console.log('calculate table task done.');
 
+    // Force to close modal after changing category when using filtered table
     $(document).ready(function () {
-        $(".modal fade").hide();
-        console.log('Modal closed');
-    })
+        $('div[class="modal fade show"]').fadeOut(2111);
+        $('div[class="modal-backdrop fade show"]').delay(1555).hide();
+        $('body').delay(1555).removeClass('modal-open');
+    });
 
 
 }

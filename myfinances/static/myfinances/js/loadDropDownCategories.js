@@ -22,6 +22,22 @@ $(document).ready(function () {
 // Capture the event for the select / dropdown menu
 $(document).ready(function () {
     // select the selects with the target class and listen for the change
+    $('select[class="noExport selDataset"]').on('mouseover', function () {
+        // Get the select that was changed
+        var selectId = $(this).attr('id');
+
+        // Get the ID of the select
+        var $dropdownID = '#Select_' + selectId.split('_')[1];
+
+        // Handler for the dropdown change for Callsign
+        loadDropdown($dropdownID);
+
+    });
+});
+
+// Capture the event for the select / dropdown menu
+$(document).ready(function () {
+    // select the selects with the target class and listen for the change
     $('select[class="noExport selDataset"]').on('change', function () {
         // Get the select that was changed
         var selectId = $(this).attr('id');

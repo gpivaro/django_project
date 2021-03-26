@@ -308,6 +308,12 @@ function generatePlot(dataIn, expensesArray) {
 
     document.getElementById('tableTitle').textContent = "Total Expenses by Category";
 
+    console.log('calculate table task done.');
+
+    $(document).ready(function () {
+        $(".modal fade").hide();
+        console.log('Modal closed');
+    })
 
 
 }

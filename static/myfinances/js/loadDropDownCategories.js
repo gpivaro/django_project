@@ -78,9 +78,9 @@ function loadDropdown(dropdownID) {
 
 // Create dropdown menu
 function createDropdownMenu(importData, dropdownID) {
-    var categoryArray = []
+    var categoryArray = ['Choose a category']
     importData.forEach(element => {
-        categoryArray.push(element.Group)
+        categoryArray.push(element.Group);
     });
     // Remove duplicates by creating a set
     var uniqueCategories = [...new Set(categoryArray)];

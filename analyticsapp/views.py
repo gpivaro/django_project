@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from .utils import get_client_ip
 from .models import ClientIPAddress
+from django.views.generic import ListView
+import csv
 
 
 # Create your views here.
@@ -29,4 +31,66 @@ def show_visitors_ip(request, granularity):
             ).count()
         }
     return JsonResponse(data, safe=False)
+
+
+# View to export visitors info as CSV file
+def export_csv(request):
+    response = HttpResponse(content_type="text/csv")
+
+    writer = csv.writer(response)
+    writer.writerow(
+        [
+            "id",
+            "ip_address",
+            "country",
+            "region",
+            "city",
+            "countryCode",
+            "regionName",
+            "zip",
+            "isp",
+            "org",
+            "asname",
+            "latitude",
+            "longitude",
+            "map_link",
+            "absolute_uri",
+            "path",
+            "issecure",
+            "useragent",
+            "timestamp",
+        ]
+    )
+
+    for ipAddressData in ClientIPAddress.objects.all().values_list(
+        "id",
+        "ip_address",
+        "country",
+        "region",
+        "city",
+        "countryCode",
+        "regionName",
+        "zip",
+        "isp",
+        "org",
+        "asname",
+        "latitude",
+        "longitude",
+        "map_link",
+        "absolute_uri",
+        "path",
+        "issecure",
+        "useragent",
+        "timestamp",
+    ):
+        writer.writerow(ipAddressData)
+
+    response["Content-Disposition"] = 'attachment; filename="ip-data.csv"'
+
+    return response
+
+
+# Create your views here.
+class IPAccessView(ListView):
+    model = ClientIPAddress
 

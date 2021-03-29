@@ -1,6 +1,8 @@
 from django.urls import path, include
 from . import views
+from .views import IPAccessView
 
+app_name = "analyticsapp"
 urlpatterns = [
     # path for the index page
     path("my-ip-info/", views.index, name="analytics-index"),
@@ -10,4 +12,8 @@ urlpatterns = [
         views.show_visitors_ip,
         name="analytics-show-visitors-ip",
     ),
+    # path to export the visitors data as csv
+    path("visitors-export-csv/", views.export_csv, name="analytics-export-csv"),
+    # path to access stats
+    path("website-access-stats/", IPAccessView.as_view(), name="website-access-stats"),
 ]

@@ -1,0 +1,67 @@
+{% extends "analyticsapp/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-2 mb-2">
+    <h3>Access by Location</h3>
+    <div class="row">
+        <div class="col-12">
+            <div id="statsMap"></div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <h3>Visits Information</h3>
+    <div class="row">
+        <div class="col-12 col-lg-10 ml-auto mr-auto">
+            <div id="linePlot"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 mt-4 ml-auto mr-auto">
+            <table id="myTable" class="display">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>ip_address</th>
+                        <th>Country</th>
+                        <th>ISP</th>
+                        <th>Organization</th>
+                        <th>As Name</th>
+                        <th>View Map</th>
+                        <th>URI</th>
+                        <th>Brownser Info</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for visit in object_list %}
+                    <tr>
+                        <td>{{ visit.id }}</td>
+                        <td>{{ visit.ip_address }}</td>
+                        <td>{{ visit.country }}</td>
+                        <td>{{ visit.isp }}</td>
+                        <td>{{ visit.org }}</td>
+                        <td>{{ visit.asname }}</td>
+                        <td><a href="{{ visit.map_link }}" target=_blank>Map</a></td>
+                        <td>{{ visit.absolute_uri }}</td>
+                        <td>{{ visit.useragent }}</td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- <script src=" {% static 'analyticsapp/js/leaflet-heat.js' %}"></script> -->
+<!-- Plot map -->
+<script type="text/javascript" src="{% static 'analyticsapp/js/statsMap.js' %}"></script>
+
+<!-- https://datatables.net/ -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="{% static 'analyticsapp/js/visitorsTable.js' %}"></script>
+
+{% endblock %}

@@ -90,9 +90,13 @@ def export_csv(request):
     return response
 
 
-# Create your views here.
+# List view to see all the access
 class IPAccessView(ListView):
     model = ClientIPAddress
+
+    def get_queryset(self, **kwargs):
+        get_client_ip(self.request, Save=True)
+        return ClientIPAddress.objects.all()
 
 
 class AccessDetailView(DetailView):

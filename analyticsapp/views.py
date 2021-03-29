@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from .utils import get_client_ip
 from .models import ClientIPAddress
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 import csv
 
 
@@ -94,3 +94,6 @@ def export_csv(request):
 class IPAccessView(ListView):
     model = ClientIPAddress
 
+
+class AccessDetailView(DetailView):
+    model = ClientIPAddress

@@ -1,6 +1,6 @@
 from django.urls import path, include
 from . import views
-from .views import IPAccessView
+from .views import IPAccessView, AccessDetailView
 
 app_name = "analyticsapp"
 urlpatterns = [
@@ -16,4 +16,6 @@ urlpatterns = [
     path("visitors-export-csv/", views.export_csv, name="analytics-export-csv"),
     # path to access stats
     path("website-access-stats/", IPAccessView.as_view(), name="website-access-stats"),
+    # path to detail view of one access
+    path("access-detail/<int:pk>/", AccessDetailView.as_view(), name="access-detail"),
 ]

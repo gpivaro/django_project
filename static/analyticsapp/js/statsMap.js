@@ -7,7 +7,16 @@ function generateMap(data) {
     // Layer Groups
     var dataPoints = []
     data.forEach(element => {
-        dataPoints.push(L.marker([element.latitude, element.longitude]).bindPopup(`${element.absolute_uri}`))
+        dataPoints.push(
+            L.circle([element.latitude, element.longitude]
+                , {
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.5,
+                    radius: 500
+                }
+            )
+                .bindPopup(`<a href="/analytics/access-detail/${element.id}/" target=_blank>Details</a>`))
     });
     var dataPointsLayer = L.layerGroup(dataPoints);
 

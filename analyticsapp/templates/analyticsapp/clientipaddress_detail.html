@@ -1,0 +1,94 @@
+{% extends "analyticsapp/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-2 mb-2">
+    <h4 style="text-align: center;">What I know based on that visit:</h4>
+    <div class="row p-2">
+        <div class="col-8 mt-2 mx-auto">
+            <table class="table table-condensed table-striped table-bordered table-hover">
+                <tbody>
+                    <tr>
+                        <td>Date: </td>
+                        <td>{{object.timestamp| date:"F d, Y" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Time: </td>
+                        <td>{{object.timestamp| time:"H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <td>IP address: </td>
+                        <td>{{object.ip_address}}</td>
+                    </tr>
+                    <tr>
+                        <td>Country: </td>
+                        <td>{{object.country}}</td>
+                    </tr>
+                    <tr>
+                        <td>Region: </td>
+                        <td>{{object.region}}</td>
+                    </tr>
+                    <tr>
+                        <td>City: </td>
+                        <td>{{object.city}}</td>
+                    </tr>
+                    <tr>
+                        <td>Country code: </td>
+                        <td>{{object.countryCode}}</td>
+                    </tr>
+                    <tr>
+                        <td>Region name: </td>
+                        <td>{{object.regionName}}</td>
+                    </tr>
+                    <tr>
+                        <td>Zip code: </td>
+                        <td>{{object.zip}}</td>
+                    </tr>
+                    <tr>
+                        <td>Internet service provider: </td>
+                        <td>{{object.isp}}</td>
+                    </tr>
+                    <tr>
+                        <td>Organization: </td>
+                        <td>{{object.org}}</td>
+                    </tr>
+                    <tr>
+                        <td>As name: </td>
+                        <td>{{object.asname}}</td>
+                    </tr>
+                    <tr>
+                        <td>Latitude: </td>
+                        <td>{{object.latitude}}</td>
+                    </tr>
+                    <tr>
+                        <td>Longitude: </td>
+                        <td>{{object.longitude}}</td>
+                    </tr>
+                    <tr>
+                        <td>Map: </td>
+                        <td><a href="{{object.map_link}}" target="_blank">click to see location</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>URI: </td>
+                        <td>{{object.absolute_uri}}</td>
+                    </tr>
+                    <tr>
+                        <td>Path: </td>
+                        <td>{{object.path}}</td>
+                    </tr>
+                    <tr>
+                        <td>Secure connection: </td>
+                        <td>{{object.issecure}}</td>
+                    </tr>
+                    <tr>
+                        <td>Device info: </td>
+                        <td>{{object.useragent}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

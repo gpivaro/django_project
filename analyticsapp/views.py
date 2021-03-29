@@ -94,10 +94,17 @@ def export_csv(request):
 class IPAccessView(ListView):
     model = ClientIPAddress
 
+    # Access method to retrieve the request ip address
     def get_queryset(self, **kwargs):
         get_client_ip(self.request, Save=True)
         return ClientIPAddress.objects.all()
 
 
+# Detail view to see individual access
 class AccessDetailView(DetailView):
     model = ClientIPAddress
+
+    # Access method to retrieve the request ip address
+    def get_queryset(self, **kwargs):
+        get_client_ip(self.request, Save=True)
+        return ClientIPAddress.objects.all()

@@ -45,3 +45,9 @@ class ClientIPAddress(models.Model):
 
 # ClientIPAddress.objects.filter(ip_address='127.0.0.1').delete()
 # ClientIPAddress.objects.filter(ip_address='107.128.116.227').delete()
+# ClientIPAddress.objects.filter(ip_address='199.96.192.254').delete()
+
+
+# Update multiple entries
+# ClientIPAddress.objects.filter(country='US').all().values()
+# ClientIPAddress.objects.filter(country='US').update(country='United States')

@@ -1,0 +1,61 @@
+Using raw SQL:
+
+
+mysql> select count(*) from analyticsapp_clientipaddress where country='FR';
++----------+
+| count(*) |
++----------+
+|        5 |
++----------+
+1 row in set (0.00 sec)
+
+mysql> update analyticsapp_clientipaddress set country='France' where country='FR';
+Query OK, 5 rows affected (0.01 sec)
+Rows matched: 5  Changed: 5  Warnings: 0
+
+mysql> select count(*) from analyticsapp_clientipaddress where country='FR';
++----------+
+| count(*) |
++----------+
+|        0 |
++----------+
+1 row in set (0.00 sec)
+
+mysql> 
+
+
+
+##########################################################################################
+
+Using Django ORM:
+
+>>> from analyticsapp.models import ClientIPAddress
+
+
+>> ClientIPAddress.objects.filter(country='US').update(country='United States')
+
+
+
+>>> from analyticsapp.models import ClientIPAddress
+>>> 
+>>> 
+>>> ClientIPAddress.objects.filter(country='BE').count()
+1
+>>> 
+>>> 
+>>> 
+>>> ClientIPAddress.objects.filter(country='BE').update(country='Belgium')
+1
+>>> 
+>>> 
+>>> 
+>>> ClientIPAddress.objects.filter(country='BE').count()
+0
+
+
+BE
+DE
+MN
+RU
+NL
+SG

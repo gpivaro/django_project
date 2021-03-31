@@ -132,7 +132,7 @@ function generatePlotlyPlot(weatherData) {
 
     };
 
-    // Responsive chart
+    // Responsive chart and no display mode bar
     var config = { responsive: true, displayModeBar: false }
 
     Plotly.newPlot('linePlot', dataPlot, layout, config);

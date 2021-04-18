@@ -13,9 +13,18 @@
 
     <!-- Button trigger modal -->
     <p class="lead">
+
+        {% if user.is_authenticated %}
+
+        <a href="{% url 'myfinances:statement' %}">
+            <button type="button" class="btn btn-primary btn-lg">
+                Start Here <i class="fa fa-arrow-circle-right"></i>
+            </button></a>
+        {% else %}
         <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#exampleModal">
             Start Here <i class="fa fa-arrow-circle-right"></i>
         </button>
+        {% endif %}
     </p>
 
 </div>

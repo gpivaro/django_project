@@ -71,6 +71,18 @@
                 <li class="nav-item" id="linksAbout">
                     <a class="nav-link" href="{% url 'myfinances:home' %}#about">About</a>
                 </li>
+
+                {% if user.is_authenticated %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" role="button"
+                        aria-haspopup="true" aria-expanded="false">{{ user.get_username }} <span
+                            class="caret"></span></a>
+                    <ul class="dropdown-menu bg-dark">
+                        <li class="nav-item"><a class="nav-link"
+                                href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
+                    </ul>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </nav>

@@ -7,6 +7,8 @@ from django.http import JsonResponse, HttpResponseRedirect
 from .utils import label_transactions
 import requests
 import pandas as pd
+from django.contrib.auth.decorators import login_required
+
 
 # To create API using rest framework
 from rest_framework import viewsets
@@ -53,6 +55,8 @@ class UsersView(viewsets.ModelViewSet):
     serializer_class = UsersSerializer
 
 
+@login_required
+# Main view of the application
 # one parameter named request
 def statement(request):
     # declaring template

@@ -3,8 +3,11 @@ import os
 import json
 import datetime as dt
 
+
+target_log_filepath = f"{os.path.expanduser('~')}/db_records_log.txt"
+
 # Create a string with the time delta of x days
-target_date = dt.datetime.date(dt.datetime.now() - dt.timedelta(days=90))
+target_date = dt.datetime.date(dt.datetime.now() - dt.timedelta(days=120))
 print(f"""The target date is {target_date.strftime("%Y-%m-%d")}.\n""")
 
 
@@ -48,7 +51,7 @@ for x in my_cursor:
         f"""There are {x[0]} records that are older than {target_date.strftime("%Y-%m-%d")} at ({dt.datetime.now()}).\n"""
     )
 
-with open("~/db_records_log.txt", "a") as f:
+with open(target_log_filepath, "a") as f:
     f.write(
         f"""There are {x[0]} records that are older than {target_date.strftime("%Y-%m-%d")} (at {dt.datetime.now()}).\n"""
     )

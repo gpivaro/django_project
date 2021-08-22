@@ -34,7 +34,7 @@ function generatePlotlyPlot(weatherData) {
     // Sort the samples in descending order of meas_time
     weatherData.sort((a, b) => b.meas_time - a.meas_time);
 
-    var sensor4 = []; var sensor13 = []; var sensor16 = []; var sensor26 = [];
+    var sensor4 = []; var sensor13 = []; var sensor16 = []; var sensor17 = [];
     weatherData.forEach(element => {
         if (element.sensor === 4) {
             sensor4.push(element);
@@ -46,62 +46,76 @@ function generatePlotlyPlot(weatherData) {
             sensor16.push(element);
         }
         else if (element.sensor === 17) {
-            sensor26.push(element);
+            sensor17.push(element);
         }
     });
 
 
+    if (sensor4.length != 0) {
+        var trace1 = {
+            // x: sensor4.map(element => {
+            //     var myDate = new Date(element.meas_time);
+            //     var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
+            //     return newDate
+            // }),
+            x: sensor4.map(element => element.meas_time),
+            y: sensor4.map(element => element.temperature),
+            type: 'scatter',
+            name: sensor4[0].sensor_name
+        }
+    }
 
-    var trace1 = {
-        // x: sensor4.map(element => {
-        //     var myDate = new Date(element.meas_time);
-        //     var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
-        //     return newDate
-        // }),
-        x: sensor26.map(element => element.meas_time),
-        y: sensor4.map(element => element.temperature),
-        type: 'scatter',
-        name: sensor4[0].sensor_name
-    };
-
-    var trace2 = {
-        // x: sensor13.map(element => {
-        //     var myDate = new Date(element.meas_time);
-        //     var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
-        //     return newDate
-        // }),
-        x: sensor26.map(element => element.meas_time),
-        y: sensor13.map(element => element.temperature),
-        type: 'scatter',
-        name: sensor13[0].sensor_name
-    };
-
-    var trace3 = {
-        // x: sensor16.map(element => {
-        //     var myDate = new Date(element.meas_time);
-        //     var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
-        //     return newDate
-        // }),
-        x: sensor26.map(element => element.meas_time),
-        y: sensor16.map(element => element.temperature),
-        type: 'scatter',
-        name: sensor16[0].sensor_name
-    };
-
-    var trace4 = {
-        // x: sensor26.map(element => {
-        //     var myDate = new Date(element.meas_time);
-        //     var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
-        //     return newDate
-        // }),
-        x: sensor26.map(element => element.meas_time),
-        y: sensor26.map(element => element.temperature),
-        type: 'scatter',
-        name: sensor26[0].sensor_name
-    };
+    if (sensor17.length != 0) {
+        var trace2 = {
+            // x: sensor13.map(element => {
+            //     var myDate = new Date(element.meas_time);
+            //     var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
+            //     return newDate
+            // }),
+            x: sensor17.map(element => element.meas_time),
+            y: sensor17.map(element => element.temperature),
+            type: 'scatter',
+            name: sensor17[0].sensor_name
+        }
+    }
 
 
-    var dataPlot = [trace1, trace2, trace3, trace4];
+    if (sensor16.length != 0) {
+        var trace3 = {
+            // x: sensor16.map(element => {
+            //     var myDate = new Date(element.meas_time);
+            //     var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
+            //     return newDate
+            // }),
+            x: sensor16.map(element => element.meas_time),
+            y: sensor16.map(element => element.temperature),
+            type: 'scatter',
+            name: sensor16[0].sensor_name
+        }
+    }
+
+    if (sensor13.length != 0) {
+        var trace4 = {
+            // x: sensor17.map(element => {
+            //     var myDate = new Date(element.meas_time);
+            //     var newDate = `${addZero(myDate.getHours() + 6)}:${addZero(myDate.getMinutes())}`;
+            //     return newDate
+            // }),
+            x: sensor13.map(element => element.meas_time),
+            y: sensor13.map(element => element.temperature),
+            type: 'scatter',
+            name: sensor13[0].sensor_name
+        }
+    }
+
+
+    if (trace3 == undefined || trace3 == undefined) {
+        var dataPlot = [trace1, trace2];
+    } else {
+        var dataPlot = [trace1, trace2, trace3, trace4];
+    }
+
+
 
     var layout = {
         // title: 'Temperature',

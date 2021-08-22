@@ -38,7 +38,7 @@ def weather_data(request, last_hours):
     data = list(
         Weather.objects.filter(
             meas_time__gt=timezone.now()
-            - timedelta(hours=6)
+            - timedelta(hours=0)
             - timedelta(hours=last_hours)
         )
         .all()

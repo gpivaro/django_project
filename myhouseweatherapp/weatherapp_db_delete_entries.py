@@ -7,7 +7,7 @@ import datetime as dt
 target_log_filepath = f"{os.path.expanduser('~')}/db_records_log.txt"
 
 # Create a string with the time delta of x days
-target_date = dt.datetime.date(dt.datetime.now() - dt.timedelta(days=120))
+target_date = dt.datetime.date(dt.datetime.now() - dt.timedelta(days=90))
 print(f"""The target date is {target_date.strftime("%Y-%m-%d")}.\n""")
 
 

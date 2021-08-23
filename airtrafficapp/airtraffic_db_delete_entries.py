@@ -11,7 +11,7 @@ target_log_filepath = f"{os.path.expanduser('~')}/mylogs/airtraffic_db_records_l
 # Create a string with the time delta of x days
 target_date = dt.datetime.date(dt.datetime.now() - dt.timedelta(days=90))
 print(f"""The target date is {target_date.strftime("%Y-%m-%d")}.\n""")
-
+target_date_unix = int(target_date.strftime("%s"))
 
 with open("/etc/config.json") as config_file:
     config = json.load(config_file)
@@ -44,7 +44,7 @@ my_cursor = mydb.cursor()
 my_cursor.execute(
     f"""SELECT count(*) 
         FROM {database_name}.{table_name} 
-        where meas_time < '{target_date.strftime("%Y-%m-%d")}'
+        where time < '{target_date_unix}'
         """
 )
 
@@ -62,7 +62,7 @@ with open(target_log_filepath, "a") as f:
 my_cursor.execute(
     f"""DELETE 
         FROM {database_name}.{table_name}
-        WHERE meas_time < '{target_date.strftime("%Y-%m-%d")}';
+        WHERE time < '{target_date_unix}';
         """
 )
 
@@ -75,8 +75,8 @@ mydb.commit()
 my_cursor.execute(
     f"""SELECT count(*) 
         FROM {database_name}.{table_name} 
-        where meas_time < '{target_date.strftime("%Y-%m-%d")}' 
-        order by meas_time desc 
+        where time < '{target_date_unix}' 
+        order by time desc 
         limit 1;
         """
 )

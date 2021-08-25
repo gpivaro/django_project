@@ -10,7 +10,7 @@ table_name = "analyticsapp_clientipaddress"
 field_name = "timestamp"
 
 # Create a string with the time delta of x days
-target_date = dt.datetime.date(dt.datetime.now() - dt.timedelta(days=150))
+target_date = dt.datetime.date(dt.datetime.now() - dt.timedelta(days=90))
 print(f"""The target date is {target_date.strftime("%Y-%m-%d")}.\n""")
 
 

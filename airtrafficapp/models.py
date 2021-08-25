@@ -51,11 +51,12 @@ class Airports(models.Model):
 
 
 # Class for the Country coordinates
+# Source: https://developers.google.com/public-data/docs/canonical/countries_csv
 class CountryLatLon(models.Model):
     country = models.CharField(max_length=3, primary_key=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=500)
 
     def __str__(self):
         return "<Name: {}, ID: {}, City: {}>".format(

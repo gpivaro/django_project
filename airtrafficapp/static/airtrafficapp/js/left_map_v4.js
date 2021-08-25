@@ -154,9 +154,11 @@ function aircraftLayer(flightData) {
 function airportsLayer(airportData) {
     // Display on the screen the number of airports
     document.getElementById('totalNumAirports').textContent = `${airportData[0].Country} ${airportData.length.toLocaleString()}`;
-
-    d3.json(`/airtraffic/api/v1.0/country-coordinates/${airportData[0].Country}`).then((CountryData) => {
-        console.log(CountryData[0]);
+    // var target_country = airportData[0].Country.replace(/ /g, "%20");
+    var target_country = airportData[0].Country;
+    // console.log(target_country);
+    d3.json(`/airtraffic/api/v1.0/country-coordinates/${target_country}`).then((CountryData) => {
+        // console.log(CountryData);
         myMap.setView([CountryData[0].latitude, CountryData[0].longitude], 4);
     })
 
@@ -249,7 +251,7 @@ function initMap() {
     // Initialize the page
     // Load only Brazil fligths to speed the page loading
 
-    createAirportsLayer("/airtraffic/api/v1.0/airports-data/United%20States");
+    createAirportsLayer("/airtraffic/api/v1.0/airports-data/United%20States/");
 
     // $(async function () {
     //     await createLayerAircrafts("/airtraffic/api/v1.0/aircrafts-data/ALL");
@@ -406,24 +408,28 @@ function generateAirCraftPlots(flightData) {
         labels: posSource.map(element => element.Type),
         textposition: 'inside',
         domain: { column: 1 },
-        hoverinfo: 'label+percent+name',
+        hoverinfo: 'label+percent',
         hole: .4,
         type: 'pie'
     }];
 
     var layout = {
         title: 'Aircraft Position Source',
-        // height: 300,
+        height: 300,
         // width: 500,
         margin: {
-            l: 10,
-            r: 10,
-            b: 10,
-            t: 40,
-            pad: 2
+            l: 50,
+            r: 50,
+            b: 50,
+            t: 50,
+            pad: 4
         },
         showlegend: true,
-        legend: { "orientation": "h" },
+        legend: {
+            "orientation": "h",
+            x: 0.2,
+            y: 0
+        },
         // paper_bgcolor: "slategrey"
         // grid: { rows: 1, columns: 1 }
     };
@@ -442,7 +448,7 @@ function generateAirCraftPlots(flightData) {
         mode: 'markers',
         type: 'scatter',
         hovertemplate: "<b>Aircraft Info:</b><br><br>" + "ICAO24: %{text.icao24}<br>" + "Flight: %{text.callsign}<br>" +
-            "Vertical rate: %{text.vertical_rate:,} m/s<br>" + "Altitude %{text.baro_altitude:,} m<br>" + "Click on the dot for more info."
+            "Vertical rate: %{text.vertical_rate:,} m/s<br>" + "Altitude %{text.baro_altitude:,} m<br>" + "<br>Click on the dot for more info."
     };
 
     var data = [trace3];

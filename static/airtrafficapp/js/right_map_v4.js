@@ -283,8 +283,11 @@ function createMarker(data) {
 
 
 // Initialize the map
+d3.json("/airtraffic/api/v1.0/aircrafts-data/single_aircraft/united%20states/").then((icao) => { getDataICAO(icao["icao24"]) });
 // getDataICAO('ace6e2');
-getDataCallsign('AAL2028');
+// getDataCallsign('AAL2028');
+
+
 
 // loadDropdown();
 

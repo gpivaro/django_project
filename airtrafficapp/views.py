@@ -72,6 +72,22 @@ def icao24(request, ICAO24):
     return JsonResponse(data, safe=False)
 
 
+# Return single aircraft for loading page pourpouses
+def single_aircraft(request, country):
+
+    # Get the last timestamp
+    timestamp = Aircrafts.objects.exclude(latitude=None).latest("time")
+    data = (
+        Aircrafts.objects.exclude(latitude=None)
+        .filter(time=timestamp.time)
+        .filter(origin_country=country)
+        .values("icao24")
+        .first()
+    )
+
+    return JsonResponse({"icao24": data["icao24"]}, safe=False)
+
+
 # Return the info for airports
 def airports(request, country):
     if country == "ALL":

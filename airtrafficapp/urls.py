@@ -12,6 +12,11 @@ urlpatterns = [
     path(
         "api/v1.0/aircrafts-data/callsign/<CallSign>/", views.callsign, name="callsign"
     ),
+    path(
+        "api/v1.0/aircrafts-data/single_aircraft/<country>/",
+        views.single_aircraft,
+        name="single_aircraft",
+    ),
     path("api/v1.0/airports-data/<country>/", views.airports, name="airports"),
     # Delete entries
     path("api/v1.0/aircrafts-delete", views.aircrafts_delete, name="aircrafts_delete"),

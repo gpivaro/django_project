@@ -6,4 +6,5 @@ urlpatterns = [
     path("", views.home, name="resumesite-home"),
     # path to the git page of the resume app
     path("git/", views.git, name="resumesite-git"),
+    path("robots.txt", views.robots, name="resumesite-robots"),
 ]

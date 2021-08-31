@@ -4,7 +4,7 @@ import json
 import datetime as dt
 
 
-target_log_filepath = f"{os.path.expanduser('~')}/mylogs/analyticsapp_records_log.txt"
+target_log_filepath = f"{os.path.expanduser('~')}/mylogs/analyticsapp_db_records_log.txt"
 db_name = "djangowebsite"
 table_name = "analyticsapp_clientipaddress"
 field_name = "timestamp"

@@ -6,10 +6,12 @@ import datetime as dt
 database_name = "djangowebsite"  # the name of the target database
 table_name = "airtrafficapp_aircrafts"
 
-target_log_filepath = f"{os.path.expanduser('~')}/mylogs/airtraffic_db_records_log.txt"
+target_log_filepath = (
+    f"{os.path.expanduser('~')}/mylogs/airtrafficapp_db_records_log.txt"
+)
 
 # Create a string with the time delta of x days
-target_date = dt.datetime.date(dt.datetime.now() - dt.timedelta(days=90))
+target_date = dt.datetime.date(dt.datetime.now() - dt.timedelta(days=60))
 print(f"""The target date is {target_date.strftime("%Y-%m-%d")}.\n""")
 target_date_unix = int(target_date.strftime("%s"))
 

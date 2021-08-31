@@ -16,7 +16,7 @@ def git(request):
 def robots(request):
     get_client_ip(request, True)
     filename = "robots.txt"
-    content = f"""User-agent: Googlebot \nDisallow: / \n\nUser-agent: PetalBot \nDisallow: / \n\nUser-agent: SemrushBot \nDisallow: /"""
+    content = f"""User-agent: * \nDisallow: / \n\nUser-agent: Googlebot \nDisallow: / \n\nUser-agent: PetalBot \nDisallow: / \n\nUser-agent: SemrushBot \nDisallow: /\n\nUser-agent: AhrefsBot \nDisallow: / \n\n"""
     response = HttpResponse(content, content_type="text/plain")
     # response["Content-Disposition"] = "attachment; filename={0}".format(filename)
     return response

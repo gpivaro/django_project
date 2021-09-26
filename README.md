@@ -1,10 +1,13 @@
 # My Personal Website using Django
 
-This repository has code used to build my personal website using the Django framework
+This repository has code used to build my personal [website](www.gpivaro.com) using the Django framework.
 
+The main page has the following view:
 ![website_pic_1.png](resources/website_pic_1.png)
 
+You can access my portfolio via the main page:
 ![website_pic_2.png](resources/website_pic_2.png)
+
 
 This website is build based on the following tutorial:
 

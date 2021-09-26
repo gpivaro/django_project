@@ -4,13 +4,15 @@ import json
 import datetime as dt
 
 
-target_log_filepath = f"{os.path.expanduser('~')}/mylogs/analyticsapp_db_records_log.txt"
+target_log_filepath = (
+    f"{os.path.expanduser('~')}/mylogs/analyticsapp_db_records_log.txt"
+)
 db_name = "djangowebsite"
 table_name = "analyticsapp_clientipaddress"
 field_name = "timestamp"
 
 # Create a string with the time delta of x days
-target_date = dt.datetime.date(dt.datetime.now() - dt.timedelta(days=90))
+target_date = dt.datetime.date(dt.datetime.now() - dt.timedelta(days=180))
 print(f"""The target date is {target_date.strftime("%Y-%m-%d")}.\n""")
 
 

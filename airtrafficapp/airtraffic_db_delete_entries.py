@@ -11,7 +11,7 @@ target_log_filepath = (
 )
 
 # Create a string with the time delta of x days
-target_date = dt.datetime.date(dt.datetime.now() - dt.timedelta(days=60))
+target_date = dt.datetime.date(dt.datetime.now() - dt.timedelta(days=10))
 print(f"""The target date is {target_date.strftime("%Y-%m-%d")}.\n""")
 target_date_unix = int(target_date.strftime("%s"))
 

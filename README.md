@@ -9,7 +9,7 @@ This repository has code used to build my personal website using the Django fram
 This website is build based on the following tutorial:
 <ul>
 <li>
-  [Python Django Tutorial: Full-Featured Web App](https://www.youtube.com/watch?v=UmljXZIypDc&list=PL-osiE80TeTtoQCKZ03TU5fNfx2UY6U4p&index=1)
+  ![Python Django Tutorial: Full-Featured Web App](https://www.youtube.com/watch?v=UmljXZIypDc&list=PL-osiE80TeTtoQCKZ03TU5fNfx2UY6U4p&index=1)
   </li>
 
 <li>[Build a Resume Website With Python and Django](https://www.youtube.com/watch?v=F5WXNI3Dq8U&t=629s)</li>

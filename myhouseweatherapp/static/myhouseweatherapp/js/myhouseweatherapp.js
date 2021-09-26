@@ -1,7 +1,8 @@
 // Filter the data to load
 lastHoursData = 24
 // API weather data
-url_api_data = `/homeweather/api/v1.0/weather-data/${lastHoursData}/`
+
+url_api_data = `/homeweather/api/v1.0/weather-data-moving-average/${lastHoursData}/`
 
 
 d3.json('/analytics/show-visitors/homeweather').then((visitsData) => {
@@ -49,7 +50,7 @@ d3.json(url_api_data).then((measData) => {
     // Trace1 to display the sensor 4 data
     var trace1 = {
         x: sensor4.map(element => element.meas_time),
-        y: sensor4.map(element => (element.temperature * 9 / 5) + 32),
+        y: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
         mode: 'lines',
         name: 'Outdoor',
         line: {
@@ -62,7 +63,7 @@ d3.json(url_api_data).then((measData) => {
     // Trace2 to display the sensor 17 data
     var trace2 = {
         x: sensor17.map(element => element.meas_time),
-        y: sensor17.map(element => (element.temperature * 9 / 5) + 32),
+        y: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
         mode: 'lines',
         name: 'Indoor',
         line: {
@@ -118,7 +119,7 @@ d3.json(url_api_data).then((measData) => {
 
 
     var trace1 = {
-        x: sensor4.map(element => (element.temperature * 9 / 5) + 32),
+        x: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
         type: "histogram",
         opacity: 1,
         marker: {
@@ -127,7 +128,7 @@ d3.json(url_api_data).then((measData) => {
         name: 'Outdoor',
     };
     var trace2 = {
-        x: sensor17.map(element => (element.temperature * 9 / 5) + 32),
+        x: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
         type: "histogram",
         opacity: 1,
         marker: {
@@ -198,14 +199,14 @@ d3.json(url_api_data).then((measData) => {
     var data = [
         {
             domain: { x: [0, 1], y: [0, 1] },
-            value: (sensor17[0].temperature * 9 / 5) + 32,
+            value: (sensor17[0].temperature_moving_avg * 9 / 5) + 32,
             number: { suffix: "°F" },
             title: { text: "Indoor Temperature<sup>2</sup>" },
             type: "indicator",
             mode: "gauge+number",
             delta: { reference: 100 },
             gauge: {
-                axis: { range: [null, 120] }, bar: { color: colorPicker((sensor17[0].temperature * 9 / 5) + 32) },
+                axis: { range: [null, 120] }, bar: { color: colorPicker((sensor17[0].temperature_moving_avg * 9 / 5) + 32) },
             }
         }
     ];
@@ -235,14 +236,14 @@ d3.json(url_api_data).then((measData) => {
     var data = [
         {
             domain: { x: [0, 1], y: [0, 1] },
-            value: (sensor4[0].temperature * 9 / 5) + 32,
+            value: (sensor4[0].temperature_moving_avg * 9 / 5) + 32,
             number: { suffix: "°F" },
             title: { text: "Outdoor Temperature<sup>1</sup>" },
             type: "indicator",
             mode: "gauge+number",
             delta: { reference: 80 },
             gauge: {
-                axis: { range: [null, 120] }, bar: { color: colorPicker((sensor4[0].temperature * 9 / 5) + 32) }
+                axis: { range: [null, 120] }, bar: { color: colorPicker((sensor4[0].temperature_moving_avg * 9 / 5) + 32) }
             }
         }
     ];
@@ -274,7 +275,22 @@ function updatePage() {
 // Create the main function to get the data and generate the plots
 function buildPlot(timeSpan) {
     // Use D3 fetch to read the JSON file
-    d3.json(`/homeweather/api/v1.0/weather-data/${timeSpan}/`).then((measData) => {
+    d3.json(`/homeweather/api/v1.0/weather-data-moving-average/${timeSpan}/`).then((measData) => {
+
+        switch (timeSpan) {
+            case 168:
+                var time_label = 'Week'
+                break;
+            case 720:
+                var time_label = 'Month'
+                break;
+            case 2160:
+                var time_label = '3-Months'
+                break;
+            default:
+                time_label = `${timeSpan} h`;
+        }
+        // console.log(time_label);
 
         // Separate data into two arrays one for each sensor
         var sensor4 = []
@@ -295,7 +311,7 @@ function buildPlot(timeSpan) {
         // Trace1 to display the sensor 13 data
         var trace1 = {
             x: sensor4.map(element => element.meas_time),
-            y: sensor4.map(element => (element.temperature * 9 / 5) + 32),
+            y: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
             mode: 'lines',
             name: 'Outdoor',
             line: {
@@ -308,7 +324,7 @@ function buildPlot(timeSpan) {
         // Trace2 to display the sensor 13 data
         var trace2 = {
             x: sensor17.map(element => element.meas_time),
-            y: sensor17.map(element => (element.temperature * 9 / 5) + 32),
+            y: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
             mode: 'lines',
             name: 'Indoor',
             line: {
@@ -324,7 +340,7 @@ function buildPlot(timeSpan) {
 
 
         var layout = {
-            title: `Temperature Over Time (${timeSpan} h) `,
+            title: `Temperature Over Time (${time_label}) `,
             yaxis: {
                 // Degree symbol 'Option + Shift + 8'
                 title: 'Temperature (°F)',
@@ -362,7 +378,7 @@ function buildPlot(timeSpan) {
 
         //  Overlaid Histogram
         var trace1 = {
-            x: sensor4.map(element => (element.temperature * 9 / 5) + 32),
+            x: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
             type: "histogram",
             opacity: 1,
             marker: {
@@ -371,7 +387,7 @@ function buildPlot(timeSpan) {
             name: 'Outdoor',
         };
         var trace2 = {
-            x: sensor17.map(element => (element.temperature * 9 / 5) + 32),
+            x: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
             type: "histogram",
             opacity: 1,
             marker: {
@@ -383,7 +399,7 @@ function buildPlot(timeSpan) {
         var dataChart = [trace1, trace2];
         var layout = {
             barmode: "overlay",
-            title: `Temperature Distribution (${timeSpan} h)`,
+            title: `Temperature Distribution (${time_label})`,
             xaxis: {
                 // Degree symbol 'Option + Shift + 8'
                 title: 'Temperature (°F)',

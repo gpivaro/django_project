@@ -24,7 +24,7 @@ class Weather(models.Model):
 # Weather.objects.all()
 # weather = Weather.objects.all().first()
 # weather.sensor_name
-# Weather.objects.filter(sensor_name='Pi0W-Kitchen').all()
+# Weather.objects.filter(sensor_name='Pi0W-DHT22-Indoor-Kitchen').all()
 
 
 # Class to create the model to save the visitor's ip address

@@ -12,7 +12,7 @@ $(document).ready(function () {
 
     // Set the request to the backend using Ajax and GET request
     req = $.ajax({
-        url: '/homeweather/api/v1.0/weather-data/24/',
+        url: '/homeweather/api/v1.0/weather-data-moving-average/24/',
         type: 'GET',
 
         success: function (weatherData) {
@@ -59,7 +59,7 @@ function generatePlotlyPlot(weatherData) {
             //     return newDate
             // }),
             x: sensor4.map(element => element.meas_time),
-            y: sensor4.map(element => element.temperature),
+            y: sensor4.map(element => element.temperature_moving_avg),
             type: 'scatter',
             name: sensor4[0].sensor_name
         }
@@ -73,7 +73,7 @@ function generatePlotlyPlot(weatherData) {
             //     return newDate
             // }),
             x: sensor17.map(element => element.meas_time),
-            y: sensor17.map(element => element.temperature),
+            y: sensor17.map(element => element.temperature_moving_avg),
             type: 'scatter',
             name: sensor17[0].sensor_name
         }
@@ -88,7 +88,7 @@ function generatePlotlyPlot(weatherData) {
             //     return newDate
             // }),
             x: sensor16.map(element => element.meas_time),
-            y: sensor16.map(element => element.temperature),
+            y: sensor16.map(element => element.temperature_moving_avg),
             type: 'scatter',
             name: sensor16[0].sensor_name
         }
@@ -102,7 +102,7 @@ function generatePlotlyPlot(weatherData) {
             //     return newDate
             // }),
             x: sensor13.map(element => element.meas_time),
-            y: sensor13.map(element => element.temperature),
+            y: sensor13.map(element => element.temperature_moving_avg),
             type: 'scatter',
             name: sensor13[0].sensor_name
         }

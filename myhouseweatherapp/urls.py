@@ -17,6 +17,11 @@ urlpatterns = [
         views.weather_data,
         name="weather_data",
     ),
+    path(
+        "api/v1.0/weather-data-moving-average/<int:last_hours>/",
+        views.weather_data_moving_average,
+        name="weather_data_moving_average",
+    ),
     # path for Weather Openweathermap
     path(
         "api/v1.0/weather-api/<str:city>/",

@@ -74,7 +74,7 @@ d3.json(url_api_data).then((measData) => {
     };
 
     // create an array to be plotted
-    var chartData = [trace1, trace2];
+    var chartData = [trace2, trace1];
 
 
 
@@ -137,7 +137,7 @@ d3.json(url_api_data).then((measData) => {
         name: 'Indoor',
     };
 
-    var dataChart = [trace1, trace2];
+    var dataChart = [trace2, trace1];
     var layout = {
         barmode: "overlay",
         title: 'Temperature Distribution (24 h)',
@@ -335,7 +335,7 @@ function buildPlot(timeSpan) {
         };
 
         // create an array to be plotted
-        var chartData = [trace1, trace2];
+        var chartData = [trace2, trace1];
 
 
 
@@ -396,7 +396,7 @@ function buildPlot(timeSpan) {
             name: 'Indoor',
         };
 
-        var dataChart = [trace1, trace2];
+        var dataChart = [trace2, trace1];
         var layout = {
             barmode: "overlay",
             title: `Temperature Distribution (${time_label})`,

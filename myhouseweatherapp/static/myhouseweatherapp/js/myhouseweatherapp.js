@@ -49,8 +49,8 @@ d3.json(url_api_data).then((measData) => {
 
     // Trace1 to display the sensor 4 data
     var trace1 = {
-        x: sensor4.map(element => element.meas_time),
-        y: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
+        x: sensor17.map(element => element.meas_time),
+        y: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
         mode: 'lines',
         name: 'Outdoor',
         line: {
@@ -62,8 +62,8 @@ d3.json(url_api_data).then((measData) => {
 
     // Trace2 to display the sensor 17 data
     var trace2 = {
-        x: sensor17.map(element => element.meas_time),
-        y: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
+        x: sensor4.map(element => element.meas_time),
+        y: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
         mode: 'lines',
         name: 'Indoor',
         line: {
@@ -119,7 +119,7 @@ d3.json(url_api_data).then((measData) => {
 
 
     var trace1 = {
-        x: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
+        x: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
         type: "histogram",
         opacity: 1,
         marker: {
@@ -128,7 +128,7 @@ d3.json(url_api_data).then((measData) => {
         name: 'Outdoor',
     };
     var trace2 = {
-        x: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
+        x: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
         type: "histogram",
         opacity: 1,
         marker: {
@@ -199,14 +199,14 @@ d3.json(url_api_data).then((measData) => {
     var data = [
         {
             domain: { x: [0, 1], y: [0, 1] },
-            value: (sensor17[0].temperature_moving_avg * 9 / 5) + 32,
+            value: (sensor4[0].temperature_moving_avg * 9 / 5) + 32,
             number: { suffix: "°F" },
             title: { text: "Indoor Temperature<sup>2</sup>" },
             type: "indicator",
             mode: "gauge+number",
             delta: { reference: 100 },
             gauge: {
-                axis: { range: [null, 120] }, bar: { color: colorPicker((sensor17[0].temperature_moving_avg * 9 / 5) + 32) },
+                axis: { range: [null, 120] }, bar: { color: colorPicker((sensor4[0].temperature_moving_avg * 9 / 5) + 32) },
             }
         }
     ];
@@ -236,14 +236,14 @@ d3.json(url_api_data).then((measData) => {
     var data = [
         {
             domain: { x: [0, 1], y: [0, 1] },
-            value: (sensor4[0].temperature_moving_avg * 9 / 5) + 32,
+            value: (sensor17[0].temperature_moving_avg * 9 / 5) + 32,
             number: { suffix: "°F" },
             title: { text: "Outdoor Temperature<sup>1</sup>" },
             type: "indicator",
             mode: "gauge+number",
             delta: { reference: 80 },
             gauge: {
-                axis: { range: [null, 120] }, bar: { color: colorPicker((sensor4[0].temperature_moving_avg * 9 / 5) + 32) }
+                axis: { range: [null, 120] }, bar: { color: colorPicker((sensor17[0].temperature_moving_avg * 9 / 5) + 32) }
             }
         }
     ];
@@ -308,10 +308,10 @@ function buildPlot(timeSpan) {
 
         // Line Chart
 
-        // Trace1 to display the sensor 13 data
+        // Trace1 to display the sensor 17 data
         var trace1 = {
-            x: sensor4.map(element => element.meas_time),
-            y: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
+            x: sensor17.map(element => element.meas_time),
+            y: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
             mode: 'lines',
             name: 'Outdoor',
             line: {
@@ -321,10 +321,10 @@ function buildPlot(timeSpan) {
             }
         };
 
-        // Trace2 to display the sensor 13 data
+        // Trace2 to display the sensor 4 data
         var trace2 = {
-            x: sensor17.map(element => element.meas_time),
-            y: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
+            x: sensor4.map(element => element.meas_time),
+            y: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
             mode: 'lines',
             name: 'Indoor',
             line: {
@@ -378,7 +378,7 @@ function buildPlot(timeSpan) {
 
         //  Overlaid Histogram
         var trace1 = {
-            x: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
+            x: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
             type: "histogram",
             opacity: 1,
             marker: {
@@ -387,7 +387,7 @@ function buildPlot(timeSpan) {
             name: 'Outdoor',
         };
         var trace2 = {
-            x: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
+            x: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
             type: "histogram",
             opacity: 1,
             marker: {

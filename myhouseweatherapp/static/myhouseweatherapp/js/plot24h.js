@@ -109,7 +109,7 @@ function generatePlotlyPlot(weatherData) {
     }
 
 
-    if (trace3 == undefined || trace3 == undefined) {
+    if (trace3 == undefined || trace4 == undefined) {
         var dataPlot = [trace1, trace2];
     } else {
         var dataPlot = [trace1, trace2, trace3, trace4];

@@ -48,7 +48,7 @@ d3.json(url_api_data).then((measData) => {
     // Line Chart
 
     // Trace1 to display the sensor 4 data
-    var trace2 = {
+    var trace1 = {
         x: sensor17.map(element => element.meas_time),
         y: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
         mode: 'lines',
@@ -61,7 +61,7 @@ d3.json(url_api_data).then((measData) => {
     };
 
     // Trace2 to display the sensor 17 data
-    var trace1 = {
+    var trace2 = {
         x: sensor4.map(element => element.meas_time),
         y: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
         mode: 'lines',
@@ -118,7 +118,7 @@ d3.json(url_api_data).then((measData) => {
     //  Overlaid Histogram
 
 
-    var trace2 = {
+    var trace1 = {
         x: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
         type: "histogram",
         opacity: 1,
@@ -127,7 +127,7 @@ d3.json(url_api_data).then((measData) => {
         },
         name: 'Outdoor',
     };
-    var trace1 = {
+    var trace2 = {
         x: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
         type: "histogram",
         opacity: 1,
@@ -309,7 +309,7 @@ function buildPlot(timeSpan) {
         // Line Chart
 
         // Trace1 to display the sensor 17 data
-        var trace2 = {
+        var trace1 = {
             x: sensor17.map(element => element.meas_time),
             y: sensor17.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
             mode: 'lines',
@@ -322,7 +322,7 @@ function buildPlot(timeSpan) {
         };
 
         // Trace2 to display the sensor 4 data
-        var trace1 = {
+        var trace2 = {
             x: sensor4.map(element => element.meas_time),
             y: sensor4.map(element => (element.temperature_moving_avg * 9 / 5) + 32),
             mode: 'lines',
@@ -396,7 +396,7 @@ function buildPlot(timeSpan) {
             name: 'Indoor',
         };
 
-        var dataChart = [trace2, trace1];
+        var dataChart = [trace1, trace2];
         var layout = {
             barmode: "overlay",
             title: `Temperature Distribution (${time_label})`,

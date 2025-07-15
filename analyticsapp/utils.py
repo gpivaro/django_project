@@ -6,8 +6,13 @@ from .models import ClientIPAddress
 from django.utils import timezone
 
 # Import credentials for the API
-with open("/etc/config.json") as config_file:
-    config = json.load(config_file)
+try:
+    with open("/etc/config.json") as config_file:
+        config = json.load(config_file)
+except:
+    # adding local config file while in dev
+    with open("./ignore_folder/config.json") as config_file:
+        config = json.load(config_file)
 
 Geo_IPIFY_API = config["Geo_IPIFY_API"]
 weather_api_key = config["OPENWEATHERMAP_API_KEY"]

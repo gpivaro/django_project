@@ -147,3 +147,5 @@ backup_posts.csv
 .DS_Store
 *.DS_Store
 *DS_Store
+
+ignore_folder/

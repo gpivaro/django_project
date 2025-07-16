@@ -18,9 +18,13 @@ from .utils import getHostIp
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-
-with open("/etc/config.json") as config_file:
-    config = json.load(config_file)
+try:
+    with open("/etc/config.json") as config_file:
+        config = json.load(config_file)
+except:
+    # adding local config file while in dev
+    with open("./ignore_folder/config.json") as config_file:
+        config = json.load(config_file)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -75,6 +79,7 @@ INSTALLED_APPS = [
     "rest_framework",
     # Crispy forms for blog app
     "crispy_forms",
+    "crispy_bootstrap4",
     # Default django apps
     "django.contrib.admin",
     "django.contrib.auth",
@@ -141,6 +146,10 @@ DATABASES = {
         },
     }
 }
+
+# configure a default auto field for your project
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 
 
 # Password validation

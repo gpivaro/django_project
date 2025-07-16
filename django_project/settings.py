@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     "rest_framework",
     # Crispy forms for blog app
     "crispy_forms",
+    "crispy_bootstrap4",
     # Default django apps
     "django.contrib.admin",
     "django.contrib.auth",

@@ -14,7 +14,7 @@ pkg-resources==0.0.0
 PyMySQL==1.1.1
 python-dateutil==2.9.0.post0
 pytz==2025.2
-requests==2.31.0
+requests==2.32.4
 sentry-sdk==2.33.0
 six==1.17.0
 sqlparse==0.4.4

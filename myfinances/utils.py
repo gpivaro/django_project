@@ -19,7 +19,7 @@ def label_transactions(data, categories_words_cleaned_df, start_date="", end_dat
     chase_df["Amount"] = chase_df["Amount"].astype("float")
 
     # Create new dataframe
-    chase_new_df = chase_df
+    chase_new_df = chase_df.copy(deep=True)
 
     # Fill the empty values for the pending transactions balance
     chase_new_df["Balance"].iloc[0] == " "
@@ -43,7 +43,7 @@ def label_transactions(data, categories_words_cleaned_df, start_date="", end_dat
 
     # Filtering dataset entries
     month_transactions = chase_new_df.loc[
-        (chase_new_df["Date"] >= start_date) & (chase_new_df["Date"] < end_date)
+        (chase_new_df["Date"] >= start_date) & (chase_new_df["Date"] <= end_date)
     ].sort_values("Date", ascending=False)
 
     # Reset the ndex to index the transactions on the new order

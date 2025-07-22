@@ -55,6 +55,8 @@ except:
         config["ALLOWED_HOSTS_1"],
         config["ALLOWED_HOSTS_2"],
         config["ALLOWED_HOSTS_3"],
+        config["ALLOWED_HOSTS_4"],
+        config["ALLOWED_HOSTS_5"],
     ]
 
 

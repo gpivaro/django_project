@@ -65,41 +65,41 @@ def label_transactions(data, categories_words_cleaned_df, start_date="", end_dat
 
     # Search the patterns
     patterns = list(categories_words_cleaned_df["Expression"])
-    month_transactions["Category"] = ""
+    # month_transactions["Category"] = ""
 
-    # Iterate over all the transactions
-    for index, row in month_transactions.iterrows():
-        # Search and match the first occurency of the table
-        text = row["Description"]
-        for n in range(len(patterns)):
+    # # Iterate over all the transactions
+    # for index, row in month_transactions.iterrows():
+    #     # Search and match the first occurency of the table
+    #     text = row["Description"]
+    #     for n in range(len(patterns)):
             
-            if re.search(patterns[n], text):
-                month_transactions["Category"].iloc[
-                    index
-                ] = categories_words_cleaned_df["Group"].iloc[n]
-                break
+    #         if re.search(patterns[n], text):
+    #             month_transactions["Category"].iloc[
+    #                 index
+    #             ] = categories_words_cleaned_df["Group"].iloc[n]
+    #             break
 
 
-    # matched_list = []
+    matched_list = []
 
-    # # Get sentence to match (transaction)
-    # for _,row in month_transactions.iterrows():
-    #     transactions = row['Description']
+    # Get sentence to match (transaction)
+    for _,row in month_transactions.iterrows():
+        transactions = row['Description']
 
-    #     # Best match
-    #     best_match = process.extractOne(transactions, patterns)
+        # Best match
+        best_match = process.extractOne(transactions, patterns)
 
-    #     # Index of best match
-    #     expression_index = patterns.index(best_match[0]) 
-    #     matched_group = categories_words_cleaned_df['Group'].iloc[expression_index]
-    #     matched_expressions = categories_words_cleaned_df['Expression'].iloc[expression_index]
-    #     matched_list.append({'matched_expressions':matched_expressions,'matched_group':matched_group})
-    #     # print(f"Description: {transactions} : Found Best Match: {matched_group}:{matched_expressions}")
+        # Index of best match
+        expression_index = patterns.index(best_match[0]) 
+        matched_group = categories_words_cleaned_df['Group'].iloc[expression_index]
+        matched_expressions = categories_words_cleaned_df['Expression'].iloc[expression_index]
+        matched_list.append({'matched_expressions':matched_expressions,'matched_group':matched_group})
+        # print(f"Description: {transactions} : Found Best Match: {matched_group}:{matched_expressions}")
 
     
-    # # Merge transactions with best match categories
-    # month_transactions = month_transactions.merge(pd.DataFrame(matched_list),left_index=True, right_index=True)
-    # month_transactions.rename(columns = {'matched_group':'Category'},inplace=True)
+    # Merge transactions with best match categories
+    month_transactions = month_transactions.merge(pd.DataFrame(matched_list),left_index=True, right_index=True)
+    month_transactions.rename(columns = {'matched_group':'Category'},inplace=True)
     statement_dict = month_transactions.to_dict("records")
   
     return {"statement_dict": statement_dict, "categories_list": categories_list}

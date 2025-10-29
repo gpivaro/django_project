@@ -1,13 +1,16 @@
 import csv, io
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
-from .models import Statement, Categories, Users
+from .models import Statement, Categories, Users, Item
 from django.http import JsonResponse, HttpResponseRedirect
 from .utils import label_transactions
 import requests
 import pandas as pd
 from django.contrib.auth.decorators import login_required
+from django.forms import modelformset_factory
+from .forms import ItemForm
+
 
 
 # To create API using rest framework
@@ -139,3 +142,19 @@ def statement(request):
 
     return render(request, template, context)
 
+# views.py
+def manage_items(request):
+    ItemFormSet = modelformset_factory(Item, form=ItemForm, extra=0)
+    if request.method == 'POST':
+        formset = ItemFormSet(request.POST)
+        if formset.is_valid():
+            formset.save()
+            # No redirect — just re-render the same page
+            return render(request, 'myfinances/item_table.html', {
+                'formset': ItemFormSet(queryset=Item.objects.all()),
+                'success': True
+            })
+
+    else:
+        formset = ItemFormSet(queryset=Item.objects.all())
+    return render(request, 'myfinances/item_table.html', {'formset': formset})

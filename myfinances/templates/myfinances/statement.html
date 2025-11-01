@@ -27,10 +27,10 @@
                         <input class="form-control-file" type="file" id="file1" name="file" required>
                     </div>
                     <div class="form-group mb-2 ml-auto">
-                        <label for="start_date"><strong>From:</strong></label>
+                        <label for="start_date"><strong>From: </strong></label>
                         <input class="form-control form-control-sm" type="date" id="start_date" name="start_date">
                         &nbsp;
-                        <label for="end_date"><strong>To:</strong></label>
+                        <label for="end_date"><strong>To: </strong></label>
                         <input class="form-control form-control-sm" type="date" id="end_date" name="end_date">
                         &nbsp;
                     </div>
@@ -101,26 +101,34 @@
         <div class="col-12 col-lg-3 align-self-end">
             <span style="font-size:2.5em;">Transactions</span>
         </div>
-        <!-- Filter Table -->
-        <div class=" col-3 col-lg-2 align-self-end ml-auto mb-2">
-            <!-- https://www.geeksforgeeks.org/how-to-convert-html-table-into-excel-spreadsheet-using-jquery/ -->
-            <button class="btn btn-secondary btn-lg align-bottom" onclick="exportTable()">
-                Save to Excel
-            </button>
-        </div>
-        <div class="col-3 col-lg-2 align-self-end mb-2">
-            <button type="button" class="btn btn-secondary btn-lg align-bottom" data-toggle="modal"
-                data-target="#categoryModal">
-                Categories
-            </button>
-        </div>
-        <div class="col-3 col-lg-4 input-group align-self-end mb-2">
-            <input class="form-control form-control-lg" type="text" id="myInput" onkeyup="filterTable()"
-                placeholder="Filter categories..">
+
+
+        <div class="col-6 col-lg-2 input-group align-self-end mb-2">
+            <input class="form-control form-control-sm" type="text" id="descriptionInput" onkeyup="filterDescription()"
+                placeholder="Filter description..">
             <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button" id="clearBtn" onclick="clearText()">X</button>
+                <button class="btn btn-outline-secondary btn-sm" type="button"
+                    onclick="clearDescriptionBox()">X</button>
             </div>
         </div>
+        <div class="col-6 col-lg-2 input-group align-self-end mb-2">
+            <input class="form-control form-control-sm" type="text" id="myInput" onkeyup="filterTable()"
+                placeholder="Filter categories..">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary btn-sm" type="button" id="clearBtn"
+                    onclick="clearText()">X</button>
+            </div>
+        </div>
+        <div class="col-3 col-lg-2 align-self-end ml-auto mb-2">
+            <button class="btn btn-secondary btn-lg align-bottom" onclick="exportTable()">Save to Excel</button>
+        </div>
+
+        <div class="col-3 col-lg-2 align-self-end mb-2">
+            <button type="button" class="btn btn-secondary btn-lg align-bottom" data-toggle="modal"
+                data-target="#categoryModal">Edit Categories</button>
+        </div>
+
+
     </div>
     <div class="row">
         <div class="col-12 mx-auto">
@@ -409,6 +417,7 @@
 <script type="text/javascript" src="{% static 'myfinances/js/updateCategories.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/sortTable.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/filterTable.js' %}"></script>
+<script type="text/javascript" src="{% static 'myfinances/js/filterDescription.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/changeCategory.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/calculateTable.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/topBottomButton.js' %}"></script>
@@ -439,6 +448,18 @@
         document.querySelector('#myInput').value = "";
         filterTable();
     }
+
+
+    // Call the function to filter and recalculate
+    filterDescription();
+
+    // Call function to clear the categories input search field
+    function clearDescriptionBox() {
+        document.querySelector('#descriptionInput').value = "";
+        filterDescription();
+    }
+
+
 
 </script>
 {% endif %}

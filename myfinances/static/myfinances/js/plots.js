@@ -25,8 +25,8 @@ function generatePlot(dataIn, expensesArray) {
     });
 
     // Total in and Out
-    var InTotal = [{ "category": "Deposits", "amount": Math.round(totalIn*100)/100 }];
-    var OutTotal = [{ "category": "Withdrawals", "amount": Math.round(totalOut*100)/100 }];
+    var InTotal = [{ "category": "Deposits", "amount": Math.round(totalIn * 100) / 100 }];
+    var OutTotal = [{ "category": "Withdrawals", "amount": Math.round(totalOut * 100) / 100 }];
 
 
 
@@ -47,7 +47,7 @@ function generatePlot(dataIn, expensesArray) {
 
 
     var layout = {
-        title: 'Expenses by Category',
+        title: 'Expenses by Category Overview',
         xaxis: {
             title: "Amount ($)",
             automargin: true,
@@ -62,7 +62,7 @@ function generatePlot(dataIn, expensesArray) {
             t: 40,
             pad: 4
         },
-        hoverlabel: { bgcolor: "#FFF" },
+        hoverlabel: { bgcolor: "#2f4b7c" },
     };
 
 
@@ -77,8 +77,20 @@ function generatePlot(dataIn, expensesArray) {
     top10SelSamples = top10SelSamples.slice(0, 10)
 
     var ultimateColors = [
-        ['#003f5c', '#2f4b7c', '#665191', '#a05195', '#d45087', '#f95d6a', '#ff7c43', '#ffa600'],
+        [
+            '#ff0000', // pure red
+            '#ff4000', // reddish orange
+            '#ff8000', // orange
+            '#ffbf00', // amber
+            '#ff8000', // orange again for smoother transition
+            '#ff4080', // pinkish red
+            '#d45087', // magenta
+            '#a05195', // purple
+            '#665191', // indigo
+            '#2f4b7c'  // deep blue
+        ]
     ];
+
 
     var data = [{
         type: "pie",
@@ -97,7 +109,7 @@ function generatePlot(dataIn, expensesArray) {
     // data.hoverinfo = 'text';
 
     var layout = {
-        title: "Proportion of Expenses by Category",
+        title: "Expense Breakdown: Top 10 Categories",
         // height: 400,
         // width: 400,
         margin: {
@@ -123,32 +135,34 @@ function generatePlot(dataIn, expensesArray) {
 
     Plotly.newPlot('pieChartOut', data, layout, config)
 
-
-    // Plot
     var dataBarPlotOut = [
         {
             y: InTotal.map(element => element.category),
             x: InTotal.map(element => element.amount),
             type: 'bar',
             orientation: 'h',
-            number: { prefix: "$" },
-            hovertemplate: 'Total: %{x:$,2f}<extra></extra>',
+            text: InTotal.map(element => `$${element.amount.toFixed(2)}`),
+            textposition: 'inside',
             marker: {
-                color: 'blue', opacity: .6
+                color: 'green',
+                opacity: 1
             },
-            name: 'Deposits'
+            name: 'Cash In',
+            hoverinfo: 'skip' // optional: disables hover if you want only labels
         },
         {
             y: OutTotal.map(element => element.category),
             x: OutTotal.map(element => element.amount),
             type: 'bar',
             orientation: 'h',
-            number: { prefix: "$" },
-            hovertemplate: 'Total: %{x:$,2f}<extra></extra>',
+            text: OutTotal.map(element => `$${element.amount.toFixed(2)}`),
+            textposition: 'inside',
             marker: {
-                color: 'red', opacity: .6
+                color: 'red',
+                opacity: 1
             },
-            name: 'Withdrawals'
+            name: 'Cash Out',
+            hoverinfo: 'skip' // optional
         }
     ];
 

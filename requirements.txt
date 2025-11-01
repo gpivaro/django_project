@@ -1,16 +1,14 @@
 asgiref==3.7.2
-backports.zoneinfo==0.2.1
 certifi==2025.7.14
 charset-normalizer==3.4.2
 crispy-bootstrap4==2022.1
-Django==3.2.25
+Django==4.2.24
 django-crispy-forms==2.0
 djangorestframework==3.15.1
 idna==3.10
-numpy==1.21.6
-pandas==1.2.1
+numpy==2.3.4
+pandas==2.3.3
 Pillow==8.3.2
-pkg-resources==0.0.0
 PyMySQL==1.1.1
 python-dateutil==2.9.0.post0
 pytz==2025.2
@@ -19,5 +17,6 @@ sentry-sdk==2.33.0
 six==1.17.0
 sqlparse==0.4.4
 thefuzz==0.18.0
-typing-extensions==4.7.1
+typing_extensions==4.7.1
+tzdata==2025.2
 urllib3==2.0.7

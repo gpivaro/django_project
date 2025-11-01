@@ -3,7 +3,7 @@ function generatePlot(dataIn, expensesArray) {
 
     // Sort the samples in descending order of amount
     dataIn.sort((a, b) => b.amount - a.amount);
-    console.log(Object.values(dataIn));
+    // console.log(Object.values(dataIn));
 
 
     var inValues = []
@@ -184,8 +184,8 @@ function generatePlot(dataIn, expensesArray) {
             t: 40,
             pad: 4
         },
-        hoverlabel: { bgcolor: "#FFF" }
-        // hovermode: false,
+        hoverlabel: { bgcolor: "#FFF" },
+        hovermode: false,
 
     };
 
@@ -244,15 +244,15 @@ function generatePlot(dataIn, expensesArray) {
 
 
     // Create a object list with the target data columns
-    var cleanData = [];
-    for (var i = 0; i < outValues.length; i++) {
-        cleanData.push({
-            "category": outValues[i].category,
-            "amount": -1 * outValues[i].amount
+    var categoryData = [];
+    for (var i = 0; i < dataIn.length; i++) {
+        categoryData.push({
+            "category": dataIn[i].category,
+            "amount": dataIn[i].amount
         });
     };
 
-    console.log(cleanData);
+    console.log(categoryData);
 
     // Insert a table
     d3.select("#categoryTable")
@@ -264,7 +264,7 @@ function generatePlot(dataIn, expensesArray) {
                 <th class="alert-dark text-uppercase" style="padding:0px; margin:0px;" onclick="sortTableNumeric(1,\'tableCategoryExpenses\')">Amount ($) &nbsp;<i class="fa fa-fw fa-sort"></i></th>`)
         .append("tbody")
         .selectAll("tr")
-        .data(cleanData)
+        .data(categoryData)
         .enter()
         .append("tr")
         .style('height', '2px')
@@ -279,7 +279,7 @@ function generatePlot(dataIn, expensesArray) {
         .style('padding', '0px')
         .style('margin', '0px');
 
-    document.getElementById('tableTitle').textContent = "Total Expenses by Category";
+    document.getElementById('tableTitle').textContent = "Categorized Transactions";
 
 
 

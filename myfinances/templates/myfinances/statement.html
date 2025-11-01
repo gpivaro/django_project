@@ -2,6 +2,50 @@
 {% load static %}
 {% block content %}
 
+
+<style>
+    .checkbox-green input[type="checkbox"] {
+        display: none;
+    }
+
+    .checkbox-green label {
+        position: relative;
+        padding-left: 30px;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .checkbox-green label::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 2px;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #28a745;
+        border-radius: 4px;
+        background-color: #fff;
+    }
+
+    .checkbox-green input[type="checkbox"]:checked+label::after {
+        content: "✔";
+        position: absolute;
+        left: 3px;
+        top: 0px;
+        font-size: 18px;
+        color: #28a745;
+    }
+
+    .amount-positive {
+        color: black;
+    }
+
+    .amount-negative {
+        color: red;
+    }
+</style>
+
+
 <!-- header -->
 <div class="container-fluid alert-secondary p-3">
     <div class="container">
@@ -58,25 +102,27 @@
         </div>
     </div>
     <hr>
-    <div class="row">
-        <div class="col-12 col-lg-8">
+    <div class="row justify-content-center" id="categoriesTableCharts">
+        <!-- Table Section -->
+        <div class="col-12 col-md-6 col-lg-5 p-4">
+            <p class="text-center"><span id="tableTitle"></span></p>
+            <div class="table-responsive" id="categoryTable" style="height: 460px;">
+                <table class="table table-striped table-bordered w-100" id="tableCategoryExpenses">
+                </table>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="col-12 col-lg-7">
             <div class="row">
-                <div class="col-8 col-lg-12 p-4 mx-auto">
+                <div class="col-12 p-4 mx-auto">
                     <div id="barChartOutvsIn"></div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-8 col-lg-12 p-4 mx-auto">
+                <div class="col-12 p-4 mx-auto">
                     <div id="scatterExpenseDay"></div>
                 </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-md-4  ml-auto mr-auto p-4">
-            <p style="text-align: center;"><span id="tableTitle"></span></p>
-            <div class="table-responsive" id="categoryTable" style="height:410px;">
-                <table class="table table-striped table-bordered" style="width: 85%;" id="tableCategoryExpenses">
-                </table>
             </div>
         </div>
     </div>
@@ -156,11 +202,11 @@
                             <td>{{transactions.Details}}</td>
                             <td>{{transactions.Description}}</td>
                             <td>{{ transactions.Amount |floatformat:2 }}</td>
-                            <!-- <td>{{transactions.Type}}</td> -->
-                            <!-- <td>{{transactions.Check}}</td> -->
-                            <!-- <td>$ {{transactions.Balance}}</td> -->
-                            <td>{{transactions.Category}}</td>
-                            <!-- <td>
+                                <!-- <td>{{transactions.Type}}</td> -->
+                                <!-- <td>{{transactions.Check}}</td> -->
+                                <!-- <td>$ {{transactions.Balance}}</td> -->
+                                <td>{{transactions.Category}}</td>
+                                <!-- <td>
                                 <select onchange="changeCategory(this.value)" class="noExport selDataset"
                                     name="selDataset">
                                     <option value="" disabled selected hidden>Choose a category</option>
@@ -170,30 +216,30 @@
                                     {% endfor %}
                                 </select>
                             </td> -->
-                            <td>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal"
-                                    data-target="#reCategorizeModal{{ forloop.counter }}"
-                                    id="Btn_{{ forloop.counter }}"><i class="fa fa-fw fa-edit"></i>
-                                </button>
-                                <!-- Modal Re-categorize -->
-                                <div class="modal fade" id="reCategorizeModal{{ forloop.counter }}" tabindex="-1"
-                                    role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLabel">Change Category for
-                                                    Transaction
-                                                </h5>
-                                                <button type="button" class="close" data-dismiss="modal"
-                                                    aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p>Description: {{transactions.Description}} </p>
-                                                <p> Current Category: <span
-                                                        id="currentCategory_{{ forloop.counter }}"><span></p>
-                                                <!-- <select onchange="changeCategory(this.value)"
+                                <td>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal"
+                                        data-target="#reCategorizeModal{{ forloop.counter }}"
+                                        id="Btn_{{ forloop.counter }}"><i class="fa fa-fw fa-edit"></i>
+                                    </button>
+                                    <!-- Modal Re-categorize -->
+                                    <div class="modal fade" id="reCategorizeModal{{ forloop.counter }}" tabindex="-1"
+                                        role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Change Category for
+                                                        Transaction
+                                                    </h5>
+                                                    <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Description: {{transactions.Description}} </p>
+                                                    <p> Current Category: <span
+                                                            id="currentCategory_{{ forloop.counter }}"><span></p>
+                                                    <!-- <select onchange="changeCategory(this.value)"
                                                     class="noExport selDataset" name="selDataset"
                                                     id="Select_{{ forloop.counter }}">
                                                     <option value="" disabled selected hidden>Choose a category</option>
@@ -203,29 +249,31 @@
                                                     </option>
                                                     {% endfor %}
                                                 </select> -->
-                                                <select class="noExport selDataset" name="selDataset"
-                                                    id="Select_{{ forloop.counter }}">
-                                                    <option value="" disabled selected hidden>Choose a category</option>
-                                                    <!-- {% for category in categories_list %} -->
-                                                    <!-- <option value="{{ forloop.parentloop.counter }}|{{category}}">
+                                                    <select class="noExport selDataset" name="selDataset"
+                                                        id="Select_{{ forloop.counter }}">
+                                                        <option value="" disabled selected hidden>Choose a category
+                                                        </option>
+                                                        <!-- {% for category in categories_list %} -->
+                                                        <!-- <option value="{{ forloop.parentloop.counter }}|{{category}}">
                                                         {{category}}
                                                     </option> -->
-                                                    <!-- {% endfor %} -->
-                                                </select>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-toggle="modal"
-                                                    data-target="#categoryModal">
-                                                    Edit Categories
-                                                </button>
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-dismiss="modal">Close</button>
-                                                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                                                        <!-- {% endfor %} -->
+                                                    </select>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-toggle="modal"
+                                                        data-target="#categoryModal">
+                                                        Edit Categories
+                                                    </button>
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Close</button>
+                                                    <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </td>
+                                </td>
+
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -417,7 +465,6 @@
 <script type="text/javascript" src="{% static 'myfinances/js/updateCategories.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/sortTable.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/filterTable.js' %}"></script>
-<script type="text/javascript" src="{% static 'myfinances/js/filterDescription.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/changeCategory.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/calculateTable.js' %}"></script>
 <script type="text/javascript" src="{% static 'myfinances/js/topBottomButton.js' %}"></script>

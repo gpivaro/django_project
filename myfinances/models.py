@@ -35,6 +35,7 @@ class Categories(models.Model):
     Expression = models.TextField()
     Class = models.CharField(max_length=254, default="Non-categorized")
     Owner = models.ForeignKey(Users, on_delete=models.CASCADE)
+    Insert_Date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         # return f"{self.Group} | {self.Expression}"
@@ -43,3 +44,7 @@ class Categories(models.Model):
     class Meta:
         ordering = ["Group"]
 
+
+class Item(models.Model):
+    name = models.CharField(max_length=100)
+    quantity = models.IntegerField()

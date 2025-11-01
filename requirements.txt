@@ -8,7 +8,11 @@ djangorestframework==3.15.1
 idna==3.10
 numpy==2.3.4
 pandas==2.3.3
+<<<<<<< HEAD
 Pillow==8.3.2
+=======
+pillow==12.0.0
+>>>>>>> 9e96f4f3417e6c39d1cb4339f1a7c2cdd4c8ed80
 PyMySQL==1.1.1
 python-dateutil==2.9.0.post0
 pytz==2025.2

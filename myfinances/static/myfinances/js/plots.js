@@ -25,8 +25,8 @@ function generatePlot(dataIn, expensesArray) {
     });
 
     // Total in and Out
-    var InTotal = [{ "category": "Deposits", "amount": Math.round(totalIn) }];
-    var OutTotal = [{ "category": "Withdrawals", "amount": Math.round(totalOut) }];
+    var InTotal = [{ "category": "Deposits", "amount": Math.round(totalIn*100)/100 }];
+    var OutTotal = [{ "category": "Withdrawals", "amount": Math.round(totalOut*100)/100 }];
 
 
 

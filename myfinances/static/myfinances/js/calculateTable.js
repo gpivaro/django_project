@@ -16,7 +16,7 @@ function calculateTable() {
         td = tr[i].getElementsByTagName("td")[4];
         if (td) {
             txtValue = td.textContent || td.innerText;
-            expensesArray.push({ "date": (tr[i].getElementsByTagName("td")[0].innerText), "amount": parseFloat(tr[i].getElementsByTagName("td")[3].innerText) });
+            expensesArray.push({ "date": (tr[i].getElementsByTagName("td")[0].innerText),"description": (tr[i].getElementsByTagName("td")[2].innerText), "amount": parseFloat(tr[i].getElementsByTagName("td")[3].innerText) });
             if (categoriesArray.includes(txtValue)) {
                 // categoriesArray.push[txtValue];
                 var jj = 0;

@@ -202,11 +202,11 @@
                             <td>{{transactions.Details}}</td>
                             <td>{{transactions.Description}}</td>
                             <td>{{ transactions.Amount |floatformat:2 }}</td>
-                                <!-- <td>{{transactions.Type}}</td> -->
-                                <!-- <td>{{transactions.Check}}</td> -->
-                                <!-- <td>$ {{transactions.Balance}}</td> -->
-                                <td>{{transactions.Category}}</td>
-                                <!-- <td>
+                            <!-- <td>{{transactions.Type}}</td> -->
+                            <!-- <td>{{transactions.Check}}</td> -->
+                            <!-- <td>$ {{transactions.Balance}}</td> -->
+                            <td>{{transactions.Category}}</td>
+                            <!-- <td>
                                 <select onchange="changeCategory(this.value)" class="noExport selDataset"
                                     name="selDataset">
                                     <option value="" disabled selected hidden>Choose a category</option>
@@ -216,30 +216,30 @@
                                     {% endfor %}
                                 </select>
                             </td> -->
-                                <td>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal"
-                                        data-target="#reCategorizeModal{{ forloop.counter }}"
-                                        id="Btn_{{ forloop.counter }}"><i class="fa fa-fw fa-edit"></i>
-                                    </button>
-                                    <!-- Modal Re-categorize -->
-                                    <div class="modal fade" id="reCategorizeModal{{ forloop.counter }}" tabindex="-1"
-                                        role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Change Category for
-                                                        Transaction
-                                                    </h5>
-                                                    <button type="button" class="close" data-dismiss="modal"
-                                                        aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <p>Description: {{transactions.Description}} </p>
-                                                    <p> Current Category: <span
-                                                            id="currentCategory_{{ forloop.counter }}"><span></p>
-                                                    <!-- <select onchange="changeCategory(this.value)"
+                            <td>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal"
+                                    data-target="#reCategorizeModal{{ forloop.counter }}"
+                                    id="Btn_{{ forloop.counter }}"><i class="fa fa-fw fa-edit"></i>
+                                </button>
+                                <!-- Modal Re-categorize -->
+                                <div class="modal fade" id="reCategorizeModal{{ forloop.counter }}" tabindex="-1"
+                                    role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Change Category for
+                                                    Transaction
+                                                </h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Description: {{transactions.Description}} </p>
+                                                <p> Current Category: <span
+                                                        id="currentCategory_{{ forloop.counter }}"><span></p>
+                                                <!-- <select onchange="changeCategory(this.value)"
                                                     class="noExport selDataset" name="selDataset"
                                                     id="Select_{{ forloop.counter }}">
                                                     <option value="" disabled selected hidden>Choose a category</option>
@@ -249,30 +249,30 @@
                                                     </option>
                                                     {% endfor %}
                                                 </select> -->
-                                                    <select class="noExport selDataset" name="selDataset"
-                                                        id="Select_{{ forloop.counter }}">
-                                                        <option value="" disabled selected hidden>Choose a category
-                                                        </option>
-                                                        <!-- {% for category in categories_list %} -->
-                                                        <!-- <option value="{{ forloop.parentloop.counter }}|{{category}}">
+                                                <select class="noExport selDataset" name="selDataset"
+                                                    id="Select_{{ forloop.counter }}">
+                                                    <option value="" disabled selected hidden>Choose a category
+                                                    </option>
+                                                    <!-- {% for category in categories_list %} -->
+                                                    <!-- <option value="{{ forloop.parentloop.counter }}|{{category}}">
                                                         {{category}}
                                                     </option> -->
-                                                        <!-- {% endfor %} -->
-                                                    </select>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-toggle="modal"
-                                                        data-target="#categoryModal">
-                                                        Edit Categories
-                                                    </button>
-                                                    <button type="button" class="btn btn-secondary"
-                                                        data-dismiss="modal">Close</button>
-                                                    <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
-                                                </div>
+                                                    <!-- {% endfor %} -->
+                                                </select>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-toggle="modal"
+                                                    data-target="#categoryModal">
+                                                    Edit Categories
+                                                </button>
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">Close</button>
+                                                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                                             </div>
                                         </div>
                                     </div>
-                                </td>
+                                </div>
+                            </td>
 
                         </tr>
                         {% endfor %}
@@ -484,6 +484,7 @@
 {% if transactions_list %}
 <script>
 
+
     // Load the page and calculate the the table totals to generate the plot
     calculateTable();
 
@@ -505,6 +506,7 @@
         document.querySelector('#descriptionInput').value = "";
         filterDescription();
     }
+
 
 
 

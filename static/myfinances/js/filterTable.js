@@ -61,3 +61,40 @@ function filterDescription() {
     totalRowCalc(totalRowValues);
 
 }
+
+
+function filterSavedCategory() {
+    const input = document.getElementById("savedCategoryInput");
+    const filter = input.value.toUpperCase();
+    const table = document.getElementById("tableCategories");
+    const tr = table.getElementsByTagName("tr");
+
+    for (let i = 0; i < tr.length; i++) {
+        const td = tr[i].getElementsByTagName("td")[0]; // Adjust index if needed
+        if (td) {
+            const inputField = td.querySelector('input[type="text"]');
+            const txtValue = inputField ? inputField.value.toUpperCase() : "";
+            tr[i].style.display = txtValue.includes(filter) ? "" : "none";
+        } else {
+            tr[i].style.display = "none";
+        }
+    }
+}
+
+function filterSavedExpression() {
+    const input = document.getElementById("savedExpressionInput");
+    const filter = input.value.toUpperCase();
+    const table = document.getElementById("tableCategories");
+    const tr = table.getElementsByTagName("tr");
+
+    for (let i = 0; i < tr.length; i++) {
+        const td = tr[i].getElementsByTagName("td")[0]; // Adjust index if needed
+        if (td) {
+            const inputField = td.querySelector('input[id^="expressionInput"]');
+            const txtValue = inputField ? inputField.value.toUpperCase() : "";
+            tr[i].style.display = txtValue.includes(filter) ? "" : "none";
+        } else {
+            tr[i].style.display = "none";
+        }
+    }
+}

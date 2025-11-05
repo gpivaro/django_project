@@ -3,8 +3,8 @@ function generatePlot(dataIn, expensesArray) {
 
     // Sort the samples in descending order of amount
     dataIn.sort((a, b) => b.amount - a.amount);
-    console.log(Object.values(dataIn));
-
+    // console.log(Object.values(dataIn));
+    // console.log(expensesArray)
 
     var inValues = []
     var totalIn = 0;
@@ -24,11 +24,6 @@ function generatePlot(dataIn, expensesArray) {
         }
     });
 
-    // Total in and Out
-    var InTotal = [{ "category": "Deposits", "amount": Math.round(totalIn * 100) / 100 }];
-    var OutTotal = [{ "category": "Withdrawals", "amount": Math.round(totalOut * 100) / 100 }];
-
-
 
     // Plot
     var dataBarPlotOut = [
@@ -40,7 +35,7 @@ function generatePlot(dataIn, expensesArray) {
             number: { prefix: "$" },
             hovertemplate: 'Total: %{x:$,2f}<extra></extra>',
             marker: {
-                color: 'red', opacity: .6
+                color: '#404040', opacity: 1
             }
         },
     ];
@@ -78,16 +73,16 @@ function generatePlot(dataIn, expensesArray) {
 
     var ultimateColors = [
         [
-            '#ff0000', // pure red
-            '#ff4000', // reddish orange
-            '#ff8000', // orange
-            '#ffbf00', // amber
-            '#ff8000', // orange again for smoother transition
-            '#ff4080', // pinkish red
-            '#d45087', // magenta
-            '#a05195', // purple
-            '#665191', // indigo
-            '#2f4b7c'  // deep blue
+            '#1C1C1C',
+            '#2E2E2E',
+            '#404040',
+            '#525252',
+            '#646464',
+            '#767676',
+            '#888888',
+            '#9A9A9A',
+            '#ACACAC',
+            '#BEBEBE'
         ]
     ];
 
@@ -135,7 +130,57 @@ function generatePlot(dataIn, expensesArray) {
 
     Plotly.newPlot('pieChartOut', data, layout, config)
 
+
+
+
+    var totalIn = 0;
+    expensesArray.forEach(element => {
+        if (element.amount >= 0) {
+            totalIn = totalIn + element.amount;
+        }
+    });
+
+    var totalOut = 0;
+    expensesArray.forEach(element => {
+        if (element.amount < 0) {
+            totalOut = totalOut + -1 * element.amount;
+        }
+    });
+
+    // Total in and Out
+    var InTotal = [{ "category": "Deposits", "amount": Math.round(totalIn * 100) / 100 }];
+    var OutTotal = [{ "category": "Withdrawals", "amount": Math.round(totalOut * 100) / 100 }];
+    var NetTotal = [{ "category": "Net Value", "amount": Math.round((totalIn - totalOut) * 100) / 100 }];
+
+
+
     var dataBarPlotOut = [
+        {
+            y: NetTotal.map(element => element.category),
+            x: NetTotal.map(element => element.amount),
+            type: 'bar',
+            orientation: 'h',
+            text: NetTotal.map(element => `$${element.amount.toFixed(2)}`),
+            textposition: 'outside',
+            marker: {
+                color: NetTotal.map(element => element.amount < 0 ? 'red' : 'blue'),
+                opacity: 1
+            },
+            name: 'Net Value',
+        },
+        {
+            y: OutTotal.map(element => element.category),
+            x: OutTotal.map(element => element.amount),
+            type: 'bar',
+            orientation: 'h',
+            text: OutTotal.map(element => `$${element.amount.toFixed(2)}`),
+            textposition: 'inside',
+            marker: {
+                color: '#404040',
+                opacity: 1
+            },
+            name: 'Withdrawals',
+        },
         {
             y: InTotal.map(element => element.category),
             x: InTotal.map(element => element.amount),
@@ -147,22 +192,7 @@ function generatePlot(dataIn, expensesArray) {
                 color: 'green',
                 opacity: 1
             },
-            name: 'Cash In',
-            hoverinfo: 'skip' // optional: disables hover if you want only labels
-        },
-        {
-            y: OutTotal.map(element => element.category),
-            x: OutTotal.map(element => element.amount),
-            type: 'bar',
-            orientation: 'h',
-            text: OutTotal.map(element => `$${element.amount.toFixed(2)}`),
-            textposition: 'inside',
-            marker: {
-                color: 'red',
-                opacity: 1
-            },
-            name: 'Cash Out',
-            hoverinfo: 'skip' // optional
+            name: 'Deposits',
         }
     ];
 
@@ -179,19 +209,19 @@ function generatePlot(dataIn, expensesArray) {
         height: 200,
         margin: {
             l: 100,
-            r: 20,
+            r: 100,
             b: 30,
             t: 40,
             pad: 4
         },
-        hoverlabel: { bgcolor: "#FFF" }
-        // hovermode: false,
+        // hoverlabel: { bgcolor: "#FFF" },
+        hovermode: false,
 
     };
 
 
 
-    Plotly.newPlot('barChartOutvsIn', dataBarPlotOut, layout, config);
+    Plotly.newPlot('barChartOutvsIn', dataBarPlotOut, layout,config);
 
 
     var expensesDateOut = [];
@@ -202,26 +232,28 @@ function generatePlot(dataIn, expensesArray) {
     });
 
     // console.log((new Date(Date.parse(expensesDateOut[1].date))).getDay());
-
     var trace1 = {
-        x: expensesDateOut.map(element => (new Date(Date.parse(element.date)))),
+        x: expensesDateOut.map(element => new Date(Date.parse(element.date))),
         y: expensesDateOut.map(element => -1 * element.amount),
+        text: expensesDateOut.map(element =>
+            `Amount: $${(-1 * element.amount).toFixed(2)}<br>Description: ${element.description}`
+        ),
         mode: 'markers',
         type: 'scatter',
         marker: {
-            color: 'red', opacity: .6
+            color: 'red',
+            opacity: 0.6
         },
+        hoverinfo: 'text',
+        name: 'Expenses'
     };
 
     var layout = {
         title: 'Expenses Distribution by Date',
         yaxis: {
-            title: "Amount ($)",
-            // automargin: true,
+            title: "Amount ($)"
         },
         showlegend: false,
-        // autosize: true,
-        // width: 500,
         height: 200,
         margin: {
             l: 100,
@@ -230,9 +262,9 @@ function generatePlot(dataIn, expensesArray) {
             t: 40,
             pad: 4
         },
-        hoverlabel: { bgcolor: "#FFF" }
-        // hovermode: false,
-
+        hoverlabel: {
+            bgcolor: "#FFF"
+        }
     };
 
     var data = [trace1];
@@ -244,15 +276,15 @@ function generatePlot(dataIn, expensesArray) {
 
 
     // Create a object list with the target data columns
-    var cleanData = [];
-    for (var i = 0; i < outValues.length; i++) {
-        cleanData.push({
-            "category": outValues[i].category,
-            "amount": -1 * outValues[i].amount
+    var categoryData = [];
+    for (var i = 0; i < dataIn.length; i++) {
+        categoryData.push({
+            "category": dataIn[i].category,
+            "amount": dataIn[i].amount
         });
     };
 
-    console.log(cleanData);
+    // console.log(categoryData);
 
     // Insert a table
     d3.select("#categoryTable")
@@ -264,7 +296,7 @@ function generatePlot(dataIn, expensesArray) {
                 <th class="alert-dark text-uppercase" style="padding:0px; margin:0px;" onclick="sortTableNumeric(1,\'tableCategoryExpenses\')">Amount ($) &nbsp;<i class="fa fa-fw fa-sort"></i></th>`)
         .append("tbody")
         .selectAll("tr")
-        .data(cleanData)
+        .data(categoryData)
         .enter()
         .append("tr")
         .style('height', '2px')
@@ -279,7 +311,7 @@ function generatePlot(dataIn, expensesArray) {
         .style('padding', '0px')
         .style('margin', '0px');
 
-    document.getElementById('tableTitle').textContent = "Total Expenses by Category";
+    document.getElementById('tableTitle').textContent = "Categorized Transactions";
 
 
 

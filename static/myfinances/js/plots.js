@@ -161,7 +161,7 @@ function generatePlot(dataIn, expensesArray) {
             type: 'bar',
             orientation: 'h',
             text: NetTotal.map(element => `$${element.amount.toFixed(2)}`),
-            textposition: 'inside',
+            textposition: 'outside',
             marker: {
                 color: NetTotal.map(element => element.amount < 0 ? 'red' : 'blue'),
                 opacity: 1
@@ -209,19 +209,19 @@ function generatePlot(dataIn, expensesArray) {
         height: 200,
         margin: {
             l: 100,
-            r: 20,
+            r: 100,
             b: 30,
             t: 40,
             pad: 4
         },
-        hoverlabel: { bgcolor: "#FFF" },
+        // hoverlabel: { bgcolor: "#FFF" },
         hovermode: false,
 
     };
 
 
 
-    Plotly.newPlot('barChartOutvsIn', dataBarPlotOut, layout, {displayModeBar: false});
+    Plotly.newPlot('barChartOutvsIn', dataBarPlotOut, layout,config);
 
 
     var expensesDateOut = [];
@@ -284,7 +284,6 @@ function generatePlot(dataIn, expensesArray) {
         });
     };
 
-    console.log(categoryData);
 
     // Insert a table
     d3.select("#categoryTable")

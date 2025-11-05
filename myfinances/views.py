@@ -39,7 +39,7 @@ def home(request):
 
 # Json version of all available categories
 def categories(request):
-    data = list(Categories.objects.order_by("Group").all().values())
+    data = list(Categories.objects.order_by("Group", "Expression").all().values())
     return JsonResponse(data, safe=False)
     # context = {"categories_list": Categories.objects.order_by("id").all()}
     # return render(request, "myfinances/categories.html", context)
@@ -104,7 +104,7 @@ def statement(request):
         )
 
     # Query database for list of categories and convert to dataframe
-    categories = Categories.objects.all().values()
+    categories = Categories.objects.order_by("Group", "Expression").all().values()
     categories_df = pd.DataFrame(categories)
 
     # Call function to label the transactions
@@ -119,7 +119,8 @@ def statement(request):
         "transactions_list": labeled_transactions["statement_dict"],
         "categories_list": labeled_transactions["categories_list"],
         "table_row_id": table_row_id,
-        "categories_list": Categories.objects.order_by("Group").all(),
+        "categories_list": categories,
+        "user_email": Users.objects.values_list('email', flat=True)
     }
 
     # If no table rows, then return the error message indication no data for the period selected

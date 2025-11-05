@@ -364,6 +364,26 @@
                             <div class="container mb-2 p-4">
                                 <h5>List of Categories and Expressions</h5>
                                 <div class="row">
+                                    <div class="col-5 input-group align-self-end mb-2">
+                                        <input class="form-control form-control-sm" type="text" id="savedCategoryInput"
+                                            onkeyup="filterSavedCategory()" placeholder="Filter categories...">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary btn-sm" type="button"
+                                                onclick="clearSavedCategoryBox()">X</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-5 input-group align-self-end mb-2">
+                                        <input class="form-control form-control-sm" type="text"
+                                            id="savedExpressionInput" onkeyup="filterSavedExpression()"
+                                            placeholder="Filter expressions..">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary btn-sm" type="button"
+                                                id="clearBtnSavedExpression"
+                                                onclick="clearSavedExpressionBox()">X</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
                                     <div class="col-12 col-md-auto">
                                         <div class="table-responsive table-striped">
                                             <table class="table table-bordered text-uppercase" id="tableCategories">
@@ -426,6 +446,10 @@
         </div>
     </div>
 </div>
+
+
+
+
 
 
 <!-- <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reCategorizeModal"
@@ -506,6 +530,26 @@
         document.querySelector('#descriptionInput').value = "";
         filterDescription();
     }
+
+    filterSavedCategory();
+
+    // Call function to clear the categories input search field
+    function clearSavedCategoryBox() {
+        document.querySelector('#savedCategoryInput').value = "";
+        filterSavedCategory();
+    }
+
+
+    filterSavedExpression();
+
+    // Call function to clear the categories input search field
+    function clearSavedExpressionBox() {
+        document.querySelector('#savedExpressionInput').value = "";
+        filterSavedExpression();
+    }
+
+
+
 
 
 

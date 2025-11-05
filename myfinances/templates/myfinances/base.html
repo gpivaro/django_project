@@ -75,7 +75,7 @@
                 {% if user.is_authenticated %}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" role="button"
-                        aria-haspopup="true" aria-expanded="false">{{ user.get_username }} <span
+                        aria-haspopup="true" aria-expanded="false" id="user_info">{{ user.get_username }} ({{ user.email }}) <span
                             class="caret"></span></a>
                     <ul class="dropdown-menu bg-dark">
                         <li class="nav-item"><a class="nav-link"

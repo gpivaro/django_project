@@ -36,6 +36,8 @@ class Categories(models.Model):
     Class = models.CharField(max_length=254, default="Non-categorized")
     Owner = models.ForeignKey(Users, on_delete=models.CASCADE)
     Insert_Date = models.DateTimeField(default=timezone.now)
+    Update_Date = models.DateTimeField(auto_now=True)         # updates on every save
+
 
     def __str__(self):
         # return f"{self.Group} | {self.Expression}"

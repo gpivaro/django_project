@@ -284,7 +284,6 @@ function generatePlot(dataIn, expensesArray) {
         });
     };
 
-    // console.log(categoryData);
 
     // Insert a table
     d3.select("#categoryTable")

@@ -18,6 +18,11 @@ $(document).ready(function () {
         // Get the expression value (text)
         var expression = $('#expressionInput' + category_ID).val();
 
+        // Get the expression value (text)
+        var userText = $('#user_info').text(); // e.g., "gpivaro (gfp.1@hotmail.com)"
+        var emailMatch = userText.match(/\(([^)]+)\)/); // extract text inside parentheses
+        var user_email = emailMatch ? emailMatch[1] : null;
+        
 
         // Set the request to the backend using Ajax and PUT method
         req = $.ajax({
@@ -29,7 +34,7 @@ $(document).ready(function () {
                 "Group": category,
                 "Expression": expression,
                 "Class": "",
-                "Owner": "gfp.1@hotmail.com",
+                "Owner": user_email,
             },
             success: function (data) {
                 console.log(data);
@@ -86,6 +91,11 @@ $(document).ready(function () {
         // Get the expression value (text)
         var expression = $('#newExpressionInput').val();
 
+        // Get the expression value (text)
+        var userText = $('#user_info').text(); // e.g., "gpivaro (gfp.1@hotmail.com)"
+        var emailMatch = userText.match(/\(([^)]+)\)/); // extract text inside parentheses
+        var user_email = emailMatch ? emailMatch[1] : null;
+
 
         // Set the request to the backend using Ajax and PUT method
         req = $.ajax({
@@ -96,7 +106,7 @@ $(document).ready(function () {
                 "Group": category,
                 "Expression": expression,
                 "Class": "",
-                "Owner": "gfp.1@hotmail.com",
+                "Owner": user_email,
             },
             success: function (data) {
                 console.log(data);

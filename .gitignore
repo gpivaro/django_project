@@ -149,3 +149,4 @@ backup_posts.csv
 *DS_Store
 
 ignore_folder/
+data.json

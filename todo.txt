@@ -1,1 +1,3 @@
 add a postgres database to the linodo server
+finish update model to capture the raw statement for further match
+write the categories/statement page with jquery to automatically update 

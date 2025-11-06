@@ -133,32 +133,32 @@ WSGI_APPLICATION = "django_project.wsgi.application"
 # }
 
 # For use in production with MySQL database
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "djangowebsite",
-#         "USER": config.get("MYSQL_USERNAME"),
-#         "PASSWORD": config.get("MYSQL_PASSWORD"),
-#         "HOST": config.get("MYSQL_HOSTNAME"),
-#         "PORT": config.get("MYSQL_PORT"),
-#         # To solve the django.db.utils.OperationalError: (1040, 'ny connections')
-#         # https://stackoverflow.com/questions/23576853/python-1040-too-many-connections
-#         "OPTIONS": {
-#             "init_command": "SET GLOBAL max_connections = 100000",  # <-- The fix
-#         },
-#     }
-# }
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
         "NAME": "djangowebsite",
         "USER": config.get("MYSQL_USERNAME"),
         "PASSWORD": config.get("MYSQL_PASSWORD"),
         "HOST": config.get("MYSQL_HOSTNAME"),
-        'PORT': '5432',
+        "PORT": config.get("MYSQL_PORT"),
+        # To solve the django.db.utils.OperationalError: (1040, 'ny connections')
+        # https://stackoverflow.com/questions/23576853/python-1040-too-many-connections
+        "OPTIONS": {
+            "init_command": "SET GLOBAL max_connections = 100000",  # <-- The fix
+        },
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         "NAME": "djangowebsite",
+#         "USER": config.get("MYSQL_USERNAME"),
+#         "PASSWORD": config.get("MYSQL_PASSWORD"),
+#         "HOST": config.get("MYSQL_HOSTNAME"),
+#         'PORT': '5432',
+#     }
+# }
 
 # configure a default auto field for your project
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

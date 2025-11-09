@@ -65,7 +65,7 @@ except:
             'file': {
                 'level': 'INFO',
                 'class': 'logging.FileHandler',
-                'filename': '/var/log/django/transactions.log',
+                'filename': '/home/gpivaro/django_project/logs/transactions.log',
             },
         },
         'loggers': {
@@ -76,6 +76,8 @@ except:
             },
         },
     }
+
+
 
 
 # Application definition

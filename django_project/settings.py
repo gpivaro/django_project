@@ -58,6 +58,24 @@ except:
         config["ALLOWED_HOSTS_4"],
         config["ALLOWED_HOSTS_5"],
     ]
+    
+    LOGGING = {
+        'version': 1,
+        'handlers': {
+            'file': {
+                'level': 'INFO',
+                'class': 'logging.FileHandler',
+                'filename': '/var/log/django/transactions.log',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'INFO',
+                'propagate': True,
+            },
+        },
+    }
 
 
 # Application definition
@@ -223,3 +241,6 @@ sentry_sdk.init(
     # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True,
 )
+
+
+

@@ -1,5 +1,8 @@
 import pandas as pd
 import re
+import logging
+logger = logging.getLogger(__name__)
+
 
 
 class TransactionLabeler:
@@ -114,9 +117,7 @@ class TransactionLabeler:
         if self.filtered_df is None:
             raise ValueError("No categorized data available.")
 
-        total = len(self.filtered_df)
-        categorized = (self.filtered_df["Category"] != "").sum()
-        print(f"Transactions Categorized: {categorized} of {total}.")
+        logger.info(f"Transactions Categorized: {(self.filtered_df['Category']!='').sum()} of {len(self.filtered_df)}.")
 
         return {
             "statement_dict": self.filtered_df.to_dict("records"),

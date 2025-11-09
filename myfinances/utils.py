@@ -42,6 +42,8 @@ class TransactionLabeler:
         self.cleaned_df = None
         self.filtered_df = None
         self.folder = folder
+        
+        logger.info(f"Transactions loaded {len(self.raw_df)}.")
 
     def clean_data(self):
         """
@@ -75,26 +77,37 @@ class TransactionLabeler:
         filtered.reset_index(drop=True, inplace=True)
         self.filtered_df = filtered
 
-    def categorize_transactions_regex(self):
+    def categorize_transactions_regex_chunked(self, chunk_size=50):
         """
-        Categorize transactions using regular expression matching.
-        Assigns the first matching category found in the pattern list.
+        Categorize transactions using regex in memory-efficient chunks.
+
+        Args:
+            chunk_size (int): Number of transactions to process per chunk.
         """
         if self.filtered_df is None:
             raise ValueError("Filtered transactions not available. Run filter_by_date first.")
 
-        descriptions = self.filtered_df["Description"].fillna("")
-        category_matches = []
+        categorized_chunks = []
 
-        for desc in descriptions:
-            matched_category = ""
-            for pattern, group in zip(self.patterns, self.groups):
-                if re.search(pattern, desc):
-                    matched_category = group
-                    break
-            category_matches.append(matched_category)
+        for start in range(0, len(self.filtered_df), chunk_size):
+            chunk = self.filtered_df.iloc[start:start + chunk_size].copy()
+            descriptions = chunk["Description"].fillna("")
+            category_matches = []
 
-        self.filtered_df["Category"] = pd.Series(category_matches, dtype="category")
+            for desc in descriptions:
+                matched_category = ""
+                for pattern, group in zip(self.patterns, self.groups):
+                    if re.search(pattern, desc):
+                        matched_category = group
+                        break
+                category_matches.append(matched_category)
+
+            chunk["Category"] = pd.Series(category_matches, dtype="category")
+            categorized_chunks.append(chunk)
+
+        # Filter out empty or all-NA chunks before concatenation
+        valid_chunks = [chunk for chunk in categorized_chunks if not chunk.empty and not chunk.isna().all(axis=1).all()]
+        self.filtered_df = pd.concat(valid_chunks, ignore_index=True)
 
     def export_to_csv(self):
         """
@@ -142,6 +155,6 @@ def label_transactions(transactions_df, categories_df, start_date="", end_date="
     labeler = TransactionLabeler(transactions_df, categories_df, start_date, end_date, folder=folder)
     labeler.clean_data()
     labeler.filter_by_date()
-    labeler.categorize_transactions_regex()
+    labeler.categorize_transactions_regex_chunked()
     labeler.export_to_csv()
     return labeler.get_results()

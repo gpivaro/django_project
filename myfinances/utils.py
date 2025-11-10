@@ -158,3 +158,13 @@ def label_transactions(transactions_df, categories_df, start_date="", end_date="
     labeler.categorize_transactions_regex_chunked()
     labeler.export_to_csv()
     return labeler.get_results()
+
+
+
+# ## For debug purpouses
+# labeler = TransactionLabeler(pd.read_csv('ignore_folder/chase_statement.csv'), pd.read_csv('ignore_folder/categories.csv'), start_date='2025-10-01', end_date='2025-10-31', folder='')
+# labeler.clean_data()
+# labeler.filter_by_date()
+# labeler.categorize_transactions_regex_chunked()
+# labeler.export_to_csv()
+# labeler.get_results()

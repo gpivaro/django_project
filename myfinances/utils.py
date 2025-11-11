@@ -1,170 +1,79 @@
+import os
 import pandas as pd
+import numpy as np
 import re
-import logging
-logger = logging.getLogger(__name__)
+
+""" Received the transactions data, the list of categorized transactions, the start and end date.
+    Adjust the list of transactions of the data, clean the data and categorize it. 
+    Return the transactions categorized and the categories list.
+"""
 
 
+def label_transactions(data, categories_words_cleaned_df, start_date="", end_date=""):
 
-class TransactionLabeler:
-    """
-    A class to clean, filter, and categorize financial transactions using regular expression matching.
+    # Convert the input data in a dataframe
+    chase_df = pd.DataFrame(data)
 
-    Attributes:
-        raw_df (pd.DataFrame): Original transaction data.
-        categories_df (pd.DataFrame): DataFrame containing regex expressions and category groups.
-        start_date (str): Start date for filtering transactions.
-        end_date (str): End date for filtering transactions.
-        folder (str): Optional folder path for exporting results.
-        patterns (list): List of regex expressions used for matching.
-        categories_list (list): Unique list of category groups.
-        cleaned_df (pd.DataFrame): Cleaned version of the transaction data.
-        filtered_df (pd.DataFrame): Date-filtered and categorized transaction data.
-    """
+    chase_df["Date"] = chase_df["Posting Date"].astype("datetime64[ns]")
+    chase_df.drop(columns=["Posting Date"], inplace=True)
+    chase_df["Amount"] = chase_df["Amount"].astype("float")
 
-    def __init__(self, transactions_df, categories_df, start_date, end_date, folder=''):
-        """
-        Initialize the TransactionLabeler with transaction and category data.
+    # Create new dataframe
+    chase_new_df = chase_df
 
-        Args:
-            transactions_df (pd.DataFrame or list): Raw transaction data.
-            categories_df (pd.DataFrame): Category expressions and groups.
-            start_date (str): Start date for filtering.
-            end_date (str): End date for filtering.
-            folder (str): Optional folder path for CSV export.
-        """
-        self.raw_df = pd.DataFrame(transactions_df)
-        self.categories_df = categories_df.sort_values("Expression")
-        self.start_date = start_date
-        self.end_date = end_date
-        self.patterns = list(self.categories_df["Expression"])
-        self.groups = list(self.categories_df["Group"])
-        self.categories_list = sorted(set(self.groups))
-        self.cleaned_df = None
-        self.filtered_df = None
-        self.folder = folder
-        
-        logger.info(f"Transactions loaded {len(self.raw_df)}.")
+    # Fill the empty values for the pending transactions balance
+    chase_new_df["Balance"].iloc[0] == " "
+    chase_new_df["Balance"].loc[chase_new_df["Balance"] == " "] = 0
+    chase_new_df["Balance"] = chase_new_df["Balance"].astype("float")
 
-    def clean_data(self):
-        """
-        Clean and normalize the raw transaction data:
-        - Convert dates
-        - Drop unused columns
-        - Ensure numeric types
-        - Fill missing values
-        """
-        df = self.raw_df.copy()
-        df["Date"] = pd.to_datetime(df["Posting Date"], errors="coerce")
-        df.drop(columns=["Posting Date"], inplace=True)
-        df["Amount"] = pd.to_numeric(df["Amount"], errors="coerce")
-        df["Balance"] = pd.to_numeric(df["Balance"].replace(" ", 0), errors="coerce")
-        df["Check"] = df["Check"].fillna(0)
-        self.cleaned_df = df
+    # Set NAN values to 0
+    chase_new_df["Check"].loc[chase_new_df["Check"].isnull() == True] = 0
 
-    def filter_by_date(self):
-        """
-        Filter cleaned transactions between start_date and end_date.
-        If dates are not provided, use the full available range.
-        """
-        if self.cleaned_df is None:
-            self.clean_data()
+    # Get the oldest and the newest date
+    oldest_date = chase_new_df["Date"].min()
+    newest_date = chase_new_df["Date"].max()
 
-        df = self.cleaned_df.copy()
-        start = pd.to_datetime(self.start_date or df["Date"].min())
-        end = pd.to_datetime(self.end_date or df["Date"].max())
+    # Verify if a start date was provided. If not use the oldest date
+    if start_date == "":
+        start_date = oldest_date
 
-        filtered = df[(df["Date"] >= start) & (df["Date"] <= end)].sort_values("Date", ascending=False)
-        filtered.reset_index(drop=True, inplace=True)
-        self.filtered_df = filtered
+    # Verify if a end date was provided. If not use the newest date
+    if end_date == "":
+        end_date = newest_date
 
-    def categorize_transactions_regex_chunked(self, chunk_size=50):
-        """
-        Categorize transactions using regex in memory-efficient chunks.
+    # Filtering dataset entries
+    month_transactions = chase_new_df.loc[
+        (chase_new_df["Date"] >= start_date) & (chase_new_df["Date"] < end_date)
+    ].sort_values("Date", ascending=False)
 
-        Args:
-            chunk_size (int): Number of transactions to process per chunk.
-        """
-        if self.filtered_df is None:
-            raise ValueError("Filtered transactions not available. Run filter_by_date first.")
+    # Reset the ndex to index the transactions on the new order
+    month_transactions.reset_index(inplace=True)
 
-        categorized_chunks = []
+    # Drop columns for visualization purposes
+    month_transactions.drop(columns=["index"], inplace=True)
 
-        for start in range(0, len(self.filtered_df), chunk_size):
-            chunk = self.filtered_df.iloc[start:start + chunk_size].copy()
-            descriptions = chunk["Description"].fillna("")
-            category_matches = []
+    # Import cleaned expressions and groups
+    # categories_words_cleaned_df = pd.read_csv(categories_words_cleaned_file)
+    categories_words_cleaned_df.sort_values("Expression", inplace=True)
 
-            for desc in descriptions:
-                matched_category = ""
-                for pattern, group in zip(self.patterns, self.groups):
-                    if re.search(pattern, desc):
-                        matched_category = group
-                        break
-                category_matches.append(matched_category)
+    # Get list of categories
+    categories_list = sorted(list(categories_words_cleaned_df["Group"].unique()))
 
-            chunk["Category"] = pd.Series(category_matches, dtype="category")
-            categorized_chunks.append(chunk)
+    # Search the patterns
+    patterns = list(categories_words_cleaned_df["Expression"])
+    month_transactions["Category"] = ""
 
-        # Filter out empty or all-NA chunks before concatenation
-        valid_chunks = [chunk for chunk in categorized_chunks if not chunk.empty and not chunk.isna().all(axis=1).all()]
-        self.filtered_df = pd.concat(valid_chunks, ignore_index=True)
+    # Iterate over all the transactions
+    for index, row in month_transactions.iterrows():
+        # Search and match the first occurency of the table
+        text = row["Description"]
+        for n in range(len(patterns)):
+            if re.search(patterns[n], text):
+                month_transactions["Category"].iloc[
+                    index
+                ] = categories_words_cleaned_df["Group"].iloc[n]
+                break
 
-    def export_to_csv(self):
-        """
-        Export the filtered and categorized transactions to a CSV file.
-        Filename includes the date range.
-        """
-        if self.filtered_df is None:
-            raise ValueError("No categorized data to export.")
-        if self.folder:
-            filename = f"{self.folder}/month_transactions_from_{self.start_date}_to_{self.end_date}.csv"
-            self.filtered_df.to_csv(filename, index=False)
+    statement_dict = month_transactions.to_dict("records")
 
-    def get_results(self):
-        """
-        Return the categorized transactions and the list of categories.
-
-        Returns:
-            dict: Contains 'statement_dict' and 'categories_list'.
-        """
-        if self.filtered_df is None:
-            raise ValueError("No categorized data available.")
-
-        logger.info(f"Transactions Categorized: {(self.filtered_df['Category']!='').sum()} of {len(self.filtered_df)}.")
-
-        return {
-            "statement_dict": self.filtered_df.to_dict("records"),
-            "categories_list": self.categories_list
-        }
-
-
-def label_transactions(transactions_df, categories_df, start_date="", end_date="", folder=None):
-    """
-    Process and categorize transactions using regex matching.
-
-    Args:
-        transactions_df (pd.DataFrame or list): Raw transaction data.
-        categories_df (pd.DataFrame): Category expressions and groups.
-        start_date (str): Start date for filtering.
-        end_date (str): End date for filtering.
-        folder (str): Optional folder path for CSV export.
-
-    Returns:
-        dict: Contains categorized transactions and category list.
-    """
-    labeler = TransactionLabeler(transactions_df, categories_df, start_date, end_date, folder=folder)
-    labeler.clean_data()
-    labeler.filter_by_date()
-    labeler.categorize_transactions_regex_chunked()
-    labeler.export_to_csv()
-    return labeler.get_results()
-
-
-
-# ## For debug purpouses
-# labeler = TransactionLabeler(pd.read_csv('ignore_folder/chase_statement.csv'), pd.read_csv('ignore_folder/categories.csv'), start_date='2025-10-01', end_date='2025-10-31', folder='')
-# labeler.clean_data()
-# labeler.filter_by_date()
-# labeler.categorize_transactions_regex_chunked()
-# labeler.export_to_csv()
-# labeler.get_results()
+    return {"statement_dict": statement_dict, "categories_list": categories_list}

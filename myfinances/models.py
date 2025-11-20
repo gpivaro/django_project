@@ -27,7 +27,8 @@ class Categories(models.Model):
 
     def __str__(self):
         # return f"{self.Group} | {self.Expression}"
-        return f"{self.Group} | {self.Expression}"
+        # return f"{self.Group} | {self.Expression}"
+        return f"{self.Group}"
 
     class Meta:
         ordering = ["Group"]

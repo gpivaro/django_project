@@ -19,6 +19,7 @@ def upload_transactions_to_db(transactions):
         try:
             Posting_Date = tx["Date"].date()
             Amount = float(tx["Amount"])
+            Balance = float(tx["Balance"])
         except (ValueError, KeyError):
             continue  # Skip malformed entries
 
@@ -27,7 +28,8 @@ def upload_transactions_to_db(transactions):
             Q(Details=tx["Details"]) &
             Q(Posting_Date=Posting_Date) &
             Q(Description=tx["Description"]) &
-            Q(Amount=Amount)
+            Q(Amount=Amount) &
+            Q(Balance=Balance)
         ).exists()
 
         if not exists:

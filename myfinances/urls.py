@@ -1,5 +1,5 @@
 from django.urls import path, include
-from myfinances.views import statement, home, categories, manage_items
+from myfinances.views import statement, home, categories, manage_items, manage_statements
 
 # To use the login view
 from django.contrib.auth.views import LoginView
@@ -20,5 +20,6 @@ urlpatterns = [
     path("categories/", categories, name="categories"),
     path("api/", include(router.urls)),
     path("manage_items/", manage_items,name="manage_items"),
+    path("manage_statements/", manage_statements,name="manage_statements"),
     # path("login/", LoginView.as_view()),
 ]

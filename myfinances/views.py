@@ -8,7 +8,8 @@ from .utils import label_transactions
 import pandas as pd
 from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
-from .forms import ItemForm
+from .forms import ItemForm, StatementForm
+
 
 
 # To create API using rest framework
@@ -172,3 +173,14 @@ def manage_items(request):
     else:
         formset = ItemFormSet(queryset=Item.objects.all())
     return render(request, 'myfinances/item_table.html', {'formset': formset})
+
+@login_required
+def manage_statements(request):
+    if request.method == "POST":
+        form = StatementForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("manage_statements")  # reloads the page after saving
+    else:
+        forms = [StatementForm(instance=stmt, prefix=str(stmt.id)) for stmt in Statements.objects.all()]
+        return render(request, "myfinances/statement_table.html", {"forms": forms})

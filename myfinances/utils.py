@@ -2,12 +2,44 @@ import os
 import pandas as pd
 import numpy as np
 import re
+from .models import Statements
+from django.db.models import Q
+
 
 """ Received the transactions data, the list of categorized transactions, the start and end date.
     Adjust the list of transactions of the data, clean the data and categorize it. 
     Return the transactions categorized and the categories list.
 """
 
+
+# Helper function to upload transactions to the Statement model
+def upload_transactions_to_db(transactions):
+    for tx in transactions:
+        # Parse date and amount safely
+        try:
+            Posting_Date = tx["Date"].date()
+            Amount = float(tx["Amount"])
+        except (ValueError, KeyError):
+            continue  # Skip malformed entries
+
+        # Check for duplicates using a combination of key fields
+        exists = Statements.objects.filter(
+            Q(Details=tx["Details"]) &
+            Q(Posting_Date=Posting_Date) &
+            Q(Description=tx["Description"]) &
+            Q(Amount=Amount)
+        ).exists()
+
+        if not exists:
+            Statements.objects.create(
+                Details=tx["Details"],
+                Posting_Date=Posting_Date,
+                Description=tx["Description"],
+                Amount=Amount,
+                Type=tx["Type"],
+                Balance=tx["Balance"],
+                Check_Slip=tx.get("Check", "")
+            )
 
 def label_transactions(data, categories_words_cleaned_df, start_date="", end_date=""):
 
@@ -51,6 +83,10 @@ def label_transactions(data, categories_words_cleaned_df, start_date="", end_dat
 
     # Drop columns for visualization purposes
     month_transactions.drop(columns=["index"], inplace=True)
+    
+        
+    # Upload to database while avoiding duplicates
+    upload_transactions_to_db(month_transactions.to_dict("records"))
 
     # Import cleaned expressions and groups
     # categories_words_cleaned_df = pd.read_csv(categories_words_cleaned_file)
@@ -74,5 +110,8 @@ def label_transactions(data, categories_words_cleaned_df, start_date="", end_dat
                 break
 
     statement_dict = month_transactions.to_dict("records")
+    
+
+
 
     return {"statement_dict": statement_dict, "categories_list": categories_list}

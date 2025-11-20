@@ -5,23 +5,34 @@ from django.contrib import messages
 from .models import Categories, Users, Item, Statements
 from django.http import JsonResponse, HttpResponseRedirect
 from .utils import label_transactions
-import requests
 import pandas as pd
 from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
 from .forms import ItemForm
-from datetime import datetime
-from django.db.models import Q
-from django.utils.timezone import make_aware
-
-
 
 
 # To create API using rest framework
 from rest_framework import viewsets
 from .serializers import CategoriesSerializer, UsersSerializer
 
+
+# Using rest framework out of the box view that handles CRUD
+class CategoriesView(viewsets.ModelViewSet):
+    queryset = Categories.objects.all()
+    serializer_class = CategoriesSerializer
+
+
+# Using rest framework out of the box view that handles CRUD
+class UsersView(viewsets.ModelViewSet):
+    queryset = Users.objects.all()
+    serializer_class = UsersSerializer
+    
+
+
+
 # Create your views here.
+
+
 # one parameter named request
 def home(request):
     if request.method == "POST":
@@ -41,57 +52,18 @@ def home(request):
     return render(request, "myfinances/home.html")
 
 
-# Json version of all available categories
+
+
+# Return all available categories
+@login_required
 def categories(request):
     data = list(Categories.objects.order_by("Group", "Expression").all().values())
-    return JsonResponse(data, safe=False)
-    # context = {"categories_list": Categories.objects.order_by("id").all()}
-    # return render(request, "myfinances/categories.html", context)
+    # return JsonResponse(data, safe=False)
+    context = {"categories_list": Categories.objects.order_by("id").all()}
+    return render(request, "myfinances/categories.html", context)
     # return JsonResponse(request, "myfinances/categories.html", context)
-
-
-# Using rest framework out of the box view that handles CRUD
-class CategoriesView(viewsets.ModelViewSet):
-    queryset = Categories.objects.all()
-    serializer_class = CategoriesSerializer
-
-
-# Using rest framework out of the box view that handles CRUD
-class UsersView(viewsets.ModelViewSet):
-    queryset = Users.objects.all()
-    serializer_class = UsersSerializer
     
-
-# Helper function to upload transactions to the Statement model
-def upload_transactions_to_db(transactions):
-    for tx in transactions:
-        # Parse date and amount safely
-        try:
-            Posting_Date = make_aware(tx["Date"])
-            Amount = float(tx["Amount"])
-        except (ValueError, KeyError):
-            continue  # Skip malformed entries
-
-        # Check for duplicates using a combination of key fields
-        exists = Statements.objects.filter(
-            Q(Details=tx["Details"]) &
-            Q(Posting_Date=Posting_Date) &
-            Q(Description=tx["Description"]) &
-            Q(Amount=Amount)
-        ).exists()
-
-        if not exists:
-            Statements.objects.create(
-                Details=tx["Details"],
-                Posting_Date=Posting_Date,
-                Description=tx["Description"],
-                Amount=Amount,
-                Type=tx["Type"],
-                Balance=tx["Balance"],
-                Check_Slip=tx.get("Check", "")
-            )
-
-
+    
 @login_required
 # Main view of the application
 # one parameter named request
@@ -117,9 +89,6 @@ def statement(request):
     data_set = csv_file.read().decode("UTF-8")
     # setup a stream which is when we loop through each line we are able to handle a data in a stream
 
-    start_date = request.POST.get("start_date")
-    end_date = request.POST.get("end_date")
-
     io_string = io.StringIO(data_set)
     next(io_string)
     transactions_list = []
@@ -140,19 +109,20 @@ def statement(request):
         
 
 
-    
-
     # Query database for list of categories and convert to dataframe
     categories = Categories.objects.order_by("Group", "Expression").all().values()
     categories_df = pd.DataFrame(categories)
+    
+    
+    start_date = request.POST.get("start_date")
+    end_date = request.POST.get("end_date")
+
 
     # Call function to label the transactions
     labeled_transactions = label_transactions(
         transactions_list, categories_df, start_date, end_date
     )
     
-    # Upload to database while avoiding duplicates
-    upload_transactions_to_db(labeled_transactions["statement_dict"])
 
     # Create a table row ID for table classification purpouses
     table_row_id = list(range(len(labeled_transactions["statement_dict"])))
@@ -186,6 +156,7 @@ def statement(request):
     return render(request, template, context)
 
 # views.py
+@login_required
 def manage_items(request):
     ItemFormSet = modelformset_factory(Item, form=ItemForm, extra=0)
     if request.method == 'POST':

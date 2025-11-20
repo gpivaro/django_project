@@ -2,7 +2,7 @@ import csv, io
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
-from .models import Statement, Categories, Users, Item
+from .models import Categories, Users, Item, Statements
 from django.http import JsonResponse, HttpResponseRedirect
 from .utils import label_transactions
 import requests
@@ -10,6 +10,10 @@ import pandas as pd
 from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
 from .forms import ItemForm
+from datetime import datetime
+from django.db.models import Q
+from django.utils.timezone import make_aware
+
 
 
 
@@ -56,6 +60,36 @@ class CategoriesView(viewsets.ModelViewSet):
 class UsersView(viewsets.ModelViewSet):
     queryset = Users.objects.all()
     serializer_class = UsersSerializer
+    
+
+# Helper function to upload transactions to the Statement model
+def upload_transactions_to_db(transactions):
+    for tx in transactions:
+        # Parse date and amount safely
+        try:
+            Posting_Date = make_aware(tx["Date"])
+            Amount = float(tx["Amount"])
+        except (ValueError, KeyError):
+            continue  # Skip malformed entries
+
+        # Check for duplicates using a combination of key fields
+        exists = Statements.objects.filter(
+            Q(Details=tx["Details"]) &
+            Q(Posting_Date=Posting_Date) &
+            Q(Description=tx["Description"]) &
+            Q(Amount=Amount)
+        ).exists()
+
+        if not exists:
+            Statements.objects.create(
+                Details=tx["Details"],
+                Posting_Date=Posting_Date,
+                Description=tx["Description"],
+                Amount=Amount,
+                Type=tx["Type"],
+                Balance=tx["Balance"],
+                Check_Slip=tx.get("Check", "")
+            )
 
 
 @login_required
@@ -64,7 +98,7 @@ class UsersView(viewsets.ModelViewSet):
 def statement(request):
     # declaring template
     template = "myfinances/statement.html"
-    data = Statement.objects.all()
+    data = Statements.objects.all()
     # prompt is a context variable that can have different values      depending on their context
     prompt = {
         "order": "Upload your statement file.",
@@ -102,6 +136,11 @@ def statement(request):
                 "Check": column[6],
             }
         )
+        
+        
+
+
+    
 
     # Query database for list of categories and convert to dataframe
     categories = Categories.objects.order_by("Group", "Expression").all().values()
@@ -111,6 +150,9 @@ def statement(request):
     labeled_transactions = label_transactions(
         transactions_list, categories_df, start_date, end_date
     )
+    
+    # Upload to database while avoiding duplicates
+    upload_transactions_to_db(labeled_transactions["statement_dict"])
 
     # Create a table row ID for table classification purpouses
     table_row_id = list(range(len(labeled_transactions["statement_dict"])))

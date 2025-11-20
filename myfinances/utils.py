@@ -23,11 +23,11 @@ def label_transactions(data, categories_words_cleaned_df, start_date="", end_dat
 
     # Fill the empty values for the pending transactions balance
     chase_new_df["Balance"].iloc[0] == " "
-    chase_new_df["Balance"].loc[chase_new_df["Balance"] == " "] = 0
+    chase_new_df.loc[chase_new_df["Balance"] == " ", "Balance"] = 0
     chase_new_df["Balance"] = chase_new_df["Balance"].astype("float")
 
     # Set NAN values to 0
-    chase_new_df["Check"].loc[chase_new_df["Check"].isnull() == True] = 0
+    chase_new_df.loc[chase_new_df["Check"].isnull(), "Check"] = 0
 
     # Get the oldest and the newest date
     oldest_date = chase_new_df["Date"].min()
@@ -62,6 +62,7 @@ def label_transactions(data, categories_words_cleaned_df, start_date="", end_dat
     # Search the patterns
     patterns = list(categories_words_cleaned_df["Expression"])
     month_transactions["Category"] = ""
+    month_transactions = month_transactions.copy()
 
     # Iterate over all the transactions
     for index, row in month_transactions.iterrows():
@@ -69,9 +70,7 @@ def label_transactions(data, categories_words_cleaned_df, start_date="", end_dat
         text = row["Description"]
         for n in range(len(patterns)):
             if re.search(patterns[n], text):
-                month_transactions["Category"].iloc[
-                    index
-                ] = categories_words_cleaned_df["Group"].iloc[n]
+                month_transactions.loc[index, "Category"] = categories_words_cleaned_df.loc[n, "Group"]
                 break
 
     statement_dict = month_transactions.to_dict("records")

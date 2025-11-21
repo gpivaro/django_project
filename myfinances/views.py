@@ -121,8 +121,13 @@ def statement(request):
 
     # Call function to label the transactions
     labeled_transactions = label_transactions(
-        transactions_list, categories_df, start_date, end_date
+        transactions_list,
+        categories_df,
+        owner=request.user,   # ✅ pass authenticated user
+        start_date=start_date,
+        end_date=end_date
     )
+
     
 
     # Create a table row ID for table classification purpouses
@@ -190,6 +195,7 @@ def manage_statements(request):
                 selected_group = form.cleaned_data["Group"]
                 matched_category = Categories.objects.filter(Group=selected_group).first()
                 stmt.Category = matched_category
+                stmt.Owner = request.user   # ✅ assign the authenticated user
                 stmt.save()
                 if request.headers.get("x-requested-with") == "XMLHttpRequest":
                     return HttpResponse(status=204)  # No content

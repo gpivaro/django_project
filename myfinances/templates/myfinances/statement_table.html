@@ -2,36 +2,114 @@
 {% load static %}
 {% block content %}
 
-<h2>Manage Statement Categories</h2>
+<h2 class="text-center mt-4 mb-3">Manage Statement Categories</h2>
+
+<div class="container mb-4">
+  <div class="alert alert-info text-justify">
+    <p>
+      On this page you can review your imported bank statement line by line and assign each transaction to the correct category group. 
+      Use the <strong>Save</strong> button in each row to update that transaction immediately without refreshing the whole page.
+    </p>
+    <p>
+      The table shows the posting date, description, amount, and current group assignment. 
+      Adjust the group if needed, then click <strong>Save</strong>. 
+      Rows will briefly highlight green when saved successfully.
+    </p>
+    <p>
+      This helps ensure your statements are categorized consistently, so your charts and totals reflect accurate spending patterns.
+    </p>
+  </div>
+</div>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
 
 {% if success %}
   <div class="alert alert-success">Statements updated successfully!</div>
 {% endif %}
 
-<form method="post">
-  {% csrf_token %}
-  {{ formset.management_form }}
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th scope="col">Posting Date</th>
-        <th scope="col">Description</th>
-        <th scope="col">Amount</th>
-        <th scope="col">Category</th>  {# Editable field #}
-      </tr>
-    </thead>
-    <tbody>
-      {% for form in formset %}
-        <tr>
-          <td>{{ form.instance.Posting_Date }}</td>
-          <td>{{ form.instance.Description }}</td>
-          <td>{{ form.instance.Amount }}</td>
-          <td>{{ form.Category }}</td>  {# Editable field #}
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <button type="submit" class="btn btn-primary">Save Changes</button>
-</form>
+<div class="container d-flex justify-content-center mt-3">
+  <div class="col-lg-10 col-md-12">
+    <form method="post">
+      {% csrf_token %}
+      {{ formset.management_form }}
+      <table class="table table-striped table-hover table-bordered">
+        <thead class="thead-dark text-center">
+          <tr>
+            <th style="width: 15%;">Date</th>
+            <th style="width: 40%; text-align: left;">Description</th>
+            <th style="width: 15%;">Amount</th>
+            <th style="width: 20%;">Group</th>
+            <th style="width: 10%;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for form in forms %}
+          <tr class="text-center">
+            <form method="post" class="statement-form" data-stmt-id="{{ form.instance.pk }}">
+              {% csrf_token %}
+              <input type="hidden" name="stmt_id" value="{{ form.instance.pk }}">
+              <td>{{ form.instance.Posting_Date }}</td>
+              <td class="text-left">{{ form.instance.Description }}</td>
+              <td>{{ form.instance.Amount }}</td>
+              <td>{{ form.Group }}</td>
+              <td>
+                <button type="submit" class="btn btn-sm btn-success">Save</button>
+              </td>
+            </form>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.statement-form').forEach(form => {
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(form);
+
+    fetch("{% url 'myfinances:manage_statements' %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+      },
+      body: formData,
+    })
+    .then(response => {
+      if (!response.ok) throw new Error("Save failed");
+      return response.text();
+    })
+    .then(() => {
+      form.style.backgroundColor = "#d4edda"; // green flash
+      setTimeout(() => form.style.backgroundColor = "", 1000);
+    })
+    .catch(() => {
+      form.style.backgroundColor = "#f8d7da"; // red flash
+      setTimeout(() => form.style.backgroundColor = "", 1000);
+    });
+  });
+});
+
+function removeById(element) {
+  var myobj = document.getElementById(element);
+  if (myobj) myobj.remove();
+}
+
+// Remove nav bar links not used in this page
+removeById("linksRestart");
+    removeById("linksCharts");
+    removeById("linksTable");
+    removeById("linksTotal");
+    removeById("linksSample");
+    
+</script>
 
 {% endblock %}

@@ -11,19 +11,28 @@ class ItemForm(forms.ModelForm):
         fields = ['name', 'quantity']
 
 class StatementForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Get unique Groups manually
-        seen_groups = set()
-        unique_categories = []
-        for cat in Categories.objects.order_by("Group"):
-            if cat.Group not in seen_groups:
-                unique_categories.append(cat)
-                seen_groups.add(cat.Group)
-
-        self.fields["Category"].queryset = Categories.objects.filter(id__in=[c.id for c in unique_categories])
+    Group = forms.ChoiceField(label="Category Group", required=False)
 
     class Meta:
         model = Statements
-        fields = ["Category"]
+        fields = []  # exclude Category from direct editing
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get("instance")
+        super().__init__(*args, **kwargs)
+
+        # Build unique group choices
+        groups = (
+            Categories.objects
+            .order_by("Group")
+            .values_list("Group", flat=True)
+            .distinct()
+        )
+        self.fields["Group"].choices = [(g, g) for g in groups]
+
+        # Pre-fill the current group if instance has a category
+        if instance and instance.Category:
+            self.fields["Group"].initial = instance.Category.Group
+
+
+

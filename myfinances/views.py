@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
 from .models import Categories, Users, Item, Statements
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from .utils import label_transactions
 import pandas as pd
 from django.contrib.auth.decorators import login_required
@@ -174,13 +174,29 @@ def manage_items(request):
         formset = ItemFormSet(queryset=Item.objects.all())
     return render(request, 'myfinances/item_table.html', {'formset': formset})
 
+
 @login_required
 def manage_statements(request):
     if request.method == "POST":
-        form = StatementForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("manage_statements")  # reloads the page after saving
-    else:
-        forms = [StatementForm(instance=stmt, prefix=str(stmt.id)) for stmt in Statements.objects.all()]
-        return render(request, "myfinances/statement_table.html", {"forms": forms})
+        stmt_id = request.POST.get("stmt_id")
+        if stmt_id:
+            try:
+                stmt = Statements.objects.get(pk=stmt_id)
+            except Statements.DoesNotExist:
+                return HttpResponse(status=404)
+
+            form = StatementForm(request.POST, instance=stmt)
+            if form.is_valid():
+                selected_group = form.cleaned_data["Group"]
+                matched_category = Categories.objects.filter(Group=selected_group).first()
+                stmt.Category = matched_category
+                stmt.save()
+                if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                    return HttpResponse(status=204)  # No content
+                else:
+                    return redirect("myfinances:manage_statements")
+        return HttpResponse(status=400)
+
+    forms = [StatementForm(instance=stmt) for stmt in Statements.objects.all()]
+    return render(request, "myfinances/statement_table.html", {"forms": forms})
+

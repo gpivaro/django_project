@@ -54,6 +54,12 @@
                 <li class="nav-item" id="linksRestart">
                     <a class="nav-link" href="{% url 'myfinances:statement' %}">Restart</a>
                 </li>
+                <li class="nav-item" id="linksManage">
+                    <a class="nav-link {% if request.resolver_match.view_name == 'myfinances:manage_statements' %}active{% endif %}"
+                    href="{% url 'myfinances:manage_statements' %}">
+                    Manage Statements
+                    </a>
+                </li>
                 <li class="nav-item" id="linksCharts">
                     <a class="nav-link" href="{% url 'myfinances:statement' %}#charts">Analyzes</a>
                 </li>
@@ -63,9 +69,9 @@
                 <li class="nav-item" id="linksTotal">
                     <a class="nav-link" href="{% url 'myfinances:statement' %}#totalsRow">Totals</a>
                 </li>
-                <!-- <li class="nav-item" id="linksCategories">
+                <li class="nav-item" id="linksCategories">
                     <a class="nav-link" href="/myfinances/categories">Categories</a>
-                </li> -->
+                </li>
                 <li class="nav-item" id="linksSample">
                     <a class="nav-link" href="{% static 'myfinances/resources/Statement.CSV'%}" download>Sample
                         Statement</a>

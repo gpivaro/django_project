@@ -20,6 +20,6 @@ urlpatterns = [
     path("categories/", categories, name="categories"),
     path("api/", include(router.urls)),
     path("manage_items/", manage_items,name="manage_items"),
-    path("manage_statements/", manage_statements,name="manage_statements"),
+    path("manage_statements/", manage_statements, name="manage_statements"),
     # path("login/", LoginView.as_view()),
 ]

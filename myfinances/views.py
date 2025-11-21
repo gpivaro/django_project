@@ -179,14 +179,14 @@ def manage_items(request):
         formset = ItemFormSet(queryset=Item.objects.all())
     return render(request, 'myfinances/item_table.html', {'formset': formset})
 
-
 @login_required
 def manage_statements(request):
     if request.method == "POST":
         stmt_id = request.POST.get("stmt_id")
         if stmt_id:
             try:
-                stmt = Statements.objects.get(pk=stmt_id)
+                # ✅ restrict lookup to current user's statements
+                stmt = Statements.objects.get(pk=stmt_id, Owner=request.user)
             except Statements.DoesNotExist:
                 return HttpResponse(status=404)
 
@@ -195,7 +195,7 @@ def manage_statements(request):
                 selected_group = form.cleaned_data["Group"]
                 matched_category = Categories.objects.filter(Group=selected_group).first()
                 stmt.Category = matched_category
-                stmt.Owner = request.user   # ✅ assign the authenticated user
+                stmt.Owner = request.user   # already assigning ownership
                 stmt.save()
                 if request.headers.get("x-requested-with") == "XMLHttpRequest":
                     return HttpResponse(status=204)  # No content
@@ -203,6 +203,8 @@ def manage_statements(request):
                     return redirect("myfinances:manage_statements")
         return HttpResponse(status=400)
 
-    forms = [StatementForm(instance=stmt) for stmt in Statements.objects.all()]
+    # ✅ only show statements owned by the current user
+    user_statements = Statements.objects.filter(Owner=request.user)
+    forms = [StatementForm(instance=stmt) for stmt in user_statements]
     return render(request, "myfinances/statement_table.html", {"forms": forms})
 

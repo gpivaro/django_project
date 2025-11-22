@@ -17,9 +17,6 @@ class Users(models.Model):
         
 
 
-from django.conf import settings
-from django.utils import timezone
-from django.db import models
 
 class Categories(models.Model):
     Group = models.TextField()
@@ -41,6 +38,32 @@ class Categories(models.Model):
         ordering = ["Group"]
 
 
+
+class CategoryList(models.Model):
+    # Use lowercase field names for consistency
+    name = models.CharField(max_length=100)
+
+    # Tie each category to a specific user/owner
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,   # prevent accidental cascade delete
+        null=False,
+        blank=False
+    )
+
+    insert_date = models.DateTimeField(default=timezone.now)
+    update_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "Category List"
+        ordering = ["name"]
+        # Ensure uniqueness per owner, not globally
+        constraints = [
+            models.UniqueConstraint(fields=["owner", "name"], name="unique_category_per_owner")
+        ]
+
+    def __str__(self):
+        return self.name
 
 class Statements(models.Model):
     Details = models.CharField(max_length=50)

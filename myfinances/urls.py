@@ -1,5 +1,5 @@
 from django.urls import path, include
-from myfinances.views import home, categories, statement, manage_items, manage_statements
+from myfinances.views import home, categories, statement, manage_items, manage_statements, banktransactions
 from myfinances.views import (CategoryListListView,
                               CategoryListDetailView,
                               CategoryListCreateView,
@@ -35,4 +35,5 @@ urlpatterns = [
     path("category/<int:pk>/delete/",
          CategoryListDeleteView.as_view(), name="category-delete"),
     # path("login/", LoginView.as_view()),
+    path("banktransactions/", banktransactions, name="banktransactions"),
 ]

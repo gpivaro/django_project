@@ -5,7 +5,7 @@ from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from .models import Categories, Users, Item, Statements, CategoryList
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
-from .utils import label_transactions
+from .utils import label_transactions, banktransactions_upload
 import pandas as pd
 from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
@@ -279,3 +279,39 @@ class CategoryListDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
         if self.request.user == category.owner:
             return True
         return False
+
+
+@login_required
+def banktransactions(request):
+    """
+    Handle the bank transactions upload view.
+
+    Workflow:
+    - On GET: render the upload page with a prompt message.
+    - On POST: process the uploaded CSV file using `banktransactions_upload`,
+      attach success/error messages via Django's messages framework,
+      and re-render the page so the user sees feedback.
+
+    Context:
+    - `order`: instruction text displayed on the page.
+    - `messages`: automatically injected by Django's messages framework
+      (no need to pass explicitly).
+    """
+
+    # Template path
+    template = "myfinances/banktransactions.html"
+
+    # Context variable for instructions
+    prompt = {
+        "order": "Upload your bank transactions file.",
+    }
+
+    # GET request → show upload form
+    if request.method == "GET":
+        return render(request, template, prompt)
+
+    # POST request → process file upload
+    banktransactions_upload(request)
+
+    # Re-render template with prompt (messages are auto-injected)
+    return render(request, template, prompt)

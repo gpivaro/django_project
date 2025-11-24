@@ -1,5 +1,10 @@
 from django.urls import path, include
-from myfinances.views import statement, home, categories, manage_items, manage_statements
+from myfinances.views import home, categories, statement, manage_items, manage_statements
+from myfinances.views import (CategoryListListView,
+                              CategoryListDetailView,
+                              CategoryListCreateView,
+                              CategoryListUpdateView,
+                              CategoryListDeleteView)
 
 # To use the login view
 from django.contrib.auth.views import LoginView
@@ -19,7 +24,15 @@ urlpatterns = [
     path("statement/", statement, name="statement"),
     path("categories/", categories, name="categories"),
     path("api/", include(router.urls)),
-    path("manage_items/", manage_items,name="manage_items"),
+    path("manage_items/", manage_items, name="manage_items"),
     path("manage_statements/", manage_statements, name="manage_statements"),
+    path("categories-list/", CategoryListListView.as_view(), name="categories-list"),
+    path("category/<int:pk>/", CategoryListDetailView.as_view(),
+         name="category-detail"),
+    path("category/new/", CategoryListCreateView.as_view(), name="category-new"),
+    path("category/<int:pk>/update/",
+         CategoryListUpdateView.as_view(), name="category-update"),
+    path("category/<int:pk>/delete/",
+         CategoryListDeleteView.as_view(), name="category-delete"),
     # path("login/", LoginView.as_view()),
 ]

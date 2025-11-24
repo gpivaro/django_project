@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
-
+from django.urls import reverse
 
 
 class Users(models.Model):
@@ -14,8 +14,6 @@ class Users(models.Model):
 
     class Meta:
         ordering = ["email"]
-        
-
 
 
 class Categories(models.Model):
@@ -38,7 +36,6 @@ class Categories(models.Model):
         ordering = ["Group"]
 
 
-
 class CategoryList(models.Model):
     # Use lowercase field names for consistency
     name = models.CharField(max_length=100)
@@ -59,11 +56,16 @@ class CategoryList(models.Model):
         ordering = ["name"]
         # Ensure uniqueness per owner, not globally
         constraints = [
-            models.UniqueConstraint(fields=["owner", "name"], name="unique_category_per_owner")
+            models.UniqueConstraint(
+                fields=["owner", "name"], name="unique_category_per_owner")
         ]
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse("myfinances:category-detail", kwargs={'pk': self.pk})
+
 
 class Statements(models.Model):
     Details = models.CharField(max_length=50)

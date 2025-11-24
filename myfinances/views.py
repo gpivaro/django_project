@@ -1,15 +1,17 @@
-import csv, io
+import csv
+import io
 from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.contrib import messages
-from .models import Categories, Users, Item, Statements
+from .models import Categories, Users, Item, Statements, CategoryList
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from .utils import label_transactions
 import pandas as pd
 from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
 from .forms import ItemForm, StatementForm
-
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
 # To create API using rest framework
@@ -27,8 +29,6 @@ class CategoriesView(viewsets.ModelViewSet):
 class UsersView(viewsets.ModelViewSet):
     queryset = Users.objects.all()
     serializer_class = UsersSerializer
-    
-
 
 
 # Create your views here.
@@ -53,18 +53,17 @@ def home(request):
     return render(request, "myfinances/home.html")
 
 
-
-
 # Return all available categories
 @login_required
 def categories(request):
-    data = list(Categories.objects.order_by("Group", "Expression").all().values())
+    data = list(Categories.objects.order_by(
+        "Group", "Expression").all().values())
     # return JsonResponse(data, safe=False)
     context = {"categories_list": Categories.objects.order_by("id").all()}
     return render(request, "myfinances/categories.html", context)
     # return JsonResponse(request, "myfinances/categories.html", context)
-    
-    
+
+
 @login_required
 # Main view of the application
 # one parameter named request
@@ -106,18 +105,14 @@ def statement(request):
                 "Check": column[6],
             }
         )
-        
-        
-
 
     # Query database for list of categories and convert to dataframe
-    categories = Categories.objects.order_by("Group", "Expression").all().values()
+    categories = Categories.objects.order_by(
+        "Group", "Expression").all().values()
     categories_df = pd.DataFrame(categories)
-    
-    
+
     start_date = request.POST.get("start_date")
     end_date = request.POST.get("end_date")
-
 
     # Call function to label the transactions
     labeled_transactions = label_transactions(
@@ -127,8 +122,6 @@ def statement(request):
         start_date=start_date,
         end_date=end_date
     )
-
-    
 
     # Create a table row ID for table classification purpouses
     table_row_id = list(range(len(labeled_transactions["statement_dict"])))
@@ -162,6 +155,8 @@ def statement(request):
     return render(request, template, context)
 
 # views.py
+
+
 @login_required
 def manage_items(request):
     ItemFormSet = modelformset_factory(Item, form=ItemForm, extra=0)
@@ -179,6 +174,7 @@ def manage_items(request):
         formset = ItemFormSet(queryset=Item.objects.all())
     return render(request, 'myfinances/item_table.html', {'formset': formset})
 
+
 @login_required
 def manage_statements(request):
     if request.method == "POST":
@@ -193,7 +189,8 @@ def manage_statements(request):
             form = StatementForm(request.POST, instance=stmt)
             if form.is_valid():
                 selected_group = form.cleaned_data["Group"]
-                matched_category = Categories.objects.filter(Group=selected_group).first()
+                matched_category = Categories.objects.filter(
+                    Group=selected_group).first()
                 stmt.Category = matched_category
                 stmt.Owner = request.user   # already assigning ownership
                 stmt.save()
@@ -208,3 +205,53 @@ def manage_statements(request):
     forms = [StatementForm(instance=stmt) for stmt in user_statements]
     return render(request, "myfinances/statement_table.html", {"forms": forms})
 
+
+# Using Python Class Views to View Model. Listview
+class CategoryListListView(LoginRequiredMixin, ListView):
+    model = CategoryList
+    template_name = 'myfinances/categorylist_list.html'
+    context_object_name = 'categories_list'
+    ordering = ['name']
+
+
+# Using Python Class Views to View Model. DetailView
+class CategoryListDetailView(LoginRequiredMixin, DetailView):
+    model = CategoryList
+
+
+# Using Python Class Views to View Model. CreateView
+class CategoryListCreateView(LoginRequiredMixin, CreateView):
+    model = CategoryList
+    fields = ['name']
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+
+# Using Python Class Views to View Model. UpdateView
+class CategoryListUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = CategoryList
+    fields = ['name']
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        category = self.get_object()
+        if self.request.user == category.owner:
+            return True
+        return False
+
+
+# Using Python Class Views to View Model. DetailView
+class CategoryListDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = CategoryList
+    success_url = reverse_lazy("myfinances:categories-list")
+
+    def test_func(self):
+        category = self.get_object()
+        if self.request.user == category.owner:
+            return True
+        return False

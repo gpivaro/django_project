@@ -12,6 +12,7 @@ from django.forms import modelformset_factory
 from .forms import ItemForm, StatementForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db import IntegrityError
 
 
 # To create API using rest framework
@@ -232,7 +233,16 @@ class CategoryListCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
-        return super().form_valid(form)
+
+        try:
+            return super().form_valid(form)
+        except IntegrityError:
+            # Add a user-friendly error to the form instead of crashing
+            form.add_error(
+                'name',
+                "You already have a category with this name."
+            )
+            return self.form_invalid(form)
 
 
 # Using Python Class Views to View Model. UpdateView
@@ -242,7 +252,15 @@ class CategoryListUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
-        return super().form_valid(form)
+        try:
+            return super().form_valid(form)
+        except IntegrityError:
+            # Add a user-friendly error to the form instead of crashing
+            form.add_error(
+                'name',
+                "You already have a category with this name."
+            )
+            return self.form_invalid(form)
 
     def test_func(self):
         category = self.get_object()

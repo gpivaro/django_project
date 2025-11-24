@@ -2,7 +2,7 @@
 from django import forms
 from .models import Item
 from django import forms
-from .models import Statements, Categories
+from .models import Statements, CategoryList
 
 
 class ItemForm(forms.ModelForm):
@@ -10,8 +10,9 @@ class ItemForm(forms.ModelForm):
         model = Item
         fields = ['name', 'quantity']
 
+
 class StatementForm(forms.ModelForm):
-    Group = forms.ChoiceField(label="Category Group", required=False)
+    Name = forms.ChoiceField(label="Category", required=False)
 
     class Meta:
         model = Statements
@@ -22,17 +23,14 @@ class StatementForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         # Build unique group choices
-        groups = (
-            Categories.objects
-            .order_by("Group")
-            .values_list("Group", flat=True)
+        names = (
+            CategoryList.objects
+            .order_by("name")
+            .values_list("name", flat=True)
             .distinct()
         )
-        self.fields["Group"].choices = [(g, g) for g in groups]
+        self.fields["Name"].choices = [(g, g) for g in names]
 
         # Pre-fill the current group if instance has a category
         if instance and instance.Category:
-            self.fields["Group"].initial = instance.Category.Group
-
-
-
+            self.fields["Name"].initial = instance.Category.name

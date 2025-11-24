@@ -188,12 +188,18 @@ def manage_statements(request):
 
             form = StatementForm(request.POST, instance=stmt)
             if form.is_valid():
-                selected_group = form.cleaned_data["Group"]
-                matched_category = Categories.objects.filter(
-                    Group=selected_group).first()
+                # ✅ use Name instead of Group
+                selected_name = form.cleaned_data["Name"]
+
+                # find matching category by name
+                matched_category = CategoryList.objects.filter(
+                    name=selected_name
+                ).first()
+
                 stmt.Category = matched_category
                 stmt.Owner = request.user   # already assigning ownership
                 stmt.save()
+
                 if request.headers.get("x-requested-with") == "XMLHttpRequest":
                     return HttpResponse(status=204)  # No content
                 else:

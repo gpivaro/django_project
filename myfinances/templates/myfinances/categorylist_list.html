@@ -27,6 +27,7 @@
     padding: 10px;
     border-bottom: 1px solid #ddd;
     font-size: 14px;
+    color: #03131d;
   }
 
   tr:hover td {
@@ -47,10 +48,7 @@
   >
     <!-- Top centered button -->
     <div class="container mt-2 mb-2 p-4" style="text-align: center">
-      <a
-        class="btn btn-outline-secondary"
-        href="{% url 'myfinances:category-new' %}"
-      >
+      <a class="btn btn-primary" href="{% url 'myfinances:category-new' %}">
         Create Category
       </a>
     </div>
@@ -75,6 +73,7 @@
             <tbody>
               <tr>
                 <th>Categories List</th>
+                <th>Action</th>
               </tr>
               {% for category in categories_list %}
               <tr>
@@ -85,6 +84,18 @@
                   >
                     {{category}}
                   </a>
+                </td>
+                <td>
+                  <a
+                    class="btn btn-secondary btn-sm mt-1 mb-1"
+                    href="{% url 'myfinances:category-update' category.id %}"
+                    >Update</a
+                  >
+                  <a
+                    class="btn btn-danger btn-sm mt-1 mb-1"
+                    href="{% url 'myfinances:category-delete' category.id %}"
+                    >Delete</a
+                  >
                 </td>
               </tr>
               {% endfor %}

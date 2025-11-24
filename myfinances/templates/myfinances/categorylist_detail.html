@@ -16,9 +16,6 @@
   >
     <div class="media-body">
       <div class="article-metadata">
-        <small class="text-muted"
-          >Created: {{ object.insert_date | date:"F d, Y" }}</small
-        >
         {% if object.owner == user %}
         <div>
           <a
@@ -32,11 +29,12 @@
             >Delete</a
           >
         </div>
-        {% endif %}
       </div>
-
-      <h2 class="article-title">Category: {{ object.name }}</h2>
-      <a class="article-title" href="{% url 'myfinances:categories-list' %}"
+      <h4>Category:</h4>
+      <h2 class="article-title">{{ object.name }}</h2>
+      <p class="text">Created: {{ object.insert_date | date:"F d, Y" }}</p>
+      {% endif %}
+      <a class="btn btn-secondary" href="{% url 'myfinances:categories-list' %}"
         >Back to Categories</a
       >
     </div>

@@ -43,7 +43,7 @@ class CategoryList(models.Model):
     # Tie each category to a specific user/owner
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,   # prevent accidental cascade delete
+        on_delete=models.CASCADE,
         null=False,
         blank=False
     )
@@ -82,7 +82,7 @@ class Statements(models.Model):
         blank=False                 # required in forms
     )
     Category = models.ForeignKey(
-        Categories,
+        CategoryList,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

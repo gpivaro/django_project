@@ -1,5 +1,11 @@
 
-
+/* Dark background for the whole page */
+body {
+  background-color: #567e91;   /* dark gray */
+  color: #f5f5f5;              /* light text for readability */
+  margin: 0;                   /* remove default margin */
+  font-family: Arial, sans-serif;
+}
 
 /* table specific styling */
 table{
@@ -20,6 +26,12 @@ table{
   padding: .25rem;
   vertical-align: middle;
 }
+
+td a {
+  color: black;               /* ✅ make links black instead of blue */
+  text-decoration: none;      /* optional: remove underline */
+}
+
 
 
   /* style the entire column of the table */

@@ -107,6 +107,7 @@ def banktransactions_upload(request):
     """
 
     csv_file = request.FILES.get("file")
+    acct_last4 = request.POST.get("acct_last4")
 
     # ✅ Validate file extension
     if not csv_file or not csv_file.name.lower().endswith(".csv"):
@@ -153,6 +154,9 @@ def banktransactions_upload(request):
     transactions_df["Amount"] = pd.to_numeric(
         transactions_df["Amount"], errors="coerce")
 
+    # add bank account
+    transactions_df["Acct_Info"] = acct_last4
+
     # (Optional) Save cleaned CSV for debugging
     # transactions_df.to_csv("ignore_folder/test_transactions.csv", index=False)
 
@@ -176,7 +180,8 @@ def banktransactions_upload(request):
             Q(Description=tx["Description"]) &
             Q(Amount=Amount) &
             Q(Balance=Balance) &
-            Q(Owner=request.user)
+            Q(Owner=request.user) &
+            Q(Acct_Info=tx["Acct_Info"])
         ).exists()
 
         if not exists:
@@ -188,7 +193,8 @@ def banktransactions_upload(request):
                 Type=tx["Type"],
                 Balance=Balance,
                 Check_Slip=tx.get("Check", ""),
-                Owner=request.user
+                Owner=request.user,
+                Acct_Info=tx["Acct_Info"]
             )
             uploaded_count += 1
         else:

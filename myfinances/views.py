@@ -315,3 +315,18 @@ def banktransactions(request):
 
     # Re-render template with prompt (messages are auto-injected)
     return render(request, template, prompt)
+
+
+# Using Python Class Views to View Model. Listview
+class TransactionsListView(LoginRequiredMixin, ListView):
+    model = Statements
+    template_name = 'myfinances/transactions_list.html'
+    context_object_name = 'transactions'
+    ordering = ['-Posting_Date']
+
+
+# Using Python Class Views to View Model. DetailView
+class TransactionsDetailView(LoginRequiredMixin, DetailView):
+    model = Statements
+    template_name = 'myfinances/transactions_detail.html'
+    context_object_name = 'transaction'

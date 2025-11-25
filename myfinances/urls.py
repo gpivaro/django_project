@@ -4,7 +4,9 @@ from myfinances.views import (CategoryListListView,
                               CategoryListDetailView,
                               CategoryListCreateView,
                               CategoryListUpdateView,
-                              CategoryListDeleteView)
+                              CategoryListDeleteView,
+                              TransactionsListView,
+                              TransactionsDetailView)
 
 # To use the login view
 from django.contrib.auth.views import LoginView
@@ -36,4 +38,8 @@ urlpatterns = [
          CategoryListDeleteView.as_view(), name="category-delete"),
     # path("login/", LoginView.as_view()),
     path("banktransactions/", banktransactions, name="banktransactions"),
+    path("transactions/", TransactionsListView.as_view(),
+         name="transactions"),
+    path("transaction/<int:pk>/", TransactionsDetailView.as_view(),
+         name="transaction-detail"),
 ]

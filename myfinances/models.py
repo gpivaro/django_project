@@ -88,6 +88,7 @@ class Statements(models.Model):
         blank=True,
         default=None
     )
+    Acct_Info = models.CharField(max_length=4)
     Insert_Date = models.DateTimeField(default=timezone.now)
     Update_Date = models.DateTimeField(auto_now=True)
 

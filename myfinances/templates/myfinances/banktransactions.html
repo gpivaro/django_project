@@ -41,6 +41,7 @@
         >
           {% csrf_token %}
           <div class="form-group mb-2 mr-4">
+            <!-- ✅ File upload -->
             <input
               class="form-control-file"
               type="file"
@@ -48,15 +49,29 @@
               name="file"
               required
             />
-            <button
-              id="btnCategorize"
-              class="btn btn-secondary mb-2 mt-2"
-              type="submit"
-            >
-              Upload Bank Transactions
-            </button>
           </div>
-          <!-- <span>Only accepts CSV files</span> -->
+
+          <div class="form-group mb-2 mr-4">
+            <!-- ✅ Account last 4 digits -->
+            <input
+              type="text"
+              class="form-control"
+              id="acct_last4"
+              name="acct_last4"
+              maxlength="4"
+              pattern="\d{4}"
+              placeholder="Acct Last 4"
+              required
+            />
+          </div>
+
+          <button
+            id="btnCategorize"
+            class="btn btn-secondary mb-2 mt-2"
+            type="submit"
+          >
+            Upload Bank Transactions
+          </button>
         </form>
       </div>
     </div>

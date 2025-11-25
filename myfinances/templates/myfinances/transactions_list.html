@@ -1,0 +1,76 @@
+{% extends "myfinances/base.html" %} {% load static %} {% block content %}
+
+<style>
+  table {
+    width: 300px;
+    /* set a fixed width */
+    border-collapse: collapse;
+    /* merge borders for a clean look */
+    margin: 20px auto;
+    /* center the table */
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    /* subtle shadow */
+  }
+
+  th {
+    background-color: #0c6ba1;
+    /* green header */
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 16px;
+    border-bottom: 2px solid #03131d;
+  }
+
+  td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    color: #03131d;
+  }
+
+  tr:hover td {
+    background-color: #f5f5f5;
+    /* highlight row on hover */
+  }
+</style>
+
+<!-- templates/transactions/statement_list.html -->
+
+<h2>Transactions</h2>
+<table border="1">
+  <thead>
+    <tr>
+      <th>Posting Date</th>
+      <th>Description</th>
+      <th>Amount</th>
+      <th>Type</th>
+      <th>Balance</th>
+      <th>Category</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for transaction in transactions %}
+    <tr>
+      <td>{{ transaction.Posting_Date }}</td>
+      <td>{{ transaction.Description }}</td>
+      <td>{{ transaction.Amount }}</td>
+      <td>{{ transaction.Type }}</td>
+      <td>{{ transaction.Balance }}</td>
+      <td>
+        {% if transaction.Category %} {{ transaction.Category }}
+        <!-- uses CategoryList.__str__ -->
+        {% else %} ---- {% endif %}
+      </td>
+      <td>Update</td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="6">No transactions found.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

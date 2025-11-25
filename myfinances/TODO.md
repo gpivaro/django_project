@@ -81,3 +81,5 @@ Each item will be tackled separately and marked complete once implemented.
 - Use GitHub Issues or project boards to break down each item.
 - Mark items as `[x]` when completed.
 - Keep this document updated as new ideas arise.
+
+add some encryption

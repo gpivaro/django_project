@@ -1,0 +1,9 @@
+{% extends "myfinances/base.html" %} {% load static %} {% block content %}
+
+<p>{{ transaction.Posting_Date }}</p>
+<p>{{ transaction.Description }}</p>
+<p>{{ transaction.Amount }}</p>
+<p>{{ transaction.Type }}</p>
+<p>{{ transaction.Balance }}</p>
+
+{% endblock %}

@@ -2,7 +2,7 @@
 /* Dark background for the whole page */
 body {
   background-color: #ffffff;   /* dark gray */
-  color: #f5f5f5;              /* light text for readability */
+  color: #131212;              /* light text for readability */
   margin: 0;                   /* remove default margin */
   font-family: Arial, sans-serif;
 }

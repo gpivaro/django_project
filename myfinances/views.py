@@ -329,4 +329,31 @@ class TransactionsListView(LoginRequiredMixin, ListView):
 class TransactionsDetailView(LoginRequiredMixin, DetailView):
     model = Statements
     template_name = 'myfinances/transactions_detail.html'
-    context_object_name = 'transaction'
+
+# Using Python Class Views to View Model. UpdateView
+
+
+class TransactionsUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Statements
+    fields = ['Category']
+    template_name = 'myfinances/transactions_form.html'
+
+    def test_func(self):
+        transactions = self.get_object()
+        if self.request.user == transactions.Owner:
+            return True
+        return False
+
+# Using Python Class Views to View Model. DetailView
+
+
+class TransactionsDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Statements
+    template_name = 'myfinances/transactions_confirm_delete.html'
+    success_url = reverse_lazy("myfinances:transactions-list")
+
+    def test_func(self):
+        category = self.get_object()
+        if self.request.user == category.Owner:
+            return True
+        return False

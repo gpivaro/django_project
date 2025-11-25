@@ -81,12 +81,17 @@
           {% if user.is_authenticated %}
           <li class="nav-item" id="linksTable">
             <a class="nav-link" href="{% url 'myfinances:banktransactions' %}"
-              >Transactions</a
+              >Upload Transactions</a
+            >
+          </li>
+          <li class="nav-item" id="linksTable">
+            <a class="nav-link" href="{% url 'myfinances:transactions-list' %}"
+              >My Transactions</a
             >
           </li>
           <li class="nav-item" id="linksCategories">
             <a class="nav-link" href="{% url 'myfinances:categories-list' %}"
-              >Categories</a
+              >My Categories</a
             >
           </li>
           <li class="nav-item" id="linksManage">

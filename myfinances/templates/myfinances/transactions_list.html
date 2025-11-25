@@ -64,7 +64,18 @@
         <!-- uses CategoryList.__str__ -->
         {% else %} ---- {% endif %}
       </td>
-      <td>Update</td>
+      <td>
+        <a
+          class="btn btn-secondary btn-sm mt-1 mb-1"
+          href="{% url 'myfinances:transactions-update' transaction.id %}"
+          >Update</a
+        >
+        <a
+          class="btn btn-danger btn-sm mt-1 mb-1"
+          href="{% url 'myfinances:transactions-delete' transaction.id %}"
+          >Delete</a
+        >
+      </td>
     </tr>
     {% empty %}
     <tr>

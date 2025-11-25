@@ -95,6 +95,9 @@ class Statements(models.Model):
     def __str__(self):
         return f"{self.Posting_Date} | {self.Description} | {self.Amount}"
 
+    def get_absolute_url(self):
+        return reverse("myfinances:transactions-detail", kwargs={'pk': self.pk})
+
     class Meta:
         ordering = ["-Posting_Date"]
 

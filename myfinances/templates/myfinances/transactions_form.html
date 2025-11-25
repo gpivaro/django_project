@@ -1,0 +1,32 @@
+{% extends "myfinances/base.html" %} {% load static %} {% block content %}
+{%load crispy_forms_tags %}
+<div class="container mt-2 mb-2 p-4">
+  <form method="POST">
+    {% csrf_token %}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">
+        Update Existing Category in the Transaction
+      </legend>
+      {{ form | crispy }}
+    </fieldset>
+    <!-- Show field-specific errors -->
+    {% if form.name.errors %}
+    <div class="text-danger">
+      {% for error in form.name.errors %}
+      <small>{{ error }}</small>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="form-group">
+      <button class="btn btn-info" type="submit">Save</button>
+      <a
+        class="btn btn-secondary"
+        href="{% url 'myfinances:transactions-list' %}"
+        >Cancel</a
+      >
+    </div>
+  </form>
+</div>
+
+{% endblock %}

@@ -1,9 +1,53 @@
 {% extends "myfinances/base.html" %} {% load static %} {% block content %}
 
-<p>{{ transaction.Posting_Date }}</p>
-<p>{{ transaction.Description }}</p>
-<p>{{ transaction.Amount }}</p>
-<p>{{ transaction.Type }}</p>
-<p>{{ transaction.Balance }}</p>
+<div
+  style="
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  "
+>
+  <!-- Article content centered at top -->
+  <article
+    class="media content-section"
+    style="margin-top: 20px; text-align: center; width: 100%; max-width: 600px"
+  >
+    <div class="media-body">
+      <div class="article-metadata">
+        {% if object.Owner == user %}
+        <div>
+          <a
+            class="btn btn-secondary btn-sm mt-1 mb-1"
+            href="{% url 'myfinances:transactions-update' object.id %}"
+            >Update</a
+          >
+          <a
+            class="btn btn-danger btn-sm mt-1 mb-1"
+            href="{% url 'myfinances:transactions-update' object.id %}"
+            >Delete</a
+          >
+        </div>
+      </div>
+      <h4>Transaction:</h4>
+      <h3 class="article-title">Posting Date: {{ object.Posting_Date }}</h3>
+      <h3 class="article-title">Description: {{ object.Description }}</h3>
+      <h3 class="article-title">Amount: {{ object.Amount }}</h3>
+      <h3 class="article-title">Type: {{ object.Type }}</h3>
+      <h3>
+        Current Category: {% if transaction.Category %}
+        <span> {{ transaction.Category }} </span> {% endif %}
+      </h3>
+      <p class="text">Created: {{ object.Insert_Date | date:"F d, Y" }}</p>
+      {% endif %}
+      <a
+        class="btn btn-secondary"
+        href="{% url 'myfinances:transactions-list' %}"
+        >Back to Transactions</a
+      >
+    </div>
+  </article>
+</div>
 
 {% endblock %}

@@ -1,0 +1,36 @@
+{% extends "myfinances/base.html" %} {% load static %} {% block content %}
+
+<div
+  style="
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  "
+>
+  <div
+    class="content-section"
+    style="margin-top: 20px; text-align: center; max-width: 600px; width: 100%"
+  >
+    <form method="POST">
+      {% csrf_token %}
+      <fieldset class="form-group">
+        <legend class="border-bottom mb-4">Delete Transaction</legend>
+        <h2>
+          Are you sure you want to delete the transaction "{{ object.Description
+          }}"?
+        </h2>
+      </fieldset>
+      <div class="form-group" style="margin-top: 15px">
+        <button class="btn btn-danger" type="submit">Yes, Delete</button>
+        <a
+          class="btn btn-secondary"
+          href="{% url 'myfinances:transactions-detail' object.id %}"
+          >Cancel</a
+        >
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

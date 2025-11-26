@@ -84,11 +84,17 @@
               >Upload Transactions</a
             >
           </li>
-          <li class="nav-item" id="linksTable">
+          <li class="nav-item" id="linksTransactions">
             <a class="nav-link" href="{% url 'myfinances:transactions-list' %}"
               >My Transactions</a
             >
           </li>
+          <li class="nav-item" id="linksCategoryTotals">
+            <a class="nav-link" href="{% url 'myfinances:category-totals' %}"
+              >Category Totals</a
+            >
+          </li>
+
           <li class="nav-item" id="linksCategories">
             <a class="nav-link" href="{% url 'myfinances:categories-list' %}"
               >My Categories</a

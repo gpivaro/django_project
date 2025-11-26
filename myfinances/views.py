@@ -1,3 +1,7 @@
+from .models import Statements
+from django.utils.timezone import now
+from django.shortcuts import render
+from django.utils.dateparse import parse_date
 import csv
 import io
 from django.shortcuts import render, redirect
@@ -13,6 +17,7 @@ from .forms import ItemForm, StatementForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import IntegrityError
+from django.db.models import Sum
 
 
 # To create API using rest framework
@@ -357,3 +362,68 @@ class TransactionsDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
         if self.request.user == category.Owner:
             return True
         return False
+
+
+"""
+View: category_totals_view
+
+This view aggregates totals per category for a given Posting_Date range.
+- It accepts optional GET parameters: `start_date` and `end_date`.
+- If only `start_date` is provided, `end_date` defaults to today's date.
+- Results are filtered by the logged-in Owner (user).
+- The queryset groups Statements by Category and computes the sum of Amounts.
+- A grand total across all categories is also calculated.
+- Each category row is labeled as "Income" if the category name is 'income',
+  otherwise labeled as "Other".
+- The results are passed to the template for display in a compact table.
+"""
+
+
+def category_totals_view(request):
+    # --- Step 1: Extract date range from query parameters ---
+    start_date_str = request.GET.get("start_date")
+    end_date_str = request.GET.get("end_date")
+
+    # Parse strings into date objects (None if not provided)
+    start_date = parse_date(start_date_str) if start_date_str else None
+    end_date = parse_date(end_date_str) if end_date_str else None
+
+    # --- Step 2: Default end_date to today if only start_date is provided ---
+    if start_date and not end_date:
+        end_date = now().date()
+
+    # --- Step 3: Filter statements by current user (Owner) ---
+    qs = Statements.objects.filter(Owner=request.user)
+
+    # --- Step 4: Apply date filter if both bounds are available ---
+    if start_date and end_date:
+        qs = qs.filter(Posting_Date__range=[start_date, end_date])
+
+    # --- Step 5: Group by Category and compute totals ---
+    category_totals = (
+        qs.values("Category_id", "Category__name")
+          .annotate(total_amount=Sum("Amount"))
+          .order_by("Category__name")
+    )
+
+    # --- Step 6: Compute grand total across all categories ---
+    grand_total = sum(row["total_amount"] or 0 for row in category_totals)
+
+    # --- Step 7: Add labels for Income vs Other categories ---
+    for row in category_totals:
+        if row["Category__name"] and row["Category__name"].lower() == "income":
+            row["label"] = "Income"
+        else:
+            row["label"] = "Other"
+
+    # --- Step 8: Build context for template rendering ---
+    context = {
+        "category_totals": category_totals,
+        "grand_total": grand_total,
+        "start_date": start_date_str,
+        # Show today's date if auto-filled
+        "end_date": end_date_str or str(end_date),
+    }
+
+    # --- Step 9: Render results in template ---
+    return render(request, "myfinances/category_totals.html", context)

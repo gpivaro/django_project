@@ -1,3 +1,7 @@
+from django.db.models import Sum, Count
+from django.views.generic import TemplateView
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Statements
 from django.utils.timezone import now
 from django.shortcuts import render
@@ -323,11 +327,51 @@ def banktransactions(request):
 
 
 # Using Python Class Views to View Model. Listview
+
+
 class TransactionsListView(LoginRequiredMixin, ListView):
     model = Statements
     template_name = 'myfinances/transactions_list.html'
+    # This maps to object_list (current page items)
     context_object_name = 'transactions'
     ordering = ['-Posting_Date']
+    paginate_by = 20  # default
+
+    def get_paginate_by(self, queryset):
+        """
+        Supports ?page_size=10|20|50|100|all
+        - 'all' disables pagination
+        - numeric values set the per-page size
+        """
+        page_size = self.request.GET.get("page_size")
+        if page_size:
+            if page_size.lower() == "all":
+                return None  # disables pagination
+            if page_size.isdigit():
+                size = int(page_size)
+                # optional: clamp to reasonable bounds
+                return max(1, min(size, 500))
+        return self.paginate_by
+
+    def get_queryset(self):
+        """
+        Filter transactions by the current user and apply ordering.
+        """
+        qs = super().get_queryset()
+        return qs.filter(Owner=self.request.user).order_by(*self.ordering)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        # expose current page size selection for the template
+        page_size = self.request.GET.get("page_size")
+        if not page_size:
+            # reflect actual per_page when paginated, else 'all'
+            if ctx.get('is_paginated'):
+                page_size = str(ctx['paginator'].per_page)
+            else:
+                page_size = "all"
+        ctx['current_page_size'] = page_size
+        return ctx
 
 
 # Using Python Class Views to View Model. DetailView
@@ -364,66 +408,95 @@ class TransactionsDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
         return False
 
 
-"""
-View: category_totals_view
+def balance_sheet(request):
+    """
+    Balance Sheet View
 
-This view aggregates totals per category for a given Posting_Date range.
-- It accepts optional GET parameters: `start_date` and `end_date`.
-- If only `start_date` is provided, `end_date` defaults to today's date.
-- Results are filtered by the logged-in Owner (user).
-- The queryset groups Statements by Category and computes the sum of Amounts.
-- A grand total across all categories is also calculated.
-- Each category row is labeled as "Income" if the category name is 'income',
-  otherwise labeled as "Other".
-- The results are passed to the template for display in a compact table.
-"""
+    - Accepts optional GET parameters: start_date, end_date, acct_info
+    - If only start_date is provided, end_date defaults to today
+    - Filters statements by Owner and optionally by Acct_Info
+    - Groups by Category and computes totals
+    - Adds labels for Income vs Other categories
+    - Provides grand total across all categories
+    """
 
-
-def category_totals_view(request):
-    # --- Step 1: Extract date range from query parameters ---
+    # --- Step 1: Extract query parameters ---
     start_date_str = request.GET.get("start_date")
     end_date_str = request.GET.get("end_date")
+    acct_info = request.GET.get("acct_info")  # new: account filter
 
-    # Parse strings into date objects (None if not provided)
+    # --- Step 2: Parse dates ---
     start_date = parse_date(start_date_str) if start_date_str else None
     end_date = parse_date(end_date_str) if end_date_str else None
 
-    # --- Step 2: Default end_date to today if only start_date is provided ---
+    # --- Step 3: Default end_date to today if only start_date is provided ---
     if start_date and not end_date:
         end_date = now().date()
 
-    # --- Step 3: Filter statements by current user (Owner) ---
+    # --- Step 4: Base queryset filtered by Owner ---
     qs = Statements.objects.filter(Owner=request.user)
 
-    # --- Step 4: Apply date filter if both bounds are available ---
+    # --- Step 5: Filter by account if selected ---
+    if acct_info:
+        qs = qs.filter(Acct_Info=acct_info)
+
+    # --- Step 6: Apply date filter ---
     if start_date and end_date:
         qs = qs.filter(Posting_Date__range=[start_date, end_date])
 
-    # --- Step 5: Group by Category and compute totals ---
+    # --- Step 7: Group by Category and compute totals ---
     category_totals = (
         qs.values("Category_id", "Category__name")
           .annotate(total_amount=Sum("Amount"))
           .order_by("Category__name")
     )
 
-    # --- Step 6: Compute grand total across all categories ---
+    # --- Step 8: Compute grand total ---
     grand_total = sum(row["total_amount"] or 0 for row in category_totals)
 
-    # --- Step 7: Add labels for Income vs Other categories ---
+    # --- Step 9: Add labels ---
     for row in category_totals:
         if row["Category__name"] and row["Category__name"].lower() == "income":
             row["label"] = "Income"
         else:
             row["label"] = "Other"
 
-    # --- Step 8: Build context for template rendering ---
+    # --- Step 10: Collect distinct accounts for dropdown ---
+    acct_infos = (
+        Statements.objects.filter(Owner=request.user)
+        .values_list("Acct_Info", flat=True)
+        .distinct()
+    )
+    # Clean up duplicates caused by whitespace/casing
+    acct_infos = sorted(set(acct.strip() for acct in acct_infos if acct))
+
+    # --- Step 11: Build context ---
     context = {
         "category_totals": category_totals,
         "grand_total": grand_total,
         "start_date": start_date_str,
-        # Show today's date if auto-filled
         "end_date": end_date_str or str(end_date),
+        "acct_infos": acct_infos,
+        "selected_acct": acct_info,
     }
 
-    # --- Step 9: Render results in template ---
-    return render(request, "myfinances/category_totals.html", context)
+    # --- Step 12: Render template ---
+    return render(request, "myfinances/balance_sheet.html", context)
+
+
+class LandingPageView(LoginRequiredMixin, TemplateView):
+    template_name = "myfinances/landing.html"
+    login_url = "login"        # redirect to your login view
+    redirect_field_name = "next"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        qs = Statements.objects.filter(Owner=self.request.user)
+
+        context["total_transactions"] = qs.count()
+        context["uncategorized_count"] = qs.filter(
+            Category__isnull=True).count()
+        context["grand_total"] = qs.aggregate(
+            total=Sum("Amount"))["total"] or 0
+        context["category_count"] = qs.values("Category").distinct().count()
+        return context

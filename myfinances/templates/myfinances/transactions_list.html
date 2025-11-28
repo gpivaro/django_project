@@ -1,52 +1,64 @@
-{% extends "myfinances/base.html" %} {% load static %} {% block content %}
+{% extends "myfinances/base.html" %}
+{% load static %}
+{% block content %}
 
 <style>
   table {
-    width: 300px;
-    /* set a fixed width */
+    width: 60%;
     border-collapse: collapse;
-    /* merge borders for a clean look */
     margin: 20px auto;
-    /* center the table */
     font-family: Arial, sans-serif;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    /* subtle shadow */
   }
-
   th {
     background-color: #0c6ba1;
-    /* green header */
     color: white;
     text-align: center;
     padding: 10px;
     font-size: 16px;
     border-bottom: 2px solid #03131d;
   }
-
   td {
     padding: 10px;
     border-bottom: 1px solid #ddd;
     font-size: 14px;
     color: #03131d;
+    text-align: center;
   }
-
-  tr:hover td {
-    background-color: #f5f5f5;
-    /* highlight row on hover */
-  }
+  tr:hover td { background-color: #f5f5f5; }
+  .amount-positive { color: green; font-weight: bold; }
+  .amount-negative { color: red; font-weight: bold; }
+  .amount-zero { color: gray; }
 </style>
 
-<!-- templates/transactions/statement_list.html -->
+<h2 class="text-center mt-3">Transactions</h2>
 
-<h2>Transactions</h2>
-<table border="1">
+<!-- Page size selector -->
+<div class="d-flex justify-content-center mb-3">
+  <form method="get" class="form-inline">
+    <label for="page_size" class="mr-2">Show per page:</label>
+    <select id="page_size" name="page_size" class="form-control form-control-sm mr-2" onchange="this.form.submit()">
+      <option value="10" {% if current_page_size == '10' %}selected{% endif %}>10</option>
+      <option value="20" {% if current_page_size == '20' %}selected{% endif %}>20</option>
+      <option value="50" {% if current_page_size == '50' %}selected{% endif %}>50</option>
+      <option value="100" {% if current_page_size == '100' %}selected{% endif %}>100</option>
+      <option value="all" {% if current_page_size == 'all' %}selected{% endif %}>All</option>
+    </select>
+    {% if page_obj %}
+      <!-- Preserve current page when changing size -->
+      <input type="hidden" name="page" value="{{ page_obj.number }}">
+    {% endif %}
+  </form>
+</div>
+
+<table>
   <thead>
     <tr>
+      <th>Acct Info</th>
       <th>Posting Date</th>
       <th>Description</th>
       <th>Amount</th>
       <th>Type</th>
-      <th>Balance</th>
       <th>Category</th>
       <th>Action</th>
     </tr>
@@ -54,34 +66,76 @@
   <tbody>
     {% for transaction in transactions %}
     <tr>
+      <td>{{ transaction.Acct_Info }}</td>
       <td>{{ transaction.Posting_Date }}</td>
       <td>{{ transaction.Description }}</td>
-      <td>{{ transaction.Amount }}</td>
-      <td>{{ transaction.Type }}</td>
-      <td>{{ transaction.Balance }}</td>
       <td>
-        {% if transaction.Category %} {{ transaction.Category }}
-        <!-- uses CategoryList.__str__ -->
-        {% else %} ---- {% endif %}
+        {% if transaction.Amount > 0 %}
+          <span class="amount-positive">${{ transaction.Amount|floatformat:2 }}</span>
+        {% elif transaction.Amount < 0 %}
+          <span class="amount-negative">${{ transaction.Amount|floatformat:2 }}</span>
+        {% else %}
+          <span class="amount-zero">${{ transaction.Amount|floatformat:2 }}</span>
+        {% endif %}
+      </td>
+      <td>{{ transaction.Type }}</td>
+      <td>
+        {% if transaction.Category %}
+          {{ transaction.Category }}
+        {% else %}
+          <span class="text-muted">----</span>
+        {% endif %}
       </td>
       <td>
-        <a
-          class="btn btn-secondary btn-sm mt-1 mb-1"
-          href="{% url 'myfinances:transactions-update' transaction.id %}"
-          >Update</a
-        >
-        <a
-          class="btn btn-danger btn-sm mt-1 mb-1"
-          href="{% url 'myfinances:transactions-delete' transaction.id %}"
-          >Delete</a
-        >
+        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'myfinances:transactions-update' transaction.id %}">Update</a>
+        <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'myfinances:transactions-delete' transaction.id %}">Delete</a>
       </td>
     </tr>
     {% empty %}
     <tr>
-      <td colspan="6">No transactions found.</td>
+      <td colspan="7">No transactions found.</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+
+<!-- Pagination controls -->
+{% if is_paginated %}
+<div class="d-flex justify-content-center mt-3">
+  <nav aria-label="Transaction pagination">
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page=1&page_size={{ paginator.per_page }}">&laquo; First</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}&page_size={{ paginator.per_page }}">Previous</a>
+        </li>
+      {% endif %}
+
+      <li class="page-item disabled">
+        <span class="page-link">
+          Page {{ page_obj.number }} of {{ paginator.num_pages }}
+        </span>
+      </li>
+
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}&page_size={{ paginator.per_page }}">Next</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ paginator.num_pages }}&page_size={{ paginator.per_page }}">Last &raquo;</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% else %}
+<!-- When showing all, provide quick navigation -->
+<div class="d-flex justify-content-center mt-3">
+  <a class="btn btn-outline-secondary btn-sm mr-2" href="?page=1&page_size=20">First page (20)</a>
+  <a class="btn btn-outline-secondary btn-sm" href="?page=1&page_size=all">View all</a>
+</div>
+{% endif %}
+
 {% endblock %}

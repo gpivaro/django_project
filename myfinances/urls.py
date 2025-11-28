@@ -9,7 +9,8 @@ from myfinances.views import (CategoryListListView,
                               TransactionsDetailView,
                               TransactionsUpdateView,
                               TransactionsDeleteView,
-                              category_totals_view)
+                              balance_sheet,
+                              LandingPageView)
 
 # To use the login view
 from django.contrib.auth.views import LoginView
@@ -25,7 +26,7 @@ router.register("users", views.UsersView)
 
 app_name = "myfinances"
 urlpatterns = [
-    path("", home, name="home"),
+    path("home/", home, name="home"),
     path("statement/", statement, name="statement"),
     path("categories/", categories, name="categories"),
     path("api/", include(router.urls)),
@@ -49,7 +50,9 @@ urlpatterns = [
          TransactionsUpdateView.as_view(), name="transactions-update"),
     path("transaction/<int:pk>/delete/",
          TransactionsDeleteView.as_view(), name="transactions-delete"),
-    path("category-totals/",
-         category_totals_view, name="category-totals"),
+    path("balance_sheet/",
+         balance_sheet, name="balance_sheet"),
+    path("", LandingPageView.as_view(), name="landing"),  # Landing page
+
 
 ]

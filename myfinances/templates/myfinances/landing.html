@@ -1,0 +1,117 @@
+{% extends "myfinances/base.html" %} {% load static %} {% block content %}
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Welcome to My-Finances</h2>
+  <p class="text-center text-muted mb-5">
+    Manage your financial data with ease. Choose an option below to get started:
+  </p>
+
+  <!-- Metrics Section -->
+  <div class="row text-center mb-5">
+    <div class="col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="card-title text-muted">Total Transactions</h6>
+          <h4>{{ total_transactions }}</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="card-title text-muted">Uncategorized</h6>
+          <h4>{{ uncategorized_count }}</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="card-title text-muted">Grand Total</h6>
+          {% if grand_total > 0 %}
+          <h4 class="text-success">${{ grand_total|floatformat:2 }}</h4>
+          {% elif grand_total < 0 %}
+          <h4 class="text-danger">${{ grand_total|floatformat:2 }}</h4>
+          {% else %}
+          <h4 class="text-muted">${{ grand_total|floatformat:2 }}</h4>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="card-title text-muted">Categories Used</h6>
+          <h4>{{ category_count }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Cards -->
+  <div class="row justify-content-center">
+    <div class="col-md-5 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <h5 class="card-title">Upload Transactions</h5>
+          <p class="card-text text-muted">
+            Import your bank statements and start tracking your finances.
+          </p>
+          <a
+            href="{% url 'myfinances:banktransactions' %}"
+            class="btn btn-primary"
+            >Go to Upload</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-5 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <h5 class="card-title">My Transactions</h5>
+          <p class="card-text text-muted">
+            View, edit, and manage all your uploaded transactions.
+          </p>
+          <a
+            href="{% url 'myfinances:transactions-list' %}"
+            class="btn btn-primary"
+            >Go to Transactions</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-5 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <h5 class="card-title">Balance Sheet</h5>
+          <p class="card-text text-muted">
+            Analyze totals by category and account over time.
+          </p>
+          <a href="{% url 'myfinances:balance_sheet' %}" class="btn btn-primary"
+            >Go to Balance Sheet</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-5 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <h5 class="card-title">My Categories</h5>
+          <p class="card-text text-muted">
+            Manage your categories to keep transactions organized.
+          </p>
+          <a
+            href="{% url 'myfinances:categories-list' %}"
+            class="btn btn-primary"
+            >Go to Categories</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

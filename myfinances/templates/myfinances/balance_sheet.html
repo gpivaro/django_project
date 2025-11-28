@@ -1,12 +1,22 @@
-{% extends "myfinances/base.html" %} {% block content %}
+{% extends "myfinances/base.html" %}
+{% block content %}
 
 <h2 class="text-center mt-3">
-  Category Totals {% if start_date and end_date %}
-  <span class="badge badge-info ml-2"> {{ start_date }} – {{ end_date }} </span>
+  Balance Sheet
+  {% if start_date and end_date %}
+    <span class="badge badge-info ml-2">
+      {{ start_date }} – {{ end_date }}
+    </span>
+  {% endif %}
+  {% if selected_acct %}
+    <span class="badge badge-secondary ml-2">
+      Account {{ selected_acct }}
+    </span>
   {% endif %}
 </h2>
 
 <form method="get" class="form-inline justify-content-center mb-3">
+  <!-- Date range -->
   <div class="form-group mr-2">
     <label for="start_date" class="mr-2">Start</label>
     <input
@@ -27,20 +37,28 @@
       value="{{ end_date }}"
     />
   </div>
+
+  <!-- Account filter -->
+  <div class="form-group mr-2">
+    <label for="acct_info" class="mr-2">Account</label>
+    <select id="acct_info" name="acct_info" class="form-control form-control-sm">
+      <option value="">All</option>
+      {% for acct in acct_infos %}
+        <option value="{{ acct }}" {% if acct == selected_acct %}selected{% endif %}>
+          {{ acct }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
   <button type="submit" class="btn btn-secondary btn-sm mr-2">Apply</button>
   <!-- ✅ Reset button -->
-  <a
-    href="{% url 'myfinances:category-totals' %}"
-    class="btn btn-outline-danger btn-sm"
-    >Reset</a
-  >
+  <a href="{% url 'myfinances:balance_sheet' %}" class="btn btn-outline-danger btn-sm">Reset</a>
 </form>
 
 <div class="d-flex justify-content-center">
   <div class="table-responsive" style="max-width: 600px">
-    <table
-      class="table table-sm table-bordered text-center align-middle mx-auto"
-    >
+    <table class="table table-sm table-bordered text-center align-middle mx-auto">
       <thead class="thead-light">
         <tr>
           <th>Category</th>
@@ -51,23 +69,15 @@
       <tbody>
         {% for row in category_totals %}
         <tr>
-          <td class="text-center">
-            {{ row.Category__name|default:"Uncategorized" }}
-          </td>
+          <td class="text-center">{{ row.Category__name|default:"Uncategorized" }}</td>
           <td class="text-center">{{ row.label }}</td>
           <td class="text-center">
             {% if row.total_amount > 0 %}
-            <span class="text-success"
-              >${{ row.total_amount|floatformat:2 }}</span
-            >
+              <span class="text-success">${{ row.total_amount|floatformat:2 }}</span>
             {% elif row.total_amount < 0 %}
-            <span class="text-danger"
-              >${{ row.total_amount|floatformat:2 }}</span
-            >
+              <span class="text-danger">${{ row.total_amount|floatformat:2 }}</span>
             {% else %}
-            <span class="text-muted"
-              >${{ row.total_amount|floatformat:2 }}</span
-            >
+              <span class="text-muted">${{ row.total_amount|floatformat:2 }}</span>
             {% endif %}
           </td>
         </tr>
@@ -82,11 +92,11 @@
           <td colspan="2" class="text-center">Grand Total</td>
           <td class="text-center">
             {% if grand_total > 0 %}
-            <span class="text-success">${{ grand_total|floatformat:2 }}</span>
+              <span class="text-success">${{ grand_total|floatformat:2 }}</span>
             {% elif grand_total < 0 %}
-            <span class="text-danger">${{ grand_total|floatformat:2 }}</span>
+              <span class="text-danger">${{ grand_total|floatformat:2 }}</span>
             {% else %}
-            <span class="text-muted">${{ grand_total|floatformat:2 }}</span>
+              <span class="text-muted">${{ grand_total|floatformat:2 }}</span>
             {% endif %}
           </td>
         </tr>

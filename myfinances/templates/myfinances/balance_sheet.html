@@ -1,6 +1,20 @@
 {% extends "myfinances/base.html" %}
 {% block content %}
 
+<style>
+  /* Highlight the whole row on hover */
+  .table tbody tr:hover {
+    background-color: #f5f5f5; /* light gray for light mode */
+    cursor: pointer;
+  }
+
+  /* Dark mode override */
+  body.dark-mode .table tbody tr:hover {
+    background-color: #2a3b2a; /* muted greenish highlight */
+    color: #ffc107; /* highlight text for contrast */
+  }
+</style>
+
 <h2 class="text-center mt-3">
   Balance Sheet
   {% if start_date and end_date %}
@@ -58,7 +72,7 @@
 
 <div class="d-flex justify-content-center">
   <div class="table-responsive" style="width: 60%;">
-    <table class="table table-sm table-bordered text-center align-middle mx-auto">
+    <table class="table table-sm table-bordered table-hover text-center align-middle mx-auto">
       <thead class="thead-light">
         <tr>
           <th>Category</th>

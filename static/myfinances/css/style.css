@@ -1,5 +1,43 @@
 
+/* Dark background for the whole page */
+body {
+  background-color: #ffffff;   /* dark gray */
+  color: #131212;              /* light text for readability */
+  margin: 0;                   /* remove default margin */
+  font-family: Arial, sans-serif;
+}
 
+/* Dark mode base */
+body.dark-mode {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+/* Navbar */
+body.dark-mode .navbar {
+  background-color: #000 !important;
+}
+
+/* Tables */
+body.dark-mode table {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+
+body.dark-mode th {
+  background-color: #333;
+  color: #fff;
+}
+
+body.dark-mode td {
+  border-color: #444;
+}
+
+/* Cards */
+body.dark-mode .card {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
 
 /* table specific styling */
 table{
@@ -20,6 +58,11 @@ table{
   padding: .25rem;
   vertical-align: middle;
 }
+
+td a {
+  text-decoration: none;      /* optional: remove underline */
+}
+
 
 
   /* style the entire column of the table */

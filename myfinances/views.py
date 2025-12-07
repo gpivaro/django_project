@@ -330,18 +330,34 @@ def banktransactions(request):
 
 
 class TransactionsListView(LoginRequiredMixin, ListView):
+    """
+    Displays a paginated list of Statement transactions for the logged-in user.
+
+    Features:
+    - Pagination with dynamic page size (?page_size=10|20|50|100|all).
+    - Filtering by description (case-insensitive substring match).
+    - Filtering by category (via CategoryList model).
+    - Displays a total sum of the Amount column for the filtered queryset.
+    - Exposes available categories for dropdown filtering in the template.
+    """
+
     model = Statements
     template_name = 'myfinances/transactions_list.html'
-    # This maps to object_list (current page items)
-    context_object_name = 'transactions'
-    ordering = ['-Posting_Date']
-    paginate_by = 20  # default
+    context_object_name = 'transactions'  # maps to object_list in template
+    ordering = ['-Posting_Date']          # newest transactions first
+    paginate_by = 20                      # default page size
 
     def get_paginate_by(self, queryset):
         """
-        Supports ?page_size=10|20|50|100|all
-        - 'all' disables pagination
-        - numeric values set the per-page size
+        Determine pagination size based on ?page_size query parameter.
+
+        Supported values:
+        - 'all' → disables pagination (returns all results).
+        - numeric values (e.g., 10, 20, 50, 100) → set per-page size.
+        - defaults to self.paginate_by if not provided.
+
+        Returns:
+            int or None: number of items per page, or None to disable pagination.
         """
         page_size = self.request.GET.get("page_size")
         if page_size:
@@ -349,13 +365,22 @@ class TransactionsListView(LoginRequiredMixin, ListView):
                 return None  # disables pagination
             if page_size.isdigit():
                 size = int(page_size)
-                # optional: clamp to reasonable bounds
+                # clamp to reasonable bounds (1–500)
                 return max(1, min(size, 500))
         return self.paginate_by
 
     def get_queryset(self):
         """
-        Filter transactions by the current user and apply ordering.
+        Build the queryset of transactions for the current user.
+
+        - Filters by Owner (logged-in user).
+        - Orders by Posting_Date descending.
+        - Applies optional filters:
+          * description → case-insensitive substring match.
+          * category → matches CategoryList.name unless 'all'.
+
+        Returns:
+            QuerySet: filtered and ordered transactions.
         """
         qs = super().get_queryset().filter(
             Owner=self.request.user).order_by(*self.ordering)
@@ -367,23 +392,30 @@ class TransactionsListView(LoginRequiredMixin, ListView):
         if description:
             qs = qs.filter(Description__icontains=description)
         if category and category != "all":
-            qs = qs.filter(Category=category)
+            qs = qs.filter(Category__name=category)
 
         return qs
 
     def get_context_data(self, **kwargs):
+        """
+        Extend template context with additional data:
+
+        - categories: all CategoryList entries for dropdown filter.
+        - total_amount: sum of Amount column for filtered queryset.
+        - current_page_size: reflects active page size selection
+          (numeric or 'all') for template display.
+
+        Returns:
+            dict: context data for template rendering.
+        """
         ctx = super().get_context_data(**kwargs)
 
         # Add a total to your context:
         qs = self.get_queryset()
-
-        ctx["categories"] = Statements.objects.filter(
-            Owner=self.request.user
-        ).values_list("Category", flat=True).distinct()
-
+        ctx["categories"] = CategoryList.objects.all()
         ctx["total_amount"] = qs.aggregate(total=Sum("Amount"))["total"] or 0
 
-        # expose current page size selection for the template
+        # Expose current page size selection for the template
         page_size = self.request.GET.get("page_size")
         if not page_size:
             # reflect actual per_page when paginated, else 'all'
@@ -392,6 +424,7 @@ class TransactionsListView(LoginRequiredMixin, ListView):
             else:
                 page_size = "all"
         ctx['current_page_size'] = page_size
+
         return ctx
 
 

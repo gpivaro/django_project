@@ -4,6 +4,7 @@
 {% block content %}
 
 <style>
+  /* Table styling */
   table {
     width: 60%;
     border-collapse: collapse;
@@ -26,9 +27,16 @@
     text-align: center;
   }
   tr:hover td { background-color: #66994e; }
+
+  /* Amount styling */
   .amount-positive { color: green; font-weight: bold; }
   .amount-negative { color: red; font-weight: bold; }
   .amount-zero { color: gray; }
+
+  /* Extra spacing between category dropdown and filter button */
+  .category-dropdown {
+    margin-right: 15px; /* adds space before Filter button */
+  }
 </style>
 
 <h2 class="text-center mt-3">Transactions</h2>
@@ -38,6 +46,7 @@
   <form method="get" class="form-inline">
     <label for="page_size" class="mr-2">Show per page:</label>
     <select id="page_size" name="page_size" class="form-control form-control-sm mr-2" onchange="this.form.submit()">
+      <!-- Options for pagination size -->
       <option value="10" {% if current_page_size == '10' %}selected{% endif %}>10</option>
       <option value="20" {% if current_page_size == '20' %}selected{% endif %}>20</option>
       <option value="50" {% if current_page_size == '50' %}selected{% endif %}>50</option>
@@ -53,23 +62,27 @@
 
 <!-- Search + Filter Form -->
 <form method="get" class="form-inline justify-content-center mb-3">
+  <!-- Description search -->
   <input type="text" name="description" class="form-control mr-2"
          placeholder="Search description..."
          value="{{ request.GET.description }}">
   
-  <select name="category" class="form-control">
-  <option value="all">All Categories</option>
-  {% for cat in categories %}
-    <option value="{{ cat }}" {% if request.GET.category == cat %}selected{% endif %}>
-      {{ cat }}
-    </option>
-  {% endfor %}
-</select>
+  <!-- Category dropdown -->
+  <select name="category" class="form-control category-dropdown">
+    <option value="all">All Categories</option>
+    {% for cat in categories %}
+      <option value="{{ cat.name }}" {% if request.GET.category == cat.name %}selected{% endif %}>
+        {{ cat.name }}
+      </option>
+    {% endfor %}
+  </select>
 
+  <!-- Filter and Clear buttons -->
   <button type="submit" class="btn btn-primary mr-2">Filter</button>
   <a href="{% url 'myfinances:transactions-list' %}" class="btn btn-secondary">Clear</a>
 </form>
 
+<!-- Transactions table -->
 <table>
   <thead>
     <tr>
@@ -90,11 +103,11 @@
       <td>{{ transaction.Description }}</td>
       <td>
         {% if transaction.Amount > 0 %}
-          <span class="amount-positive">${{ transaction.Amount|floatformat:2 |intcomma }}</span>
+          <span class="amount-positive">${{ transaction.Amount|floatformat:2|intcomma }}</span>
         {% elif transaction.Amount < 0 %}
-          <span class="amount-negative">${{ transaction.Amount|floatformat:2 |intcomma }}</span>
+          <span class="amount-negative">${{ transaction.Amount|floatformat:2|intcomma }}</span>
         {% else %}
-          <span class="amount-zero">${{ transaction.Amount|floatformat:2 |intcomma }}</span>
+          <span class="amount-zero">${{ transaction.Amount|floatformat:2|intcomma }}</span>
         {% endif %}
       </td>
       <td>{{ transaction.Type }}</td>
@@ -106,6 +119,7 @@
         {% endif %}
       </td>
       <td>
+        <!-- Update/Delete actions -->
         <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'myfinances:transactions-update' transaction.id %}">Update</a>
         <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'myfinances:transactions-delete' transaction.id %}">Delete</a>
       </td>
@@ -118,14 +132,14 @@
   </tbody>
   <tfoot>
     <tr class="font-weight-bold">
-      <td></td> <!-- empty cell under Date -->
+      <td></td> <!-- empty cell under Acct Info -->
       <td></td> <!-- empty cell under Posting Date -->
-      <td class="text-center">Total:</td> <!-- bigger text -->
+      <td class="text-center">TOTAL</td> <!-- total label -->
       <td>
         {% if total_amount < 0 %}
-          <span class="text-danger">${{ total_amount | floatformat:2 | intcomma }}</span>
+          <span class="amount-negative">${{ total_amount|floatformat:2|intcomma }}</span>
         {% else %}
-          <span class="text-success">${{ total_amount | floatformat:2 |intcomma }}</span>
+          <span class="amount-positive">${{ total_amount|floatformat:2|intcomma }}</span>
         {% endif %}
       </td>
       <td></td> <!-- empty cell under Type -->

@@ -1,6 +1,9 @@
-{% extends "myfinances/base.html" %} {% load static %} {% block content %}
+{% extends "myfinances/base.html" %}
+{% load static %}
+{% block content %}
 
 <style>
+  /* Table styling */
   table {
     width: 60%;
     border-collapse: collapse;
@@ -25,65 +28,105 @@
   tr:hover td {
     background-color: #66994e;
   }
-  .amount-positive {
-    color: green;
-    font-weight: bold;
-  }
-  .amount-negative {
-    color: red;
-    font-weight: bold;
-  }
-  .amount-zero {
-    color: gray;
-  }
 </style>
 
-<!-- main content -->
-<div style="flex: 1; text-align: center">
-  <div
-    style="
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    "
-  >
-    <!-- Top centered button -->
-    <div class="container mt-2 mb-2 p-4" style="text-align: center">
-      <a class="btn btn-primary" href="{% url 'myfinances:category-new' %}">
-        Create Category
-      </a>
-    </div>
+<h2 class="text-center mt-3">
+  Categories
+  <button class="btn btn-link p-0 ml-2" type="button"
+          data-toggle="collapse" data-target="#quickGuide"
+          aria-expanded="false" aria-controls="quickGuide"
+          title="Show/Hide Quick Guide">
+    <span class="badge badge-info">?</span>
+  </button>
+</h2>
+
+<div class="collapse mt-2 mb-4" id="quickGuide">
+  <div class="card card-body text-left mx-auto" style="width: 60%;">
+    <h5 class="mb-2">How to use this Categories page</h5>
+    <ul class="mb-0">
+      <li><strong>Filter categories</strong> by name or label using the form above. Click <em>Filter</em> to apply or <em>Reset</em> to clear.</li>
+      <li><strong>Active filters</strong> are shown as badges so you can see what’s applied at a glance.</li>
+      <li><strong>Create Category</strong> button lets you add a new category quickly.</li>
+      <li><strong>Categories table</strong> lists all categories with their labels. Click a category name to view details.</li>
+      <li><strong>Actions</strong> allow you to update or delete categories directly from the table.</li>
+      <li>If no categories match your filters, a helpful message is displayed instead of an empty table.</li>
+    </ul>
   </div>
 </div>
 
+<!-- Filter form -->
+<form method="get" class="form-inline justify-content-center mb-3">
+  <!-- Category name filter -->
+  <div class="form-group mr-3">
+    <label for="category_name" class="mr-2">Category</label>
+    <input type="text" id="category_name" name="category_name"
+           class="form-control form-control-sm"
+           value="{{ selected_name }}">
+  </div>
+
+  <!-- Label filter -->
+  <div class="form-group mr-3">
+    <label for="label" class="mr-2">Label</label>
+    <select id="label" name="label" class="form-control form-control-sm">
+      <option value="all">All Labels</option>
+      {% for l in labels %}
+        <option value="{{ l }}" {% if selected_label == l %}selected{% endif %}>
+          {{ l }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary btn-sm mr-2">Filter</button>
+  <a href="{% url 'myfinances:categories-list' %}" class="btn btn-secondary btn-sm">Reset</a>
+</form>
+
+<!-- Active filters summary -->
+<div class="d-flex justify-content-center mb-3">
+  {% if selected_name %}
+    <span class="badge badge-info mr-2">Category: {{ selected_name }}</span>
+  {% endif %}
+  {% if selected_label and selected_label != "all" %}
+    <span class="badge badge-warning">Label: {{ selected_label }}</span>
+  {% endif %}
+</div>
+
+<!-- Create Category button -->
+<div class="container mt-2 mb-2 p-4 text-center">
+  <a class="btn btn-primary" href="{% url 'myfinances:category-new' %}">
+    Create Category
+  </a>
+</div>
+
+<!-- Categories table -->
 <table id="tableCategories">
-  <tbody>
+  <thead>
     <tr>
-      <th>Categories List</th>
+      <th>Category</th>
+      <th>Label</th>
       <th>Action</th>
     </tr>
+  </thead>
+  <tbody>
     {% for category in categories_list %}
     <tr>
       <td>
-        <a
-          class="article-title"
-          href="{% url 'myfinances:category-detail' category.id %}"
-        >
-          {{category}}
+        <a class="article-title" href="{% url 'myfinances:category-detail' category.id %}">
+          {{ category.name }}
         </a>
       </td>
+      <td>{{ category.label }}</td>
       <td>
-        <a
-          class="btn btn-secondary btn-sm mt-1 mb-1"
-          href="{% url 'myfinances:category-update' category.id %}"
-          >Update</a
-        >
-        <a
-          class="btn btn-danger btn-sm mt-1 mb-1"
-          href="{% url 'myfinances:category-delete' category.id %}"
-          >Delete</a
-        >
+        <a class="btn btn-secondary btn-sm mt-1 mb-1"
+           href="{% url 'myfinances:category-update' category.id %}">Update</a>
+        <a class="btn btn-danger btn-sm mt-1 mb-1"
+           href="{% url 'myfinances:category-delete' category.id %}">Delete</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="3" class="text-center text-muted">
+        No categories found for the selected filters.
       </td>
     </tr>
     {% endfor %}

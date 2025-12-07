@@ -40,6 +40,20 @@ class CategoryList(models.Model):
     # Use lowercase field names for consistency
     name = models.CharField(max_length=100)
 
+    label = models.CharField(
+        max_length=50,
+        choices=[
+            ("Income", "Income"),
+            ("Expense", "Expense"),
+            ("Asset", "Asset"),
+            ("Liability", "Liability"),
+            ("Equity", "Equity"),
+            ("Other", "Other"),
+        ],
+        default="Other",
+        help_text="Assign a label to classify this category (e.g., Income, Expense, Asset, Liability)."
+    )
+
     # Tie each category to a specific user/owner
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,

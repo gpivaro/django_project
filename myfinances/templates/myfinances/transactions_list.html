@@ -39,7 +39,29 @@
   }
 </style>
 
-<h2 class="text-center mt-3">Transactions</h2>
+<h2 class="text-center mt-3">
+  Transactions
+  <button class="btn btn-link p-0 ml-2" type="button"
+          data-toggle="collapse" data-target="#quickGuide"
+          aria-expanded="false" aria-controls="quickGuide"
+          title="Show/Hide Quick Guide">
+    <span class="badge badge-info">?</span>
+  </button>
+</h2>
+
+<div class="collapse mt-2 mb-4" id="quickGuide">
+  <div class="card card-body text-left mx-auto" style="width: 60%;">
+    <h5 class="mb-2">How to use this Transactions page</h5>
+    <ul class="mb-0">
+      <li><strong>Page size selector</strong> lets you choose how many transactions to display per page.</li>
+      <li><strong>Search and filter</strong> by description or category using the form above. Click <em>Filter</em> to apply or <em>Clear</em> to reset.</li>
+      <li><strong>Transactions table</strong> shows account info, posting date, description, amount, type, and category. Positive amounts are green, negatives are red.</li>
+      <li><strong>Actions</strong> allow you to update or delete a transaction directly from the table.</li>
+      <li><strong>Total row</strong> at the bottom shows the sum of all listed transactions.</li>
+      <li><strong>Pagination controls</strong> help you navigate between pages. If you select “All,” you’ll see every transaction at once.</li>
+    </ul>
+  </div>
+</div>
 
 <!-- Page size selector -->
 <div class="d-flex justify-content-center mb-3">

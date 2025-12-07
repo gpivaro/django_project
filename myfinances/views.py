@@ -1,3 +1,5 @@
+from django.db.models.functions import TruncMonth
+from .models import Statements, CategoryList
 from django.db.models import Sum, Count
 from django.views.generic import TemplateView
 from django.views.generic import ListView
@@ -222,12 +224,44 @@ def manage_statements(request):
     return render(request, "myfinances/statement_table.html", {"forms": forms})
 
 
-# Using Python Class Views to View Model. Listview
 class CategoryListListView(LoginRequiredMixin, ListView):
     model = CategoryList
     template_name = 'myfinances/categorylist_list.html'
     context_object_name = 'categories_list'
-    ordering = ['name']
+    ordering = ['name', 'label']
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        # Extract filters
+        category_name = (self.request.GET.get("category_name") or "").strip()
+        label = (self.request.GET.get("label") or "").strip()
+
+        # Apply filters
+        if category_name:
+            qs = qs.filter(name__icontains=category_name)
+
+        # Labels are exact values (choices), so filter by equality
+        if label and label.lower() != "all":
+            qs = qs.filter(label=label)
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        # Build a unique, cleaned list of labels for the dropdown
+        raw_labels = CategoryList.objects.values_list("label", flat=True)
+        labels_unique = sorted(
+            set(l.strip() for l in raw_labels if l and l.strip())
+        )
+
+        ctx["labels"] = labels_unique
+        ctx["selected_name"] = (self.request.GET.get(
+            "category_name") or "").strip()
+        ctx["selected_label"] = (self.request.GET.get("label") or "").strip()
+
+        return ctx
 
 
 # Using Python Class Views to View Model. DetailView
@@ -238,7 +272,7 @@ class CategoryListDetailView(LoginRequiredMixin, DetailView):
 # Using Python Class Views to View Model. CreateView
 class CategoryListCreateView(LoginRequiredMixin, CreateView):
     model = CategoryList
-    fields = ['name']
+    fields = ['name', 'label']
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -257,7 +291,7 @@ class CategoryListCreateView(LoginRequiredMixin, CreateView):
 # Using Python Class Views to View Model. UpdateView
 class CategoryListUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = CategoryList
-    fields = ['name']
+    fields = ['name', 'label']
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -466,18 +500,20 @@ def balance_sheet(request):
     """
     Balance Sheet View
 
-    - Accepts optional GET parameters: start_date, end_date, acct_info
+    - Accepts optional GET parameters: start_date, end_date, acct_info, category
     - If only start_date is provided, end_date defaults to today
-    - Filters statements by Owner and optionally by Acct_Info
+    - Filters statements by Owner and optionally by Acct_Info and Category
     - Groups by Category and computes totals
-    - Adds labels for Income vs Other categories
+    - Summarizes totals by label (Income, Expense, Asset, Liability, Equity, Other)
     - Provides grand total across all categories
+    - Aggregates monthly totals by label for line chart visualization
     """
 
     # --- Step 1: Extract query parameters ---
     start_date_str = request.GET.get("start_date")
     end_date_str = request.GET.get("end_date")
-    acct_info = request.GET.get("acct_info")  # new: account filter
+    acct_info = request.GET.get("acct_info")       # account filter
+    category = request.GET.get("category")         # category filter
 
     # --- Step 2: Parse dates ---
     start_date = parse_date(start_date_str) if start_date_str else None
@@ -498,43 +534,68 @@ def balance_sheet(request):
     if start_date and end_date:
         qs = qs.filter(Posting_Date__range=[start_date, end_date])
 
-    # --- Step 7: Group by Category and compute totals ---
+    # --- Step 7: Apply category filter ---
+    if category and category != "all":
+        qs = qs.filter(Category__name=category)
+
+    # --- Step 8: Group by Category and compute totals ---
     category_totals = (
-        qs.values("Category_id", "Category__name")
+        qs.values("Category_id", "Category__name", "Category__label")
           .annotate(total_amount=Sum("Amount"))
           .order_by("Category__name")
     )
 
-    # --- Step 8: Compute grand total ---
+    # --- Step 9: Compute grand total ---
     grand_total = sum(row["total_amount"] or 0 for row in category_totals)
 
-    # --- Step 9: Add labels ---
-    for row in category_totals:
-        if row["Category__name"] and row["Category__name"].lower() == "income":
-            row["label"] = "Income"
-        else:
-            row["label"] = "Other"
+    # --- Step 10: Summarize by label ---
+    label_summary = (
+        qs.values("Category__label")
+        .annotate(total_amount=Sum("Amount"))
+        .order_by("-total_amount")
+    )
 
-    # --- Step 10: Collect distinct accounts for dropdown ---
+    # --- Step 11: Monthly totals by label (for line chart) ---
+    monthly_data = (
+        qs.annotate(month=TruncMonth("Posting_Date"))
+          .values("month", "Category__label")
+          .annotate(total_amount=Sum("Amount"))
+          .order_by("month", "Category__label")
+    )
+
+    # Reshape into dict: {label: {month: total}}
+    chart_data = {}
+    for row in monthly_data:
+        month = row["month"].strftime("%Y-%m")
+        label = row["Category__label"]
+        chart_data.setdefault(label, {})[month] = float(
+            row["total_amount"] or 0)
+
+    # --- Step 12: Collect distinct accounts for dropdown ---
     acct_infos = (
         Statements.objects.filter(Owner=request.user)
         .values_list("Acct_Info", flat=True)
         .distinct()
     )
-    # Clean up duplicates caused by whitespace/casing
     acct_infos = sorted(set(acct.strip() for acct in acct_infos if acct))
 
-    # --- Step 11: Build context ---
+    # --- Step 13: Collect distinct categories for dropdown ---
+    categories = CategoryList.objects.all()
+
+    # --- Step 14: Build context ---
     context = {
         "category_totals": category_totals,
         "grand_total": grand_total,
+        "label_summary": label_summary,
+        "chart_data": chart_data,   # <-- monthly totals by label
         "start_date": start_date_str,
         "end_date": end_date_str or str(end_date),
         "acct_infos": acct_infos,
         "selected_acct": acct_info,
+        "categories": categories,
     }
 
-    # --- Step 12: Render template ---
+    # --- Step 15: Render template ---
     return render(request, "myfinances/balance_sheet.html", context)
 
 

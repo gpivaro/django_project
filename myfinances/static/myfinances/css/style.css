@@ -1,9 +1,8 @@
-
-/* Dark background for the whole page */
+/* Base page styling */
 body {
-  background-color: #ffffff;   /* dark gray */
-  color: #131212;              /* light text for readability */
-  margin: 0;                   /* remove default margin */
+  background-color: #ffffff;
+  color: #131212;
+  margin: 0;
   font-family: Arial, sans-serif;
 }
 
@@ -18,7 +17,38 @@ body.dark-mode .navbar {
   background-color: #000 !important;
 }
 
-/* Tables */
+/* Tables – unified look for transactions and balance sheet */
+table {
+  width: 60%;
+  border-collapse: collapse;
+  margin: 20px auto;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+th {
+  background-color: #0c6ba1;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  font-size: 16px;
+  border-bottom: 2px solid #03131d;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+  text-align: center;
+}
+
+tr:hover td {
+  background-color: #66994e;
+}
+
+/* Dark mode table overrides */
 body.dark-mode table {
   background-color: #1e1e1e;
   color: #e0e0e0;
@@ -33,51 +63,20 @@ body.dark-mode td {
   border-color: #444;
 }
 
-/* Cards */
-body.dark-mode .card {
-  background-color: #1e1e1e;
-  color: #e0e0e0;
-}
+/* Amount styling */
+.amount-positive { color: green; font-weight: bold; }
+.amount-negative { color: red; font-weight: bold; }
+.amount-zero { color: gray; }
 
-/* table specific styling */
-table{
-    font-size: 9pt;
-    text-align: center;
-  }
-  
-  /* style the table title head*/
-  #tr-title{
-    text-align: justify;
-  }
-
-  table th {
-    width: auto !important;
-}
-
-.table td, .table th {
-  padding: .25rem;
-  vertical-align: middle;
-}
-
+/* Links inside table cells */
 td a {
-  text-decoration: none;      /* optional: remove underline */
+  text-decoration: none;
 }
 
-
-
-  /* style the entire column of the table */
-td:nth-child(2) + td { text-align: justify; }
-td:nth-child(3) + td { text-align: right; }
-
-#tableCategoryExpenses td:nth-child(1) + td { text-align: right; }  
-
-
-
-/* Top button styling */
-#topBtn{
+/* Buttons */
+#topBtn, #bottomBtn {
   display: none;
   position: fixed;
-  bottom: 80px;
   right: 20px;
   z-index: 99;
   font-size: 18px;
@@ -85,50 +84,31 @@ td:nth-child(3) + td { text-align: right; }
   outline: none;
   background-color: red;
   color: white;
-  cursor:pointer;
+  cursor: pointer;
   padding: 15px;
   border-radius: 4px;
 }
 
-#bottomBtn:hover{
+#topBtn { bottom: 80px; }
+#bottomBtn { bottom: 20px; }
+
+#topBtn:hover, #bottomBtn:hover {
   background-color: #555;
 }
 
-/* Top button styling */
-#bottomBtn{
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 99;
-  font-size: 18px;
-  border: none;
-  outline: none;
-  background-color: red;
-  color: white;
-  cursor:pointer;
-  padding: 15px;
-  border-radius: 4px;
-}
-
-#topBtn:hover{
-  background-color: #555;
-}
-
-/* The code styles the text at the bottom of the footer */
+/* Footer */
 .footer {
-  /* position: absolute; */
   right: 0;
   bottom: 0;
   left: 0;
   text-align: center;
   margin-top: 5%;
   padding: 5px;
-  background-color:#292b2c;
+  background-color: #292b2c;
   color: white;
 }
 
-#logo{
+/* Logo spacing */
+#logo {
   margin-right: 1%;
 }
-

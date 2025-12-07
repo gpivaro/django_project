@@ -1,7 +1,60 @@
 {% extends "myfinances/base.html" %} {% load static %} {% block content %}
 
 <div class="container mt-5">
-  <h2 class="text-center mb-4">Welcome to My-Finances</h2>
+  <h2 class="text-center mb-4">
+    Welcome to My-Finances
+    <button
+      class="btn btn-link p-0 ml-2"
+      type="button"
+      data-toggle="collapse"
+      data-target="#quickGuide"
+      aria-expanded="false"
+      aria-controls="quickGuide"
+      title="Show/Hide Quick Guide"
+    >
+      <span class="badge badge-info">?</span>
+    </button>
+  </h2>
+
+  <div class="collapse mt-2 mb-4" id="quickGuide">
+    <div class="card card-body text-left mx-auto" style="width: 70%">
+      <h5 class="mb-2">How to use this Landing Page</h5>
+      <ul class="mb-0">
+        <li>
+          <strong>Metrics section</strong> at the top shows quick stats: total
+          transactions, uncategorized count, grand total, and categories used.
+        </li>
+        <li>
+          <strong>Navigation cards</strong> below let you jump directly to key
+          features:
+          <ul>
+            <li><em>Upload Transactions</em> — import your bank statements.</li>
+            <li>
+              <em>My Transactions</em> — view, edit, and manage all uploaded
+              transactions.
+            </li>
+            <li>
+              <em>Balance Sheet</em> — analyze totals by category and account
+              over time.
+            </li>
+            <li>
+              <em>My Categories</em> — manage categories to keep transactions
+              organized.
+            </li>
+          </ul>
+        </li>
+        <li>
+          Click the blue <strong>Go to…</strong> buttons to navigate to each
+          section.
+        </li>
+        <li>
+          This page is your <strong>dashboard</strong> — use it as the starting
+          point for managing finances.
+        </li>
+      </ul>
+    </div>
+  </div>
+
   <p class="text-center text-muted mb-5">
     Manage your financial data with ease. Choose an option below to get started:
   </p>

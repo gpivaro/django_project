@@ -1,59 +1,46 @@
 {% extends "myfinances/base.html" %}
+{% load static %}
+{% load humanize %}
 {% block content %}
-
-<style>
-  /* Highlight the whole row on hover */
-  .table tbody tr:hover {
-    background-color: #f5f5f5; /* light gray for light mode */
-    cursor: pointer;
-  }
-
-  /* Dark mode override */
-  body.dark-mode .table tbody tr:hover {
-    background-color: #2a3b2a; /* muted greenish highlight */
-    color: #ffc107; /* highlight text for contrast */
-  }
-</style>
 
 <h2 class="text-center mt-3">
   Balance Sheet
-  {% if start_date and end_date %}
-    <span class="badge badge-info ml-2">
-      {{ start_date }} – {{ end_date }}
-    </span>
-  {% endif %}
-  {% if selected_acct %}
-    <span class="badge badge-secondary ml-2">
-      Account {{ selected_acct }}
-    </span>
-  {% endif %}
+  <button class="btn btn-link p-0 ml-2" type="button" data-toggle="collapse" data-target="#quickGuide" aria-expanded="false" aria-controls="quickGuide" title="Show/Hide Quick Guide">
+    <span class="badge badge-info">?</span>
+  </button>
 </h2>
 
+<div class="collapse mt-2 mb-4" id="quickGuide">   <!-- added mb-4 for spacing -->
+  <div class="card card-body text-left mx-auto" style="width: 60%;">
+    <h5 class="mb-2">How to use this Balance Sheet page</h5>
+    <ul class="mb-0">
+      <li><strong>Filter your data</strong> using the date range, account, and category selectors above. Click <em>Filter</em> to apply or <em>Reset</em> to clear.</li>
+      <li><strong>Active filters</strong> are shown as colored badges so you can see what’s applied at a glance.</li>
+      <li><strong>Label summary badges</strong> display totals by label (Income, Expense, etc.). The overall total badge shows your net position in green (positive), red (negative), or gray (zero).</li>
+      <li><strong>Chart</strong> visualizes monthly totals by label. Hover over points to see exact values.</li>
+      <li><strong>Table</strong> lists each category with its label and total, plus a grand total at the bottom.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Filter form: date range + account + category -->
 <form method="get" class="form-inline justify-content-center mb-3">
   <!-- Date range -->
   <div class="form-group mr-2">
-    <label for="start_date" class="mr-2">Start</label>
-    <input
-      type="date"
-      id="start_date"
-      name="start_date"
-      class="form-control form-control-sm text-center"
-      value="{{ start_date }}"
-    />
+    <label for="start_date" class="mr-2">Start Date</label>
+    <input type="date" id="start_date" name="start_date"
+           class="form-control form-control-sm text-center"
+           value="{{ start_date }}" />
   </div>
   <div class="form-group mr-2">
-    <label for="end_date" class="mr-2">End</label>
-    <input
-      type="date"
-      id="end_date"
-      name="end_date"
-      class="form-control form-control-sm text-center"
-      value="{{ end_date }}"
-    />
+    <label for="end_date" class="mr-2">End Date</label>
+    <input type="date" id="end_date" name="end_date"
+           class="form-control form-control-sm text-center"
+           value="{{ end_date }}" />
   </div>
 
   <!-- Account filter -->
-  <div class="form-group mr-2">
+  <div class="form-group mr-3">
     <label for="acct_info" class="mr-2">Account</label>
     <select id="acct_info" name="acct_info" class="form-control form-control-sm">
       <option value="">All</option>
@@ -65,15 +52,89 @@
     </select>
   </div>
 
-  <button type="submit" class="btn btn-secondary btn-sm mr-2">Apply</button>
-  <!-- ✅ Reset button -->
-  <a href="{% url 'myfinances:balance_sheet' %}" class="btn btn-outline-danger btn-sm">Reset</a>
+  <!-- Category filter -->
+  <div class="form-group mr-3">
+    <label for="category" class="mr-2">Category</label>
+    <select id="category" name="category" class="form-control form-control-sm">
+      <option value="all">All Categories</option>
+      {% for cat in categories %}
+        <option value="{{ cat.name }}" {% if request.GET.category == cat.name %}selected{% endif %}>
+          {{ cat.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Apply + Reset buttons -->
+  <button type="submit" class="btn btn-primary btn-sm mr-2">Filter</button>
+  <a href="{% url 'myfinances:balance_sheet' %}" class="btn btn-secondary btn-sm">Reset</a>
 </form>
 
+<!-- Active filters summary -->
+<div class="d-flex justify-content-center mb-3">
+  {% if start_date and end_date %}
+    <span class="badge badge-info mr-2">Date: {{ start_date }} – {{ end_date }}</span>
+  {% endif %}
+  {% if selected_acct %}
+    <span class="badge badge-secondary mr-2">Account: {{ selected_acct }}</span>
+  {% endif %}
+  {% if request.GET.category and request.GET.category != "all" %}
+    <span class="badge badge-warning">Category: {{ request.GET.category }}</span>
+  {% endif %}
+</div>
+
+<!-- Label summary badges -->
+<div class="d-flex justify-content-center mb-3">
+  {% for item in label_summary %}
+    {% if item.total_amount > 0 %}
+      <span class="badge badge-success mr-2">
+        {{ item.Category__label }}: ${{ item.total_amount|floatformat:2|intcomma }}
+      </span>
+    {% elif item.total_amount < 0 %}
+      <span class="badge badge-danger mr-2">
+        {{ item.Category__label }}: ${{ item.total_amount|floatformat:2|intcomma }}
+      </span>
+    {% else %}
+      <span class="badge badge-secondary mr-2">
+        {{ item.Category__label }}: ${{ item.total_amount|floatformat:2|intcomma }}
+      </span>
+    {% endif %}
+  {% endfor %}
+
+  <!-- Overall total badge -->
+  {% if grand_total > 0 %}
+    <span class="badge badge-success ml-3">
+      Overall Total: ${{ grand_total|floatformat:2|intcomma }}
+    </span>
+  {% elif grand_total < 0 %}
+    <span class="badge badge-danger ml-3">
+      Overall Total: ${{ grand_total|floatformat:2|intcomma }}
+    </span>
+  {% else %}
+    <span class="badge badge-secondary ml-3">
+      Overall Total: ${{ grand_total|floatformat:2|intcomma }}
+    </span>
+  {% endif %}
+</div>
+
+<!-- Chart container -->
+<div class="d-flex justify-content-center mb-4">
+  <div style="width: 40%; height: 300px;">   <!-- balanced ratio -->
+    <canvas id="balanceSheetChart"></canvas>
+  </div>
+</div>
+
+{{ chart_data|json_script:"chart-data" }}
+
+<script>
+  const chartData = JSON.parse(document.getElementById("chart-data").textContent);
+</script>
+
+<!-- Balance sheet table -->
 <div class="d-flex justify-content-center">
   <div class="table-responsive" style="width: 60%;">
-    <table class="table table-sm table-bordered table-hover text-center align-middle mx-auto">
-      <thead class="thead-light">
+    <table>
+      <thead>
         <tr>
           <th>Category</th>
           <th>Label</th>
@@ -83,34 +144,36 @@
       <tbody>
         {% for row in category_totals %}
         <tr>
-          <td class="text-center">{{ row.Category__name|default:"Uncategorized" }}</td>
-          <td class="text-center">{{ row.label }}</td>
-          <td class="text-center">
+          <td>{{ row.Category__name|default:"Uncategorized" }}</td>
+          <td>{{ row.Category__label }}</td>
+          <td>
             {% if row.total_amount > 0 %}
-              <span class="text-success">${{ row.total_amount|floatformat:2 }}</span>
+              <span class="amount-positive">${{ row.total_amount|floatformat:2|intcomma }}</span>
             {% elif row.total_amount < 0 %}
-              <span class="text-danger">${{ row.total_amount|floatformat:2 }}</span>
+              <span class="amount-negative">${{ row.total_amount|floatformat:2|intcomma }}</span>
             {% else %}
-              <span class="text-muted">${{ row.total_amount|floatformat:2 }}</span>
+              <span class="amount-zero">${{ row.total_amount|floatformat:2|intcomma }}</span>
             {% endif %}
           </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="3" class="text-center">No data for this range.</td>
+          <td colspan="3" class="text-center text-muted">
+            No categories found for the selected filters.
+          </td>
         </tr>
         {% endfor %}
       </tbody>
       <tfoot>
         <tr class="font-weight-bold">
-          <td colspan="2" class="text-center">Grand Total</td>
-          <td class="text-center">
+          <td colspan="2" class="text-center">TOTAL</td>
+          <td>
             {% if grand_total > 0 %}
-              <span class="text-success">${{ grand_total|floatformat:2 }}</span>
+              <span class="amount-positive">${{ grand_total|floatformat:2|intcomma }}</span>
             {% elif grand_total < 0 %}
-              <span class="text-danger">${{ grand_total|floatformat:2 }}</span>
+              <span class="amount-negative">${{ grand_total|floatformat:2|intcomma }}</span>
             {% else %}
-              <span class="text-muted">${{ grand_total|floatformat:2 }}</span>
+              <span class="amount-zero">${{ grand_total|floatformat:2|intcomma }}</span>
             {% endif %}
           </td>
         </tr>
@@ -118,5 +181,15 @@
     </table>
   </div>
 </div>
+
+
+<!-- Load Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+<!-- Load your custom script -->
+<script type="text/javascript" src="{% static 'myfinances/js/balance_sheet_chart.js' %}"></script>
+
 
 {% endblock %}

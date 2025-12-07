@@ -1,5 +1,6 @@
 {% extends "myfinances/base.html" %}
 {% load static %}
+{% load humanize %}
 {% block content %}
 
 <style>
@@ -50,6 +51,25 @@
   </form>
 </div>
 
+<!-- Search + Filter Form -->
+<form method="get" class="form-inline justify-content-center mb-3">
+  <input type="text" name="description" class="form-control mr-2"
+         placeholder="Search description..."
+         value="{{ request.GET.description }}">
+  
+  <select name="category" class="form-control">
+  <option value="all">All Categories</option>
+  {% for cat in categories %}
+    <option value="{{ cat }}" {% if request.GET.category == cat %}selected{% endif %}>
+      {{ cat }}
+    </option>
+  {% endfor %}
+</select>
+
+  <button type="submit" class="btn btn-primary mr-2">Filter</button>
+  <a href="{% url 'myfinances:transactions-list' %}" class="btn btn-secondary">Clear</a>
+</form>
+
 <table>
   <thead>
     <tr>
@@ -70,11 +90,11 @@
       <td>{{ transaction.Description }}</td>
       <td>
         {% if transaction.Amount > 0 %}
-          <span class="amount-positive">${{ transaction.Amount|floatformat:2 }}</span>
+          <span class="amount-positive">${{ transaction.Amount|floatformat:2 |intcomma }}</span>
         {% elif transaction.Amount < 0 %}
-          <span class="amount-negative">${{ transaction.Amount|floatformat:2 }}</span>
+          <span class="amount-negative">${{ transaction.Amount|floatformat:2 |intcomma }}</span>
         {% else %}
-          <span class="amount-zero">${{ transaction.Amount|floatformat:2 }}</span>
+          <span class="amount-zero">${{ transaction.Amount|floatformat:2 |intcomma }}</span>
         {% endif %}
       </td>
       <td>{{ transaction.Type }}</td>
@@ -96,6 +116,23 @@
     </tr>
     {% endfor %}
   </tbody>
+  <tfoot>
+    <tr class="font-weight-bold">
+      <td></td> <!-- empty cell under Date -->
+      <td></td> <!-- empty cell under Posting Date -->
+      <td class="text-center">Total:</td> <!-- bigger text -->
+      <td>
+        {% if total_amount < 0 %}
+          <span class="text-danger">${{ total_amount | floatformat:2 | intcomma }}</span>
+        {% else %}
+          <span class="text-success">${{ total_amount | floatformat:2 |intcomma }}</span>
+        {% endif %}
+      </td>
+      <td></td> <!-- empty cell under Type -->
+      <td></td> <!-- empty cell under Category -->
+      <td></td> <!-- empty cell under Action -->
+    </tr>
+  </tfoot>
 </table>
 
 <!-- Pagination controls -->

@@ -357,11 +357,32 @@ class TransactionsListView(LoginRequiredMixin, ListView):
         """
         Filter transactions by the current user and apply ordering.
         """
-        qs = super().get_queryset()
-        return qs.filter(Owner=self.request.user).order_by(*self.ordering)
+        qs = super().get_queryset().filter(
+            Owner=self.request.user).order_by(*self.ordering)
+
+        # Filters
+        description = self.request.GET.get("description")
+        category = self.request.GET.get("category")
+
+        if description:
+            qs = qs.filter(Description__icontains=description)
+        if category and category != "all":
+            qs = qs.filter(Category=category)
+
+        return qs
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+
+        # Add a total to your context:
+        qs = self.get_queryset()
+
+        ctx["categories"] = Statements.objects.filter(
+            Owner=self.request.user
+        ).values_list("Category", flat=True).distinct()
+
+        ctx["total_amount"] = qs.aggregate(total=Sum("Amount"))["total"] or 0
+
         # expose current page size selection for the template
         page_size = self.request.GET.get("page_size")
         if not page_size:

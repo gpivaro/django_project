@@ -144,7 +144,11 @@
       <tbody>
         {% for row in category_totals %}
         <tr>
-          <td>{{ row.Category__name|default:"Uncategorized" }}</td>
+          <td>
+            <a href="{% url 'myfinances:transactions-list' %}?description=&category={{ row.Category__name|urlencode }}">
+              {{ row.Category__name|default:"Uncategorized" }}
+            </a>
+          </td>
           <td>{{ row.Category__label }}</td>
           <td>
             {% if row.total_amount > 0 %}

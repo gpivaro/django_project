@@ -378,7 +378,7 @@ class TransactionsListView(LoginRequiredMixin, ListView):
     model = Statements
     template_name = 'myfinances/transactions_list.html'
     context_object_name = 'transactions'  # maps to object_list in template
-    ordering = ['-Posting_Date']          # newest transactions first
+    ordering = ['-Posting_Date', '-id']  # stable ordering
     paginate_by = 20                      # default page size
 
     def get_paginate_by(self, queryset):

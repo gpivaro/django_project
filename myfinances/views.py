@@ -389,18 +389,25 @@ class TransactionsListView(LoginRequiredMixin, ListView):
         - 'all' → disables pagination (returns all results).
         - numeric values (e.g., 10, 20, 50, 100) → set per-page size.
         - defaults to self.paginate_by if not provided.
-
-        Returns:
-            int or None: number of items per page, or None to disable pagination.
+        - if filters are active and no page_size is given → default to 'all'.
         """
         page_size = self.request.GET.get("page_size")
+
+        # Detect active filters
+        description = self.request.GET.get("description")
+        category = self.request.GET.get("category")
+
+        if not page_size and (description or (category and category != "all")):
+            # Default to 'all' when filters are active
+            return None
+
         if page_size:
             if page_size.lower() == "all":
                 return None  # disables pagination
             if page_size.isdigit():
                 size = int(page_size)
-                # clamp to reasonable bounds (1–500)
                 return max(1, min(size, 500))
+
         return self.paginate_by
 
     def get_queryset(self):

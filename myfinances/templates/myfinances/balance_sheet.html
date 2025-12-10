@@ -133,12 +133,12 @@
 <!-- Balance sheet table -->
 <div class="d-flex justify-content-center">
   <div class="table-responsive" style="width: 60%;">
-    <table>
+    <table id="balanceSheetTable">
       <thead>
         <tr>
-          <th>Category</th>
-          <th>Label</th>
-          <th>Total</th>
+          <th onclick="sortTable(0, 'text')">Category ▲▼</th>
+          <th onclick="sortTable(1, 'text')">Label ▲▼</th>
+          <th onclick="sortTable(2, 'number')">Total ▲▼</th>
         </tr>
       </thead>
       <tbody>
@@ -154,12 +154,6 @@
             {% else %}
               <span class="amount-zero">${{ row.total_amount|floatformat:2|intcomma }}</span>
             {% endif %}
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="3" class="text-center text-muted">
-            No categories found for the selected filters.
           </td>
         </tr>
         {% endfor %}
@@ -187,9 +181,38 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
-
 <!-- Load your custom script -->
 <script type="text/javascript" src="{% static 'myfinances/js/balance_sheet_chart.js' %}"></script>
+
+<script>
+let sortDirections = {};
+
+function sortTable(colIndex, type) {
+  const table = document.getElementById("balanceSheetTable");
+  const tbody = table.tBodies[0];
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+
+  // Toggle sort direction per column
+  sortDirections[colIndex] = !sortDirections[colIndex];
+  const ascending = sortDirections[colIndex];
+
+  rows.sort((a, b) => {
+    let aText = a.cells[colIndex].innerText.trim();
+    let bText = b.cells[colIndex].innerText.trim();
+
+    if (type === "number") {
+      aText = parseFloat(aText.replace(/[$,]/g, "")) || 0;
+      bText = parseFloat(bText.replace(/[$,]/g, "")) || 0;
+      return ascending ? aText - bText : bText - aText;
+    } else {
+      return ascending ? aText.localeCompare(bText) : bText.localeCompare(aText);
+    }
+  });
+
+  // Re-append sorted rows (footer untouched)
+  rows.forEach(row => tbody.appendChild(row));
+}
+</script>
 
 
 {% endblock %}

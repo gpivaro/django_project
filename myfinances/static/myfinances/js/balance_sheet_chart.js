@@ -28,14 +28,36 @@ document.addEventListener("DOMContentLoaded", function () {
     new Set(Object.values(chartData).map(labelObj => Object.keys(labelObj)).flat())
   ).sort();
 
-  const datasets = Object.keys(chartData).map(label => ({
-    label: label,
-    data: allMonths.map(month => chartData[label][month] || 0),
-    borderColor: labelColors[label] || textColor,
-    backgroundColor: labelColors[label] || textColor,
-    fill: false,
-    tension: 0.25
-  }));
+const datasets = Object.keys(chartData).map(label => ({
+  label: label,
+  data: allMonths.map(month => {
+    const val = chartData[label][month] || 0;
+    // Keep Income as-is, flip all others to positive
+    return label === "Income" ? val : Math.abs(val);
+  }),
+  borderColor: labelColors[label] || textColor,
+  backgroundColor: labelColors[label] || textColor,
+  fill: false,
+  tension: 0.25
+}));
+
+// Add a new dataset for Income - Expense
+const incomeExpenseDiff = {
+  label: "Income - Expense",
+  data: allMonths.map(month => {
+    const income = chartData["Income"] ? (chartData["Income"][month] || 0) : 0;
+    const expense = chartData["Expense"] ? (chartData["Expense"][month] || 0) : 0;
+    return income - Math.abs(expense); // subtract expense (converted to positive)
+  }),
+  borderColor: "#ff9900",   // orange line for visibility
+  backgroundColor: "#ff9900",
+  borderDash: [5, 5],       // dashed line to distinguish
+  fill: false,
+  tension: 0.25
+};
+
+// Push the difference dataset into the list
+datasets.push(incomeExpenseDiff);
 
   new Chart(ctx, {
     type: "line",

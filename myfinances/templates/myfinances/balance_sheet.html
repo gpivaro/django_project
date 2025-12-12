@@ -130,10 +130,16 @@
   const chartData = JSON.parse(document.getElementById("chart-data").textContent);
 </script>
 
+<div class="d-flex justify-content-center mb-2">
+  <a class="btn btn-outline-primary btn-sm" href="?export=csv{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if selected_acct %}&acct_info={{ selected_acct }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% else %}&category=all{% endif %}">
+    Export CSV
+  </a>
+</div>
+
 <!-- Balance sheet table -->
 <div class="d-flex justify-content-center">
-  <div class="table-responsive" style="width: 60%;">
-    <table id="balanceSheetTable">
+  <div class="table-responsive" style="width: 60%; max-height: 800px; overflow-y: auto;">
+    <table id="balanceSheetTable" class="table table-striped">
       <thead>
         <tr>
           <th onclick="sortTable(0, 'text')">Category ▲▼</th>

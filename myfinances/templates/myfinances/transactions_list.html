@@ -104,6 +104,62 @@
   <a href="{% url 'myfinances:transactions-list' %}" class="btn btn-secondary">Clear</a>
 </form>
 
+{% if is_paginated %}
+<div class="d-flex flex-column align-items-center mb-3">
+  <!-- Pagination info -->
+  <div class="badge bg-info text-light mb-2">
+    Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }} records
+    (Page {{ page_obj.number }} of {{ paginator.num_pages }})
+  </div>
+
+  <!-- Pagination controls -->
+  <nav aria-label="Transaction pagination">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page=1&page_size={{ paginator.per_page }}&description={{ request.GET.description }}&category={{ request.GET.category }}">&laquo; First</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}&page_size={{ paginator.per_page }}&description={{ request.GET.description }}&category={{ request.GET.category }}">Previous</a>
+        </li>
+      {% endif %}
+
+      <li class="page-item disabled">
+        <span class="page-link">
+          Page {{ page_obj.number }} of {{ paginator.num_pages }}
+        </span>
+      </li>
+
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}&page_size={{ paginator.per_page }}&description={{ request.GET.description }}&category={{ request.GET.category }}">Next</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ paginator.num_pages }}&page_size={{ paginator.per_page }}&description={{ request.GET.description }}&category={{ request.GET.category }}">Last &raquo;</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% else %}
+<!-- When showing all, provide quick navigation -->
+<div class="d-flex justify-content-center mt-3">
+  <a class="btn btn-outline-secondary btn-sm mr-2" href="?page=1&page_size=20&description={{ request.GET.description }}&category={{ request.GET.category }}">First page (20)</a>
+  <a class="btn btn-outline-secondary btn-sm" href="?page=1&page_size=all&description={{ request.GET.description }}&category={{ request.GET.category }}">View all</a>
+</div>
+{% endif %}
+
+{% if not is_paginated %}
+  <div class="mb-4"></div>  {# adds space above the button when pagination is off #}
+{% endif %}
+
+<div class="d-flex justify-content-center mb-2">
+  <a href="?export=csv{% if active_description %}&description={{ active_description }}{% endif %}{% if active_category %}&category={{ active_category }}{% else %}&category=all{% endif %}{% if current_page_size %}&page_size={{ current_page_size }}{% endif %}"
+     class="btn btn-outline-primary btn-sm">
+    Export Transactions CSV
+  </a>
+</div>
+
 <!-- Transactions table -->
 <table>
   <thead>
@@ -171,43 +227,5 @@
   </tfoot>
 </table>
 
-<!-- Pagination controls -->
-{% if is_paginated %}
-<div class="d-flex justify-content-center mt-3">
-  <nav aria-label="Transaction pagination">
-    <ul class="pagination">
-      {% if page_obj.has_previous %}
-        <li class="page-item">
-          <a class="page-link" href="?page=1&page_size={{ paginator.per_page }}">&laquo; First</a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" href="?page={{ page_obj.previous_page_number }}&page_size={{ paginator.per_page }}">Previous</a>
-        </li>
-      {% endif %}
-
-      <li class="page-item disabled">
-        <span class="page-link">
-          Page {{ page_obj.number }} of {{ paginator.num_pages }}
-        </span>
-      </li>
-
-      {% if page_obj.has_next %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ page_obj.next_page_number }}&page_size={{ paginator.per_page }}">Next</a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" href="?page={{ paginator.num_pages }}&page_size={{ paginator.per_page }}">Last &raquo;</a>
-        </li>
-      {% endif %}
-    </ul>
-  </nav>
-</div>
-{% else %}
-<!-- When showing all, provide quick navigation -->
-<div class="d-flex justify-content-center mt-3">
-  <a class="btn btn-outline-secondary btn-sm mr-2" href="?page=1&page_size=20">First page (20)</a>
-  <a class="btn btn-outline-secondary btn-sm" href="?page=1&page_size=all">View all</a>
-</div>
-{% endif %}
 
 {% endblock %}

@@ -112,3 +112,33 @@ td a {
 #logo {
   margin-right: 1%;
 }
+
+#balanceSheetTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2; /* keep above table body */
+}
+
+#balanceSheetTable tbody tr:hover {
+  background-color: #f1f3f5; /* light gray highlight */
+  cursor: pointer;
+}
+
+#balanceSheetTable tfoot tr {
+  background-color: #e9ecef; /* light gray */
+  font-weight: bold;
+}
+
+#balanceSheetTable tfoot td {
+  border-top: 2px solid #343a40; /* dark separator */
+}
+
+#balanceSheetChart {
+  height: 400px; /* default desktop */
+}
+
+@media (max-width: 768px) {
+  #balanceSheetChart {
+    height: 250px; /* smaller on mobile */
+  }
+}

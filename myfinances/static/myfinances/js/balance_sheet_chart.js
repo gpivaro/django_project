@@ -28,36 +28,35 @@ document.addEventListener("DOMContentLoaded", function () {
     new Set(Object.values(chartData).map(labelObj => Object.keys(labelObj)).flat())
   ).sort();
 
-const datasets = Object.keys(chartData).map(label => ({
-  label: label,
-  data: allMonths.map(month => {
-    const val = chartData[label][month] || 0;
-    // Keep Income as-is, flip all others to positive
-    return label === "Income" ? val : Math.abs(val);
-  }),
-  borderColor: labelColors[label] || textColor,
-  backgroundColor: labelColors[label] || textColor,
-  fill: false,
-  tension: 0.25
-}));
+  const datasets = Object.keys(chartData).map(label => ({
+    label: label,
+    data: allMonths.map(month => {
+      const val = chartData[label][month] || 0;
+      // Keep Income as-is, flip all others to positive
+      return label === "Income" ? val : Math.abs(val);
+    }),
+    borderColor: labelColors[label] || textColor,
+    backgroundColor: labelColors[label] || textColor,
+    fill: false,
+    tension: 0.25
+  }));
 
-// Add a new dataset for Income - Expense
-const incomeExpenseDiff = {
-  label: "Income - Expense",
-  data: allMonths.map(month => {
-    const income = chartData["Income"] ? (chartData["Income"][month] || 0) : 0;
-    const expense = chartData["Expense"] ? (chartData["Expense"][month] || 0) : 0;
-    return income - Math.abs(expense); // subtract expense (converted to positive)
-  }),
-  borderColor: "#ff9900",   // orange line for visibility
-  backgroundColor: "#ff9900",
-  borderDash: [5, 5],       // dashed line to distinguish
-  fill: false,
-  tension: 0.25
-};
+  // Add a new dataset for Income - Expense
+  const incomeExpenseDiff = {
+    label: "Income - Expense",
+    data: allMonths.map(month => {
+      const income = chartData["Income"] ? (chartData["Income"][month] || 0) : 0;
+      const expense = chartData["Expense"] ? (chartData["Expense"][month] || 0) : 0;
+      return income - Math.abs(expense); // subtract expense (converted to positive)
+    }),
+    borderColor: "#ff9900",   // orange line for visibility
+    backgroundColor: "#ff9900",
+    borderDash: [5, 5],       // dashed line to distinguish
+    fill: false,
+    tension: 0.25
+  };
 
-// Push the difference dataset into the list
-datasets.push(incomeExpenseDiff);
+  datasets.push(incomeExpenseDiff);
 
   new Chart(ctx, {
     type: "line",
@@ -80,6 +79,16 @@ datasets.push(incomeExpenseDiff);
             color: textColor
           }
         },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              const value = context.parsed.y;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const pct = total ? ((value / total) * 100).toFixed(1) : 0;
+              return `$${value.toLocaleString()} (${pct}%)`;
+            }
+          }
+        },
         annotation: {
           annotations: {
             baseline: {
@@ -87,7 +96,7 @@ datasets.push(incomeExpenseDiff);
               yMin: 0,
               yMax: 0,
               borderColor: textColor,
-              borderWidth: 2,
+              borderWidth: 3,
               label: {
                 enabled: true,
                 content: "Zero baseline",
@@ -131,10 +140,36 @@ datasets.push(incomeExpenseDiff);
             }
           },
           grid: {
-            color: gridColor
+            color: function (context) {
+              if (context.tick.value === 0) {
+                return "#000000"; // solid black for zero line
+              }
+              return gridColor;
+            },
+            lineWidth: function (context) {
+              return context.tick.value === 0 ? 2 : 1;
+            }
           }
         }
       }
-    }
+    },
+    plugins: [{
+      // Custom plugin for shading below zero
+      id: "negativeShade",
+      beforeDraw: chart => {
+        const ctx = chart.ctx;
+        const yAxis = chart.scales.y;
+        const zeroY = yAxis.getPixelForValue(0);
+        ctx.save();
+        ctx.fillStyle = "rgba(200, 35, 51, 0.05)"; // light red shading
+        ctx.fillRect(
+          chart.chartArea.left,
+          zeroY,
+          chart.chartArea.right - chart.chartArea.left,
+          chart.chartArea.bottom - zeroY
+        );
+        ctx.restore();
+      }
+    }]
   });
 });

@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.db.models.functions import TruncMonth
 from .models import Statements, CategoryList
 from django.db.models import Sum, Count
@@ -373,60 +374,34 @@ class TransactionsListView(LoginRequiredMixin, ListView):
     - Filtering by category (via CategoryList model).
     - Displays a total sum of the Amount column for the filtered queryset.
     - Exposes available categories for dropdown filtering in the template.
+    - CSV export of filtered transactions (?export=csv).
     """
 
     model = Statements
     template_name = 'myfinances/transactions_list.html'
-    context_object_name = 'transactions'  # maps to object_list in template
-    ordering = ['-Posting_Date', '-id']  # stable ordering
-    paginate_by = 20                      # default page size
+    context_object_name = 'transactions'
+    ordering = ['-Posting_Date', '-id']
+    paginate_by = 20
 
     def get_paginate_by(self, queryset):
-        """
-        Determine pagination size based on ?page_size query parameter.
-
-        Supported values:
-        - 'all' → disables pagination (returns all results).
-        - numeric values (e.g., 10, 20, 50, 100) → set per-page size.
-        - defaults to self.paginate_by if not provided.
-        - if filters are active and no page_size is given → default to 'all'.
-        """
         page_size = self.request.GET.get("page_size")
-
-        # Detect active filters
         description = self.request.GET.get("description")
         category = self.request.GET.get("category")
 
         if not page_size and (description or (category and category != "all")):
-            # Default to 'all' when filters are active
             return None
-
         if page_size:
             if page_size.lower() == "all":
-                return None  # disables pagination
+                return None
             if page_size.isdigit():
                 size = int(page_size)
                 return max(1, min(size, 500))
-
         return self.paginate_by
 
     def get_queryset(self):
-        """
-        Build the queryset of transactions for the current user.
-
-        - Filters by Owner (logged-in user).
-        - Orders by Posting_Date descending.
-        - Applies optional filters:
-          * description → case-insensitive substring match.
-          * category → matches CategoryList.name unless 'all'.
-
-        Returns:
-            QuerySet: filtered and ordered transactions.
-        """
         qs = super().get_queryset().filter(
             Owner=self.request.user).order_by(*self.ordering)
 
-        # Filters
         description = self.request.GET.get("description")
         category = self.request.GET.get("category")
 
@@ -438,35 +413,70 @@ class TransactionsListView(LoginRequiredMixin, ListView):
         return qs
 
     def get_context_data(self, **kwargs):
-        """
-        Extend template context with additional data:
-
-        - categories: all CategoryList entries for dropdown filter.
-        - total_amount: sum of Amount column for filtered queryset.
-        - current_page_size: reflects active page size selection
-          (numeric or 'all') for template display.
-
-        Returns:
-            dict: context data for template rendering.
-        """
         ctx = super().get_context_data(**kwargs)
-
-        # Add a total to your context:
         qs = self.get_queryset()
         ctx["categories"] = CategoryList.objects.all()
         ctx["total_amount"] = qs.aggregate(total=Sum("Amount"))["total"] or 0
 
-        # Expose current page size selection for the template
+        # Expose current page size
         page_size = self.request.GET.get("page_size")
         if not page_size:
-            # reflect actual per_page when paginated, else 'all'
             if ctx.get('is_paginated'):
                 page_size = str(ctx['paginator'].per_page)
             else:
                 page_size = "all"
         ctx['current_page_size'] = page_size
 
+        # NEW: expose active filters
+        ctx["active_description"] = self.request.GET.get("description", "")
+        ctx["active_category"] = self.request.GET.get("category", "all")
+
         return ctx
+
+    def get(self, request, *args, **kwargs):
+        # Handle CSV export
+        if request.GET.get("export") == "csv":
+            qs = self.get_queryset()
+            timestamp = now().strftime("%Y%m%d_%H%M%S")   # e.g. 20251212_132430
+            filename = f"transactions_{timestamp}.csv"
+
+            response = HttpResponse(content_type="text/csv")
+            response["Content-Disposition"] = f'attachment; filename="{filename}"'
+            writer = csv.writer(response)
+
+            # Header row with filters
+            writer.writerow([
+                f"Transactions Export ({timestamp})",
+                f"Description filter: {request.GET.get('description') or 'None'}",
+                f"Category filter: {request.GET.get('category') or 'All'}",
+                f"Generated: {now().strftime('%Y-%m-%d %H:%M:%S')}",
+                f"Records: {qs.count()}"
+            ])
+            writer.writerow([])
+
+            # Column headers
+            writer.writerow(
+                ["Date", "Account", "Category", "Description", "Amount"])
+
+            # Data rows
+            for tx in qs:
+                writer.writerow([
+                    tx.Posting_Date.strftime("%Y-%m-%d"),
+                    tx.Acct_Info,
+                    tx.Category.name if tx.Category else "Uncategorized",
+                    tx.Description,
+                    f"{tx.Amount:.2f}"
+                ])
+
+            # Add total row
+            total = qs.aggregate(total=Sum("Amount"))["total"] or 0
+            writer.writerow([])
+            writer.writerow(["", "", "", "TOTAL", f"{total:.2f}"])
+
+            return response
+
+        # Normal HTML response
+        return super().get(request, *args, **kwargs)
 
 
 # Using Python Class Views to View Model. DetailView
@@ -505,54 +515,42 @@ class TransactionsDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
 
 def balance_sheet(request):
     """
-    Balance Sheet View
-
-    - Accepts optional GET parameters: start_date, end_date, acct_info, category
-    - If only start_date is provided, end_date defaults to today
-    - Filters statements by Owner and optionally by Acct_Info and Category
-    - Groups by Category and computes totals
-    - Summarizes totals by label (Income, Expense, Asset, Liability, Equity, Other)
-    - Provides grand total across all categories
-    - Aggregates monthly totals by label for line chart visualization
+    Balance Sheet View with optional CSV export
     """
 
     # --- Step 1: Extract query parameters ---
     start_date_str = request.GET.get("start_date")
     end_date_str = request.GET.get("end_date")
-    acct_info = request.GET.get("acct_info")       # account filter
-    category = request.GET.get("category")         # category filter
+    acct_info = request.GET.get("acct_info")
+    category = request.GET.get("category")
+    export = request.GET.get("export")
 
     # --- Step 2: Parse dates ---
     start_date = parse_date(start_date_str) if start_date_str else None
     end_date = parse_date(end_date_str) if end_date_str else None
 
-    # --- Step 3: Default end_date to today if only start_date is provided ---
     if start_date and not end_date:
         end_date = now().date()
 
-    # --- Step 4: Base queryset filtered by Owner ---
+    # --- Step 4: Base queryset ---
     qs = Statements.objects.filter(Owner=request.user)
 
-    # --- Step 5: Filter by account if selected ---
     if acct_info:
         qs = qs.filter(Acct_Info=acct_info)
 
-    # --- Step 6: Apply date filter ---
     if start_date and end_date:
         qs = qs.filter(Posting_Date__range=[start_date, end_date])
 
-    # --- Step 7: Apply category filter ---
     if category and category != "all":
         qs = qs.filter(Category__name=category)
 
-    # --- Step 8: Group by Category and compute totals ---
+    # --- Step 8: Group by Category ---
     category_totals = (
         qs.values("Category_id", "Category__name", "Category__label")
           .annotate(total_amount=Sum("Amount"))
           .order_by("Category__name")
     )
 
-    # --- Step 9: Compute grand total ---
     grand_total = sum(row["total_amount"] or 0 for row in category_totals)
 
     # --- Step 10: Summarize by label ---
@@ -562,7 +560,7 @@ def balance_sheet(request):
         .order_by("-total_amount")
     )
 
-    # --- Step 11: Monthly totals by label (for line chart) ---
+    # --- Step 11: Monthly totals by label ---
     monthly_data = (
         qs.annotate(month=TruncMonth("Posting_Date"))
           .values("month", "Category__label")
@@ -570,7 +568,6 @@ def balance_sheet(request):
           .order_by("month", "Category__label")
     )
 
-    # Reshape into dict: {label: {month: total}}
     chart_data = {}
     for row in monthly_data:
         month = row["month"].strftime("%Y-%m")
@@ -578,7 +575,6 @@ def balance_sheet(request):
         chart_data.setdefault(label, {})[month] = float(
             row["total_amount"] or 0)
 
-    # --- Step 12: Collect distinct accounts for dropdown ---
     acct_infos = (
         Statements.objects.filter(Owner=request.user)
         .values_list("Acct_Info", flat=True)
@@ -586,15 +582,50 @@ def balance_sheet(request):
     )
     acct_infos = sorted(set(acct.strip() for acct in acct_infos if acct))
 
-    # --- Step 13: Collect distinct categories for dropdown ---
     categories = CategoryList.objects.all()
+
+    # --- Step X: Handle CSV export ---
+    if export == "csv":
+        timestamp = now().strftime("%Y%m%d_%H%M%S")
+        filename = f"balance_sheet_{timestamp}.csv"
+
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        writer = csv.writer(response)
+
+        # Header row with filters
+        writer.writerow([
+            f"Balance Sheet Export ({timestamp})",
+            f"Start Date: {start_date_str or 'N/A'}",
+            f"End Date: {end_date_str or 'N/A'}",
+            f"Account: {acct_info or 'All'}",
+            f"Category: {category or 'All'}",
+            f"Generated: {now().strftime('%Y-%m-%d %H:%M:%S')}",
+            f"Records: {len(category_totals)}"
+        ])
+        writer.writerow([])  # blank line
+
+        # Column headers
+        writer.writerow(["Category", "Label", "Total"])
+
+        # Data rows
+        for row in category_totals:
+            writer.writerow([
+                row["Category__name"] or "Uncategorized",
+                row["Category__label"],
+                f"{row['total_amount']:.2f}"
+            ])
+
+        # Grand total
+        writer.writerow(["TOTAL", "", f"{grand_total:.2f}"])
+        return response
 
     # --- Step 14: Build context ---
     context = {
         "category_totals": category_totals,
         "grand_total": grand_total,
         "label_summary": label_summary,
-        "chart_data": chart_data,   # <-- monthly totals by label
+        "chart_data": chart_data,
         "start_date": start_date_str,
         "end_date": end_date_str or str(end_date),
         "acct_infos": acct_infos,
@@ -602,7 +633,6 @@ def balance_sheet(request):
         "categories": categories,
     }
 
-    # --- Step 15: Render template ---
     return render(request, "myfinances/balance_sheet.html", context)
 
 

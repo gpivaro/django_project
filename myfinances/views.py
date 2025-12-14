@@ -1,18 +1,18 @@
+from .models import Statements, CategoryList
+import csv
+import io
+from django.db.models import Q
+from django.views import View
 from datetime import date, timedelta
-import calendar
 from django.http import HttpResponse
 from django.db.models.functions import TruncMonth
-from .models import Statements, CategoryList
 from django.db.models import Sum, Count
 from django.views.generic import TemplateView
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Statements
 from django.utils.timezone import now
 from django.shortcuts import render
 from django.utils.dateparse import parse_date
-import csv
-import io
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
@@ -26,8 +26,7 @@ from .forms import ItemForm, StatementForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import IntegrityError
-from django.db.models import Sum
-
+from django.shortcuts import get_object_or_404
 
 # To create API using rest framework
 from rest_framework import viewsets
@@ -752,3 +751,89 @@ class LandingPageView(LoginRequiredMixin, TemplateView):
             total=Sum("Amount"))["total"] or 0
         context["category_count"] = qs.values("Category").distinct().count()
         return context
+
+
+class BulkCategoryUpdateView(View):
+    """
+    BulkCategoryUpdateView
+
+    This view allows end-users to bulk update the category of multiple
+    Statement records at once, based on a keyword filter applied to the
+    Description field.
+
+    Workflow:
+    ---------
+    - GET request:
+        * Accepts an optional 'keyword' query parameter.
+        * If keyword is provided, filters Statements whose Description contains the keyword.
+        * If no keyword is provided, returns no transactions (empty list).
+        * Always provides a list of available categories for selection.
+
+    - POST request:
+        * Accepts 'keyword' (to reapply the filter), 'new_category'
+          (the category ID chosen by the user), and 'transaction_ids'
+          (IDs of selected transactions).
+        * Updates only the selected Statements to the new category.
+        * Re-renders the same page with the same filter applied.
+        * Displays a success banner showing how many transactions were updated.
+
+    Notes:
+    ------
+    - Uses `Description__icontains` for case-insensitive substring matching.
+    - Categories are retrieved from CategoryList.
+    - This implementation supports selective updates via checkboxes.
+    - PostingDate is included in the queryset automatically and can be displayed in the template.
+    """
+
+    template_name = "myfinances/bulk_update.html"
+
+    def get(self, request):
+        """
+        Handle GET requests:
+        - If a keyword is provided, filter Statements by Description.
+        - If no keyword, return an empty queryset (no transactions shown).
+        """
+        keyword = request.GET.get("keyword", "")
+        qs = Statements.objects.none()  # default: no transactions
+        if keyword:
+            qs = Statements.objects.filter(Description__icontains=keyword)
+
+        categories = CategoryList.objects.all()
+        return render(request, self.template_name, {
+            "transactions": qs,
+            "categories": categories,
+            "keyword": keyword,
+            "updated_count": None,  # no updates yet
+        })
+
+    def post(self, request):
+        """
+        Handle POST requests:
+        - Accept keyword, new_category, and transaction_ids.
+        - Update only selected transactions.
+        - Re-render the same page with the same filter applied.
+        - Pass updated_count into context for success banner.
+        """
+        keyword = request.POST.get("keyword", "")
+        new_category_id = request.POST.get("new_category")
+        transaction_ids = request.POST.getlist("transaction_ids")
+
+        updated_count = 0
+        if transaction_ids and new_category_id:
+            # Bulk update selected transactions
+            updated_count = Statements.objects.filter(id__in=transaction_ids).update(
+                Category_id=new_category_id
+            )
+
+        # Re-query with the same keyword so the user stays on the page
+        qs = Statements.objects.none()
+        if keyword:
+            qs = Statements.objects.filter(Description__icontains=keyword)
+
+        categories = CategoryList.objects.all()
+        return render(request, self.template_name, {
+            "transactions": qs,
+            "categories": categories,
+            "keyword": keyword,
+            "updated_count": updated_count,
+        })

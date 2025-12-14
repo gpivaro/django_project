@@ -78,12 +78,17 @@
 <!-- Date range quick-select buttons -->
 <div class="d-flex justify-content-center mb-3">
   <div class="btn-group" role="group">
-    <a href="?start_date={{ current_month_start|date:'Y-m-d' }}&end_date={{ current_month_end|date:'Y-m-d' }}" class="btn btn-outline-primary btn-sm">Current Month</a>
-    <a href="?start_date={{ last_month_start|date:'Y-m-d' }}&end_date={{ last_month_end|date:'Y-m-d' }}" class="btn btn-outline-primary btn-sm">Last Month</a>
-    <a href="?start_date={{ three_months_start|date:'Y-m-d' }}&end_date={{ three_months_end|date:'Y-m-d' }}" class="btn btn-outline-primary btn-sm">Last 3 Months</a>
-    <a href="?start_date={{ last_year_start|date:'Y-m-d' }}&end_date={{ last_year_end|date:'Y-m-d' }}" class="btn btn-outline-primary btn-sm">Last Year</a>
-    <a href="?start_date={{ current_year_start|date:'Y-m-d' }}&end_date={{ current_year_end|date:'Y-m-d' }}" class="btn btn-outline-primary btn-sm">Current Year</a>
-    <!-- Clear Range: resets only date filters, keeps other filters -->
+    <a href="?start_date={{ current_month_start|date:'Y-m-d' }}&end_date={{ current_month_end|date:'Y-m-d' }}&description={{ active_description }}&category={{ active_category }}&page_size={{ current_page_size }}" class="btn btn-outline-primary btn-sm">Current Month</a>
+
+    <a href="?start_date={{ last_month_start|date:'Y-m-d' }}&end_date={{ last_month_end|date:'Y-m-d' }}&description={{ active_description }}&category={{ active_category }}&page_size={{ current_page_size }}" class="btn btn-outline-primary btn-sm">Last Month</a>
+
+    <a href="?start_date={{ three_months_start|date:'Y-m-d' }}&end_date={{ three_months_end|date:'Y-m-d' }}&description={{ active_description }}&category={{ active_category }}&page_size={{ current_page_size }}" class="btn btn-outline-primary btn-sm">Last 3 Months</a>
+
+    <a href="?start_date={{ last_year_start|date:'Y-m-d' }}&end_date={{ last_year_end|date:'Y-m-d' }}&description={{ active_description }}&category={{ active_category }}&page_size={{ current_page_size }}" class="btn btn-outline-primary btn-sm">Last Year</a>
+
+    <a href="?start_date={{ current_year_start|date:'Y-m-d' }}&end_date={{ current_year_end|date:'Y-m-d' }}&description={{ active_description }}&category={{ active_category }}&page_size={{ current_page_size }}" class="btn btn-outline-primary btn-sm">Current Year</a>
+
+    <!-- Clear Range: reset only dates, keep other filters -->
     <a href="?description={{ active_description }}&category={{ active_category }}&page_size={{ current_page_size }}" class="btn btn-outline-secondary btn-sm">Clear Range</a>
   </div>
 </div>
@@ -105,7 +110,7 @@
 
 <!-- Page size selector with loading banner -->
 <div class="d-flex justify-content-center mb-3">
-  <form method="get" class="form-inline" onsubmit="showLoadingBanner()">
+  <form method="get" class="form-inline" onsubmit="showSpinner()">
     <label for="page_size" class="mr-2">Show per page:</label>
     <select id="page_size" name="page_size" class="form-control form-control-sm mr-2" onchange="this.form.submit()">
       <option value="10" {% if current_page_size == '10' %}selected{% endif %}>10</option>
@@ -118,6 +123,7 @@
     {% if page_obj %}
       <input type="hidden" name="page" value="{{ page_obj.number }}">
     {% endif %}
+
     <!-- Preserve filters -->
     <input type="hidden" name="description" value="{{ active_description }}">
     <input type="hidden" name="category" value="{{ active_category }}">
@@ -134,7 +140,7 @@
 </div>
 
 <!-- Search + Filter Form -->
-<form method="get" class="form-inline justify-content-center mb-3">
+<form method="get" class="form-inline justify-content-center mb-3" onsubmit="showSpinner()">
   <input type="text" name="description" class="form-control mr-2"
          placeholder="Search description..."
          value="{{ request.GET.description }}">
@@ -148,8 +154,14 @@
     {% endfor %}
   </select>
 
+  <!-- Preserve date filters -->
+  <input type="hidden" name="start_date" value="{{ active_start_date }}">
+  <input type="hidden" name="end_date" value="{{ active_end_date }}">
+
+  <!-- Preserve page size -->
+  <input type="hidden" name="page_size" value="{{ current_page_size }}">
+
   <button type="submit" class="btn btn-primary mr-2">Filter</button>
-  <!-- Clear all filters -->
   <a href="?page_size={{ current_page_size }}" class="btn btn-secondary">Clear</a>
 </form>
 

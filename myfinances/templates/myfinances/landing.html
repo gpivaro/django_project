@@ -16,6 +16,7 @@
     </button>
   </h2>
 
+  <!-- Quick Guide -->
   <div class="collapse mt-2 mb-4" id="quickGuide">
     <div class="card card-body text-left mx-auto" style="width: 70%">
       <h5 class="mb-2">How to use this Landing Page</h5>
@@ -40,6 +41,10 @@
             <li>
               <em>My Categories</em> — manage categories to keep transactions
               organized.
+            </li>
+            <li>
+              <em>Bulk Update Categories</em> — quickly re‑categorize multiple
+              transactions at once using keyword filters.
             </li>
           </ul>
         </li>
@@ -118,8 +123,9 @@
           <a
             href="{% url 'myfinances:banktransactions' %}"
             class="btn btn-primary"
-            >Go to Upload</a
           >
+            Go to Upload
+          </a>
         </div>
       </div>
     </div>
@@ -134,8 +140,9 @@
           <a
             href="{% url 'myfinances:transactions-list' %}"
             class="btn btn-primary"
-            >Go to Transactions</a
           >
+            Go to Transactions
+          </a>
         </div>
       </div>
     </div>
@@ -147,9 +154,12 @@
           <p class="card-text text-muted">
             Analyze totals by category and account over time.
           </p>
-          <a href="{% url 'myfinances:balance_sheet' %}" class="btn btn-primary"
-            >Go to Balance Sheet</a
+          <a
+            href="{% url 'myfinances:balance_sheet' %}"
+            class="btn btn-primary"
           >
+            Go to Balance Sheet
+          </a>
         </div>
       </div>
     </div>
@@ -164,8 +174,25 @@
           <a
             href="{% url 'myfinances:categories-list' %}"
             class="btn btn-primary"
-            >Go to Categories</a
           >
+            Go to Categories
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW Bulk Update Card -->
+    <div class="col-md-5 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm border-info">
+        <div class="card-body text-center">
+          <h5 class="card-title">Bulk Update Categories</h5>
+          <p class="card-text text-muted">
+            Quickly re‑categorize multiple transactions at once using keyword
+            filters.
+          </p>
+          <a href="{% url 'myfinances:bulk_update' %}" class="btn btn-info">
+            Go to Bulk Update
+          </a>
         </div>
       </div>
     </div>

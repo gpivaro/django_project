@@ -10,7 +10,8 @@ from myfinances.views import (CategoryListListView,
                               TransactionsUpdateView,
                               TransactionsDeleteView,
                               balance_sheet,
-                              LandingPageView)
+                              LandingPageView,
+                              BulkCategoryUpdateView)
 
 # To use the login view
 from django.contrib.auth.views import LoginView
@@ -53,6 +54,6 @@ urlpatterns = [
     path("balance_sheet/",
          balance_sheet, name="balance_sheet"),
     path("", LandingPageView.as_view(), name="landing"),  # Landing page
-
+    path("bulk-update/", BulkCategoryUpdateView.as_view(), name="bulk_update"),
 
 ]

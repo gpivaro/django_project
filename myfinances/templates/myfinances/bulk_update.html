@@ -1,0 +1,156 @@
+{% extends "myfinances/base.html" %} {% load static %} {% block content %}
+
+<style>
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    display: none; /* hidden initially */
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* ensure it's above everything */
+  }
+</style>
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">
+    Bulk Update Categories
+    <button
+      class="btn btn-link p-0 ml-2"
+      type="button"
+      data-toggle="collapse"
+      data-target="#quickGuide"
+      aria-expanded="false"
+      aria-controls="quickGuide"
+      title="Show/Hide Quick Guide"
+    >
+      <span class="badge badge-info">?</span>
+    </button>
+  </h2>
+
+  <!-- Quick Guide -->
+  <div class="collapse mt-2 mb-4" id="quickGuide">
+    <div class="card card-body text-left mx-auto" style="width: 70%">
+      <h5 class="mb-2">How to use Bulk Update</h5>
+      <ul class="mb-0">
+        <li>Enter a keyword to filter transactions by description.</li>
+        <li>Review the preview list of matching transactions.</li>
+        <li>Select one or more transactions using the checkboxes.</li>
+        <li>Choose a new category from the dropdown.</li>
+        <li>Click <strong>Update Selected</strong> to apply changes.</li>
+        <li>Use the <strong>Clear</strong> button to reset the filter.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Banner with count (only if keyword is provided) -->
+  {% if keyword %}
+  <div class="alert alert-info text-center">
+    Found <strong>{{ transactions|length }}</strong> matching transactions for
+    keyword "<em>{{ keyword }}</em>"
+  </div>
+  {% endif %}
+
+  <!-- Success banner after update -->
+  {% if updated_count %}
+  <div class="alert alert-success text-center">
+    Successfully updated <strong>{{ updated_count }}</strong>transaction(s).
+  </div>
+  {% endif %}
+
+  <!-- Keyword Search Form -->
+  <form method="get" class="form-inline justify-content-center mb-3">
+    <input
+      type="text"
+      name="keyword"
+      placeholder="Filter by description..."
+      value="{{ keyword }}"
+      class="form-control mr-2"
+    />
+    <button type="submit" class="btn btn-primary mr-2">Search</button>
+    <a href="{% url 'myfinances:bulk_update' %}" class="btn btn-secondary"
+      >Clear</a
+    >
+  </form>
+
+  {% if transactions %}
+  <!-- Bulk Update Form -->
+  <form method="post" id="bulkUpdateForm">
+    {% csrf_token %}
+    <input type="hidden" name="keyword" value="{{ keyword }}" />
+
+    <div class="form-group text-center mb-3">
+      <label for="new_category"><strong>Set new category:</strong></label>
+      <select
+        name="new_category"
+        id="new_category"
+        class="form-control d-inline-block w-auto ml-2"
+      >
+        {% for cat in categories %}
+        <option value="{{ cat.id }}">{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-success ml-2">
+        Update Selected
+      </button>
+    </div>
+
+    <!-- Preview Table -->
+    <table class="table table-sm table-striped mt-3">
+      <thead class="thead-light">
+        <tr>
+          <th><input type="checkbox" id="selectAll" /></th>
+          <th>Posting Date</th>
+          <th>Description</th>
+          <th>Details</th>
+          <th>Category</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tx in transactions %}
+        <tr>
+          <td>
+            <input type="checkbox" name="transaction_ids" value="{{ tx.id }}" />
+          </td>
+          <td>{{ tx.Posting_Date|date:"Y-m-d" }}</td>
+          <td>{{ tx.Description }}</td>
+          <td>{{ tx.Details }}</td>
+          <td>{{ tx.Category }}</td>
+          <td>{{ tx.Amount }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </form>
+  {% else %}
+  <p class="text-center text-muted">No transactions match your filter.</p>
+  {% endif %}
+</div>
+
+<!-- Loading Banner Overlay -->
+<div id="loadingOverlay" class="loading-overlay" style="display: none">
+  <div class="spinner-border text-primary" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("bulkUpdateForm");
+    const overlay = document.getElementById("loadingOverlay");
+
+    if (form && overlay) {
+      form.addEventListener("submit", function () {
+        overlay.style.display = "flex"; // show overlay
+      });
+    } else {
+      console.log("Form or overlay not found");
+    }
+  });
+</script>
+
+{% endblock %}

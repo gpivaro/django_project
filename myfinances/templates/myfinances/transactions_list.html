@@ -37,6 +37,19 @@
   .category-dropdown {
     margin-right: 15px; /* adds space before Filter button */
   }
+
+.spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6); /* darker background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000; /* above everything */
+}
 </style>
 
 <h2 class="text-center mt-3">
@@ -62,35 +75,71 @@
     </ul>
   </div>
 </div>
-
-<!-- Page size selector -->
+<!-- Date range quick-select buttons -->
 <div class="d-flex justify-content-center mb-3">
-  <form method="get" class="form-inline">
+  <div class="btn-group" role="group">
+    <a href="?start_date={{ current_month_start|date:'Y-m-d' }}&end_date={{ current_month_end|date:'Y-m-d' }}" class="btn btn-outline-primary btn-sm">Current Month</a>
+    <a href="?start_date={{ last_month_start|date:'Y-m-d' }}&end_date={{ last_month_end|date:'Y-m-d' }}" class="btn btn-outline-primary btn-sm">Last Month</a>
+    <a href="?start_date={{ three_months_start|date:'Y-m-d' }}&end_date={{ three_months_end|date:'Y-m-d' }}" class="btn btn-outline-primary btn-sm">Last 3 Months</a>
+    <a href="?start_date={{ last_year_start|date:'Y-m-d' }}&end_date={{ last_year_end|date:'Y-m-d' }}" class="btn btn-outline-primary btn-sm">Last Year</a>
+    <a href="?start_date={{ current_year_start|date:'Y-m-d' }}&end_date={{ current_year_end|date:'Y-m-d' }}" class="btn btn-outline-primary btn-sm">Current Year</a>
+    <!-- Clear Range: resets only date filters, keeps other filters -->
+    <a href="?description={{ active_description }}&category={{ active_category }}&page_size={{ current_page_size }}" class="btn btn-outline-secondary btn-sm">Clear Range</a>
+  </div>
+</div>
+
+<!-- Date range banner -->
+<div class="d-flex justify-content-center mb-2">
+  <div class="badge bg-secondary text-light">
+    {% if active_start_date and active_end_date %}
+      Showing records from {{ active_start_date }} to {{ active_end_date }}
+    {% elif active_start_date %}
+      Showing records from {{ active_start_date }} onward
+    {% elif active_end_date %}
+      Showing records up to {{ active_end_date }}
+    {% else %}
+      Showing all dates
+    {% endif %}
+  </div>
+</div>
+
+<!-- Page size selector with loading banner -->
+<div class="d-flex justify-content-center mb-3">
+  <form method="get" class="form-inline" onsubmit="showLoadingBanner()">
     <label for="page_size" class="mr-2">Show per page:</label>
     <select id="page_size" name="page_size" class="form-control form-control-sm mr-2" onchange="this.form.submit()">
-      <!-- Options for pagination size -->
       <option value="10" {% if current_page_size == '10' %}selected{% endif %}>10</option>
       <option value="20" {% if current_page_size == '20' %}selected{% endif %}>20</option>
       <option value="50" {% if current_page_size == '50' %}selected{% endif %}>50</option>
       <option value="100" {% if current_page_size == '100' %}selected{% endif %}>100</option>
       <option value="all" {% if current_page_size == 'all' %}selected{% endif %}>All</option>
     </select>
+
     {% if page_obj %}
-      <!-- Preserve current page when changing size -->
       <input type="hidden" name="page" value="{{ page_obj.number }}">
     {% endif %}
+    <!-- Preserve filters -->
+    <input type="hidden" name="description" value="{{ active_description }}">
+    <input type="hidden" name="category" value="{{ active_category }}">
+    <input type="hidden" name="start_date" value="{{ active_start_date }}">
+    <input type="hidden" name="end_date" value="{{ active_end_date }}">
   </form>
+</div>
+
+<!-- Spinner overlay (hidden by default) -->
+<div id="spinner-overlay" class="spinner-overlay" style="display:none;font-size: 5rem; letter-spacing: 1px;">
+  <div class="spinner-border text-danger" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
 </div>
 
 <!-- Search + Filter Form -->
 <form method="get" class="form-inline justify-content-center mb-3">
-  <!-- Description search -->
   <input type="text" name="description" class="form-control mr-2"
          placeholder="Search description..."
          value="{{ request.GET.description }}">
   
-  <!-- Category dropdown -->
-  <select name="category" class="form-control category-dropdown">
+  <select name="category" class="form-control category-dropdown mr-2">
     <option value="all">All Categories</option>
     {% for cat in categories %}
       <option value="{{ cat.name }}" {% if request.GET.category == cat.name %}selected{% endif %}>
@@ -99,62 +148,77 @@
     {% endfor %}
   </select>
 
-  <!-- Filter and Clear buttons -->
   <button type="submit" class="btn btn-primary mr-2">Filter</button>
-  <a href="{% url 'myfinances:transactions-list' %}" class="btn btn-secondary">Clear</a>
+  <!-- Clear all filters -->
+  <a href="?page_size={{ current_page_size }}" class="btn btn-secondary">Clear</a>
 </form>
 
+<!-- Pagination -->
 {% if is_paginated %}
 <div class="d-flex flex-column align-items-center mb-3">
-  <!-- Pagination info -->
   <div class="badge bg-info text-light mb-2">
     Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }} records
     (Page {{ page_obj.number }} of {{ paginator.num_pages }})
   </div>
 
-  <!-- Pagination controls -->
   <nav aria-label="Transaction pagination">
     <ul class="pagination justify-content-center">
       {% if page_obj.has_previous %}
         <li class="page-item">
-          <a class="page-link" href="?page=1&page_size={{ paginator.per_page }}&description={{ request.GET.description }}&category={{ request.GET.category }}">&laquo; First</a>
+          <a class="page-link"
+             href="?page=1&page_size={{ current_page_size }}&description={{ active_description }}&category={{ active_category }}&start_date={{ active_start_date }}&end_date={{ active_end_date }}">
+             &laquo; First
+          </a>
         </li>
         <li class="page-item">
-          <a class="page-link" href="?page={{ page_obj.previous_page_number }}&page_size={{ paginator.per_page }}&description={{ request.GET.description }}&category={{ request.GET.category }}">Previous</a>
+          <a class="page-link"
+             href="?page={{ page_obj.previous_page_number }}&page_size={{ current_page_size }}&description={{ active_description }}&category={{ active_category }}&start_date={{ active_start_date }}&end_date={{ active_end_date }}">
+             Previous
+          </a>
         </li>
       {% endif %}
 
       <li class="page-item disabled">
-        <span class="page-link">
-          Page {{ page_obj.number }} of {{ paginator.num_pages }}
-        </span>
+        <span class="page-link">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
       </li>
 
       {% if page_obj.has_next %}
         <li class="page-item">
-          <a class="page-link" href="?page={{ page_obj.next_page_number }}&page_size={{ paginator.per_page }}&description={{ request.GET.description }}&category={{ request.GET.category }}">Next</a>
+          <a class="page-link"
+             href="?page={{ page_obj.next_page_number }}&page_size={{ current_page_size }}&description={{ active_description }}&category={{ active_category }}&start_date={{ active_start_date }}&end_date={{ active_end_date }}">
+             Next
+          </a>
         </li>
         <li class="page-item">
-          <a class="page-link" href="?page={{ paginator.num_pages }}&page_size={{ paginator.per_page }}&description={{ request.GET.description }}&category={{ request.GET.category }}">Last &raquo;</a>
+          <a class="page-link"
+             href="?page={{ paginator.num_pages }}&page_size={{ current_page_size }}&description={{ active_description }}&category={{ active_category }}&start_date={{ active_start_date }}&end_date={{ active_end_date }}">
+             Last &raquo;
+          </a>
         </li>
       {% endif %}
     </ul>
   </nav>
 </div>
 {% else %}
-<!-- When showing all, provide quick navigation -->
 <div class="d-flex justify-content-center mt-3">
-  <a class="btn btn-outline-secondary btn-sm mr-2" href="?page=1&page_size=20&description={{ request.GET.description }}&category={{ request.GET.category }}">First page (20)</a>
-  <a class="btn btn-outline-secondary btn-sm" href="?page=1&page_size=all&description={{ request.GET.description }}&category={{ request.GET.category }}">View all</a>
+  <a class="btn btn-outline-secondary btn-sm mr-2"
+     href="?page=1&page_size=20&description={{ active_description }}&category={{ active_category }}&start_date={{ active_start_date }}&end_date={{ active_end_date }}">
+     First page (20)
+  </a>
+  <a class="btn btn-outline-secondary btn-sm"
+     href="?page=1&page_size=all&description={{ active_description }}&category={{ active_category }}&start_date={{ active_start_date }}&end_date={{ active_end_date }}">
+     View all
+  </a>
 </div>
 {% endif %}
 
 {% if not is_paginated %}
-  <div class="mb-4"></div>  {# adds space above the button when pagination is off #}
+  <div class="mb-4"></div>
 {% endif %}
 
+<!-- Export button -->
 <div class="d-flex justify-content-center mb-2">
-  <a href="?export=csv{% if active_description %}&description={{ active_description }}{% endif %}{% if active_category %}&category={{ active_category }}{% else %}&category=all{% endif %}{% if current_page_size %}&page_size={{ current_page_size }}{% endif %}"
+  <a href="?export=csv{% if active_description %}&description={{ active_description }}{% endif %}{% if active_category %}&category={{ active_category }}{% else %}&category=all{% endif %}{% if current_page_size %}&page_size={{ current_page_size }}{% endif %}{% if active_start_date %}&start_date={{ active_start_date }}{% endif %}{% if active_end_date %}&end_date={{ active_end_date }}{% endif %}"
      class="btn btn-outline-primary btn-sm">
     Export Transactions CSV
   </a>
@@ -226,6 +290,37 @@
     </tr>
   </tfoot>
 </table>
+
+<script>
+  function showSpinner() {
+    document.getElementById('spinner-overlay').style.display = 'flex';
+  }
+
+  window.addEventListener('load', function() {
+    document.getElementById('spinner-overlay').style.display = 'none';
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Attach spinner to all forms
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', showSpinner);
+    });
+
+    // Attach spinner to pagination/filter links
+    document.querySelectorAll('a.page-link, a.btn').forEach(link => {
+      link.addEventListener('click', showSpinner);
+    });
+
+    // Attach spinner to dropdown pagination (page size selector)
+    const pageSizeDropdown = document.getElementById('page_size');
+    if (pageSizeDropdown) {
+      pageSizeDropdown.addEventListener('change', function() {
+        showSpinner();
+        this.form.submit(); // ensure form still submits
+      });
+    }
+  });
+</script>
 
 
 {% endblock %}

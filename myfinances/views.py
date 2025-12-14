@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+import calendar
 from django.http import HttpResponse
 from django.db.models.functions import TruncMonth
 from .models import Statements, CategoryList
@@ -372,9 +374,11 @@ class TransactionsListView(LoginRequiredMixin, ListView):
     - Pagination with dynamic page size (?page_size=10|20|50|100|all).
     - Filtering by description (case-insensitive substring match).
     - Filtering by category (via CategoryList model).
+    - Filtering by date range (?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD).
     - Displays a total sum of the Amount column for the filtered queryset.
     - Exposes available categories for dropdown filtering in the template.
     - CSV export of filtered transactions (?export=csv).
+    - Predefined date ranges for quick selection (current month, last month, last 3 months, last year, current year).
     """
 
     model = Statements
@@ -404,11 +408,18 @@ class TransactionsListView(LoginRequiredMixin, ListView):
 
         description = self.request.GET.get("description")
         category = self.request.GET.get("category")
+        start_date_str = self.request.GET.get("start_date")
+        end_date_str = self.request.GET.get("end_date")
+
+        start_date = parse_date(start_date_str) if start_date_str else None
+        end_date = parse_date(end_date_str) if end_date_str else None
 
         if description:
             qs = qs.filter(Description__icontains=description)
         if category and category != "all":
             qs = qs.filter(Category__name=category)
+        if start_date and end_date:
+            qs = qs.filter(Posting_Date__range=[start_date, end_date])
 
         return qs
 
@@ -417,6 +428,7 @@ class TransactionsListView(LoginRequiredMixin, ListView):
         qs = self.get_queryset()
         ctx["categories"] = CategoryList.objects.all()
         ctx["total_amount"] = qs.aggregate(total=Sum("Amount"))["total"] or 0
+        ctx["record_count"] = qs.count()
 
         # Expose current page size
         page_size = self.request.GET.get("page_size")
@@ -427,9 +439,53 @@ class TransactionsListView(LoginRequiredMixin, ListView):
                 page_size = "all"
         ctx['current_page_size'] = page_size
 
-        # NEW: expose active filters
+        # Active filters
         ctx["active_description"] = self.request.GET.get("description", "")
         ctx["active_category"] = self.request.GET.get("category", "all")
+        ctx["active_start_date"] = self.request.GET.get("start_date", "")
+        ctx["active_end_date"] = self.request.GET.get("end_date", "")
+
+        # Predefined ranges
+        today = now().date()
+
+        # Current month
+        current_month_start = today.replace(day=1)
+        current_month_end = today
+
+        # Last month
+        first_day_this_month = today.replace(day=1)
+        last_month_end = first_day_this_month - timedelta(days=1)
+        last_month_start = last_month_end.replace(day=1)
+
+        # Last 3 months (up to last day of last month)
+        month = today.month - 3
+        year = today.year
+        if month <= 0:
+            month += 12
+            year -= 1
+        three_months_start = date(year, month, 1)
+        three_months_end = last_month_end
+
+        # Last year
+        last_year_start = date(today.year - 1, 1, 1)
+        last_year_end = date(today.year - 1, 12, 31)
+
+        # Current year
+        current_year_start = date(today.year, 1, 1)
+        current_year_end = today
+
+        ctx.update({
+            "current_month_start": current_month_start,
+            "current_month_end": current_month_end,
+            "last_month_start": last_month_start,
+            "last_month_end": last_month_end,
+            "three_months_start": three_months_start,
+            "three_months_end": three_months_end,
+            "last_year_start": last_year_start,
+            "last_year_end": last_year_end,
+            "current_year_start": current_year_start,
+            "current_year_end": current_year_end,
+        })
 
         return ctx
 
@@ -437,7 +493,7 @@ class TransactionsListView(LoginRequiredMixin, ListView):
         # Handle CSV export
         if request.GET.get("export") == "csv":
             qs = self.get_queryset()
-            timestamp = now().strftime("%Y%m%d_%H%M%S")   # e.g. 20251212_132430
+            timestamp = now().strftime("%Y%m%d_%H%M%S")
             filename = f"transactions_{timestamp}.csv"
 
             response = HttpResponse(content_type="text/csv")
@@ -449,6 +505,7 @@ class TransactionsListView(LoginRequiredMixin, ListView):
                 f"Transactions Export ({timestamp})",
                 f"Description filter: {request.GET.get('description') or 'None'}",
                 f"Category filter: {request.GET.get('category') or 'All'}",
+                f"Date range: {request.GET.get('start_date') or 'N/A'} → {request.GET.get('end_date') or 'N/A'}",
                 f"Generated: {now().strftime('%Y-%m-%d %H:%M:%S')}",
                 f"Records: {qs.count()}"
             ])
@@ -515,7 +572,7 @@ class TransactionsDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
 
 def balance_sheet(request):
     """
-    Balance Sheet View with optional CSV export
+    Balance Sheet View with optional CSV export and predefined date ranges
     """
 
     # --- Step 1: Extract query parameters ---
@@ -620,7 +677,38 @@ def balance_sheet(request):
         writer.writerow(["TOTAL", "", f"{grand_total:.2f}"])
         return response
 
-    # --- Step 14: Build context ---
+    # --- Step 14: Predefined ranges ---
+    today = now().date()
+
+    # Current month
+    current_month_start = today.replace(day=1)
+    current_month_end = today
+
+    # Last month
+    first_day_this_month = today.replace(day=1)
+    last_month_end = first_day_this_month - timedelta(days=1)
+    last_month_start = last_month_end.replace(day=1)
+
+    # Last 3 months (start at first day of month 3 months ago, end at last day of previous month)
+    month = today.month - 3
+    year = today.year
+    if month <= 0:
+        month += 12
+        year -= 1
+    three_months_start = date(year, month, 1)
+
+    # End = last day of last month
+    three_months_end = last_month_end
+
+    # Last year
+    last_year_start = date(today.year - 1, 1, 1)
+    last_year_end = date(today.year - 1, 12, 31)
+
+    # Current year
+    current_year_start = date(today.year, 1, 1)
+    current_year_end = today
+
+    # --- Step 15: Build context ---
     context = {
         "category_totals": category_totals,
         "grand_total": grand_total,
@@ -631,6 +719,18 @@ def balance_sheet(request):
         "acct_infos": acct_infos,
         "selected_acct": acct_info,
         "categories": categories,
+        # Predefined ranges
+        "today": today,
+        "current_month_start": current_month_start,
+        "current_month_end": current_month_end,
+        "last_month_start": last_month_start,
+        "last_month_end": last_month_end,
+        "three_months_start": three_months_start,
+        "three_months_end": three_months_end,
+        "last_year_start": last_year_start,
+        "last_year_end": last_year_end,
+        "current_year_start": current_year_start,
+        "current_year_end": current_year_end,
     }
 
     return render(request, "myfinances/balance_sheet.html", context)

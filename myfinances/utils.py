@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group
 import os
 import csv
 import io
@@ -96,7 +97,7 @@ def label_transactions(data, categories_words_cleaned_df, owner, start_date="", 
     return {"statement_dict": statement_dict, "categories_list": categories_list}
 
 
-def banktransactions_upload(request):
+def banktransactions_upload(request, user_group):
     """
     Handle CSV upload of bank transactions:
     - Validate file type
@@ -104,6 +105,13 @@ def banktransactions_upload(request):
     - Clean and normalize data (dates, numeric fields)
     - Upload new transactions to the database
     - Return counts of uploaded vs declined records
+
+    Parameters
+    ----------
+    request : HttpRequest
+        The incoming request with file and form data.
+    user_group : Group
+        The group to assign to each new Statement. Must not be None.
     """
 
     csv_file = request.FILES.get("file")
@@ -130,7 +138,7 @@ def banktransactions_upload(request):
                 "Check",
                 "N/A"
             ],
-            quotechar='"',   # handle quoted text properly
+            quotechar='"',
         )
     except Exception as e:
         messages.error(request, f"Error reading CSV: {e}")
@@ -157,10 +165,6 @@ def banktransactions_upload(request):
     # add bank account
     transactions_df["Acct_Info"] = acct_last4
 
-    # (Optional) Save cleaned CSV for debugging
-    # transactions_df.to_csv("ignore_folder/test_transactions.csv", index=False)
-
-    # --- Upload to DB ---
     uploaded_count = 0
     declined_count = 0
 
@@ -171,17 +175,18 @@ def banktransactions_upload(request):
             Balance = float(tx["Balance"])
         except (ValueError, KeyError, AttributeError):
             declined_count += 1
-            continue  # Skip malformed entries
+            continue
 
-        # ✅ Check for duplicates per user
+        # ✅ Duplicate check includes user_group
         exists = Statements.objects.filter(
-            Q(Details=tx["Details"]) &
-            Q(Posting_Date=Posting_Date) &
-            Q(Description=tx["Description"]) &
-            Q(Amount=Amount) &
-            Q(Balance=Balance) &
-            Q(Owner=request.user) &
-            Q(Acct_Info=tx["Acct_Info"])
+            Details=tx["Details"],
+            Posting_Date=Posting_Date,
+            Description=tx["Description"],
+            Amount=Amount,
+            Balance=Balance,
+            Owner=request.user,
+            Acct_Info=tx["Acct_Info"],
+            user_group=user_group
         ).exists()
 
         if not exists:
@@ -194,7 +199,8 @@ def banktransactions_upload(request):
                 Balance=Balance,
                 Check_Slip=tx.get("Check", ""),
                 Owner=request.user,
-                Acct_Info=tx["Acct_Info"]
+                Acct_Info=tx["Acct_Info"],
+                user_group=user_group   # ✅ required
             )
             uploaded_count += 1
         else:

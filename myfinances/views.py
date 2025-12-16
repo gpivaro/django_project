@@ -1,3 +1,8 @@
+# assuming your upload logic lives here
+from .utils import banktransactions_upload   # adjust import path if needed
+from .utils import banktransactions_upload   # adjust import if needed
+from .utils import banktransactions_upload
+from django.contrib.auth.models import Group
 from .models import Statements, CategoryList
 import csv
 import io
@@ -331,34 +336,28 @@ def banktransactions(request):
     """
     Handle the bank transactions upload view.
 
-    Workflow:
     - On GET: render the upload page with a prompt message.
     - On POST: process the uploaded CSV file using `banktransactions_upload`,
       attach success/error messages via Django's messages framework,
       and re-render the page so the user sees feedback.
-
-    Context:
-    - `order`: instruction text displayed on the page.
-    - `messages`: automatically injected by Django's messages framework
-      (no need to pass explicitly).
     """
 
-    # Template path
     template = "myfinances/banktransactions.html"
+    prompt = {"order": "Upload your bank transactions file."}
 
-    # Context variable for instructions
-    prompt = {
-        "order": "Upload your bank transactions file.",
-    }
-
-    # GET request → show upload form
     if request.method == "GET":
         return render(request, template, prompt)
 
     # POST request → process file upload
-    banktransactions_upload(request)
+    user_groups = request.user.groups.all()
+    if not user_groups.exists():
+        messages.error(
+            request, "No user group found for this account. Please contact an administrator.")
+        return render(request, template, prompt)
 
-    # Re-render template with prompt (messages are auto-injected)
+    # Pass the first group into the upload function
+    banktransactions_upload(request, user_group=user_groups.first())
+
     return render(request, template, prompt)
 
 

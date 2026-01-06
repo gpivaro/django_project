@@ -53,11 +53,17 @@
     keyword "<em>{{ keyword }}</em>"
   </div>
   {% endif %}
-
   <!-- Success banner after update -->
-  {% if updated_count %}
+  {% if updated_count is not None %}
   <div class="alert alert-success text-center">
-    Successfully updated <strong>{{ updated_count }}</strong>transaction(s).
+    Successfully updated <strong>{{ updated_count }}</strong> transaction(s).
+  </div>
+  {% endif %}
+
+  <!-- Success banner after delete -->
+  {% if deleted_count is not None %}
+  <div class="alert alert-danger text-center">
+    Deleted <strong>{{ deleted_count }}</strong> transaction(s).
   </div>
   {% endif %}
 
@@ -83,9 +89,10 @@
     <input type="hidden" name="keyword" value="{{ keyword }}" />
 
     <div class="form-group text-center mb-3">
+      <!-- Category Update Controls -->
       <label for="new_category"><strong>Set new category:</strong></label>
       <select
-        name="new_category"
+        name="category_id"
         id="new_category"
         class="form-control d-inline-block w-auto ml-2"
       >
@@ -93,8 +100,20 @@
         <option value="{{ cat.id }}">{{ cat.name }}</option>
         {% endfor %}
       </select>
+
       <button type="submit" class="btn btn-success ml-2">
         Update Selected
+      </button>
+
+      <!-- ⭐ NEW: Bulk Delete Button -->
+      <!-- Uses name="bulk_delete" so the view can detect this action -->
+      <button
+        type="submit"
+        name="bulk_delete"
+        class="btn btn-danger ml-3"
+        onclick="return confirm('Are you sure you want to delete the selected transactions? This cannot be undone.')"
+      >
+        Delete Selected
       </button>
     </div>
 
@@ -103,6 +122,7 @@
       <thead class="thead-light">
         <tr>
           <th><input type="checkbox" id="selectAll" /></th>
+          <th>Acct Info</th>
           <th>Posting Date</th>
           <th>Description</th>
           <th>Details</th>
@@ -114,8 +134,10 @@
         {% for tx in transactions %}
         <tr>
           <td>
-            <input type="checkbox" name="transaction_ids" value="{{ tx.id }}" />
+            <!-- Checkbox name matches view: statement_ids -->
+            <input type="checkbox" name="statement_ids" value="{{ tx.id }}" />
           </td>
+          <td>{{ tx.Acct_Info }}</td>
           <td>{{ tx.Posting_Date|date:"Y-m-d" }}</td>
           <td>{{ tx.Description }}</td>
           <td>{{ tx.Details }}</td>
@@ -147,9 +169,13 @@
       form.addEventListener("submit", function () {
         overlay.style.display = "flex"; // show overlay
       });
-    } else {
-      console.log("Form or overlay not found");
     }
+  });
+
+  // Select All checkbox logic
+  document.getElementById("selectAll")?.addEventListener("change", function () {
+    const checkboxes = document.querySelectorAll('input[name="statement_ids"]');
+    checkboxes.forEach((cb) => (cb.checked = this.checked));
   });
 </script>
 

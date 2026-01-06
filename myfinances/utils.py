@@ -99,35 +99,27 @@ def label_transactions(data, categories_words_cleaned_df, owner, start_date="", 
 
 def banktransactions_upload(request, user_group):
     """
-    Handle CSV upload of bank transactions:
-    - Validate file type
-    - Parse CSV into a pandas DataFrame
-    - Clean and normalize data (dates, numeric fields)
-    - Upload new transactions to the database
-    - Return counts of uploaded vs declined records
+    Handle CSV upload of bank transactions with group‑scoped duplicate detection.
 
-    Parameters
-    ----------
-    request : HttpRequest
-        The incoming request with file and form data.
-    user_group : Group
-        The group to assign to each new Statement. Must not be None.
+    Fixes:
+    - Skip invalid rows BEFORE duplicate check (NaT, NaN, missing fields)
+    - Prevent MySQL errors when comparing NaN values
     """
 
     csv_file = request.FILES.get("file")
     acct_last4 = request.POST.get("acct_last4")
 
-    # ✅ Validate file extension
+    # Validate file type
     if not csv_file or not csv_file.name.lower().endswith(".csv"):
         messages.error(request, "THIS IS NOT A CSV FILE")
         return
 
-    # ✅ Read CSV directly into DataFrame
+    # Read CSV
     try:
         transactions_df = pd.read_csv(
             csv_file,
             encoding="utf-8",
-            skiprows=1,  # skip header row if bank adds metadata line
+            skiprows=1,
             names=[
                 "Details",
                 "Posting Date",
@@ -144,69 +136,89 @@ def banktransactions_upload(request, user_group):
         messages.error(request, f"Error reading CSV: {e}")
         return
 
-    # ✅ Drop unused column
+    # Drop unused column
     transactions_df.drop(columns=["N/A"], inplace=True)
 
-    # ✅ Convert Posting Date to datetime
+    # Normalize date
     transactions_df["Date"] = pd.to_datetime(
         transactions_df["Posting Date"], errors="coerce"
     )
     transactions_df.drop(columns=["Posting Date"], inplace=True)
 
-    # ✅ Ensure Balance is numeric and drop invalid rows
+    # Convert numeric fields
     transactions_df["Balance"] = pd.to_numeric(
-        transactions_df["Balance"], errors="coerce")
-    transactions_df = transactions_df.dropna(subset=["Balance"])
-
-    # ✅ Ensure Amount is numeric
+        transactions_df["Balance"], errors="coerce"
+    )
     transactions_df["Amount"] = pd.to_numeric(
-        transactions_df["Amount"], errors="coerce")
+        transactions_df["Amount"], errors="coerce"
+    )
 
-    # add bank account
+    # Add account info
     transactions_df["Acct_Info"] = acct_last4
 
     uploaded_count = 0
     declined_count = 0
 
+    # Process each row
     for tx in transactions_df.to_dict("records"):
+
+        # ------------------------------------------------------------------
+        # ⭐ VALIDATION: Skip invalid rows BEFORE duplicate check
+        # ------------------------------------------------------------------
+
+        # Skip invalid date
+        if pd.isna(tx["Date"]):
+            declined_count += 1
+            continue
+
+        # Skip invalid amount or balance
+        if pd.isna(tx["Amount"]) or pd.isna(tx["Balance"]):
+            declined_count += 1
+            continue
+
         try:
             Posting_Date = tx["Date"].date()
             Amount = float(tx["Amount"])
             Balance = float(tx["Balance"])
-        except (ValueError, KeyError, AttributeError):
+        except Exception:
             declined_count += 1
             continue
 
-        # ✅ Duplicate check includes user_group
+        # ------------------------------------------------------------------
+        # ⭐ GROUP‑SCOPED DUPLICATE CHECK
+        # ------------------------------------------------------------------
         exists = Statements.objects.filter(
+            user_group=user_group,
             Details=tx["Details"],
             Posting_Date=Posting_Date,
             Description=tx["Description"],
             Amount=Amount,
             Balance=Balance,
+            Acct_Info=tx["Acct_Info"],
+            Type=tx["Type"],
+        ).exists()
+
+        if exists:
+            declined_count += 1
+            continue
+
+        # Create new Statement
+        Statements.objects.create(
+            Details=tx["Details"],
+            Posting_Date=Posting_Date,
+            Description=tx["Description"],
+            Amount=Amount,
+            Type=tx["Type"],
+            Balance=Balance,
+            Check_Slip=tx.get("Check", ""),
             Owner=request.user,
             Acct_Info=tx["Acct_Info"],
             user_group=user_group
-        ).exists()
+        )
 
-        if not exists:
-            Statements.objects.create(
-                Details=tx["Details"],
-                Posting_Date=Posting_Date,
-                Description=tx["Description"],
-                Amount=Amount,
-                Type=tx["Type"],
-                Balance=Balance,
-                Check_Slip=tx.get("Check", ""),
-                Owner=request.user,
-                Acct_Info=tx["Acct_Info"],
-                user_group=user_group   # ✅ required
-            )
-            uploaded_count += 1
-        else:
-            declined_count += 1
+        uploaded_count += 1
 
-    # ✅ Report results back to user
+    # Report results
     messages.success(
         request,
         f"Upload complete: {uploaded_count} records added, {declined_count} records declined."

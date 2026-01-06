@@ -978,32 +978,35 @@ class BulkCategoryUpdateView(View):
     """
     BulkCategoryUpdateView
 
-    This view allows end-users to bulk update the category of multiple
+    This view allows end-users to bulk update OR bulk delete multiple
     Statement records at once, based on a keyword filter applied to the
     Description field.
+
+    New Feature:
+    ------------
+    - Bulk Delete:
+        Users can now select multiple transactions and delete them in one action.
+        This mirrors the existing bulk update workflow and keeps all batch
+        operations in a single, intuitive UI.
 
     Workflow:
     ---------
     - GET request:
         * Accepts an optional 'keyword' query parameter.
-        * If keyword is provided, filters Statements whose Description contains the keyword.
-        * If no keyword is provided, returns no transactions (empty list).
-        * Always provides a list of available categories for selection.
+        * If keyword is provided, filters Statements whose Description contains it.
+        * If no keyword is provided, returns an empty queryset.
+        * Always provides a list of available categories.
 
     - POST request:
-        * Accepts 'keyword' (to reapply the filter), 'new_category'
-          (the category ID chosen by the user), and 'transaction_ids'
-          (IDs of selected transactions).
-        * Updates only the selected Statements to the new category.
-        * Re-renders the same page with the same filter applied.
-        * Displays a success banner showing how many transactions were updated.
-
-    Notes:
-    ------
-    - Uses `Description__icontains` for case-insensitive substring matching.
-    - Categories are retrieved from CategoryList.
-    - This implementation supports selective updates via checkboxes.
-    - PostingDate is included in the queryset automatically and can be displayed in the template.
+        * Accepts:
+            - 'keyword' (to reapply the filter)
+            - 'category_id' (new category to apply)
+            - 'statement_ids' (IDs of selected transactions)
+            - 'bulk_delete' (optional flag to trigger deletion)
+        * If bulk_delete is present → delete selected transactions.
+        * Else → bulk update category.
+        * Re-renders the page with the same filter applied.
+        * Displays a success banner showing how many transactions were updated/deleted.
     """
 
     template_name = "myfinances/bulk_update.html"
@@ -1012,7 +1015,7 @@ class BulkCategoryUpdateView(View):
         """
         Handle GET requests:
         - If a keyword is provided, filter Statements by Description.
-        - If no keyword, return an empty queryset (no transactions shown).
+        - If no keyword, return an empty queryset.
         - Always scoped to the user's groups.
         """
         keyword = request.GET.get("keyword", "")
@@ -1021,7 +1024,7 @@ class BulkCategoryUpdateView(View):
         if keyword:
             qs = Statements.objects.filter(
                 Description__icontains=keyword,
-                user_group__in=request.user.groups.all()   # ✅ group filter
+                user_group__in=request.user.groups.all()   # group-scoped filter
             )
 
         categories = CategoryList.objects.all()
@@ -1029,24 +1032,44 @@ class BulkCategoryUpdateView(View):
             "transactions": qs,
             "categories": categories,
             "keyword": keyword,
-            "updated_count": None,  # no updates yet
+            "updated_count": None,   # no updates yet
+            "deleted_count": None,   # no deletions yet
         })
 
     def post(self, request):
         keyword = request.POST.get("keyword", "")
 
-        # Match test field names
+        # Field names from the template
         new_category_id = request.POST.get("category_id")
         transaction_ids = request.POST.getlist("statement_ids")
 
         updated_count = 0
-        if transaction_ids and new_category_id:
+        deleted_count = 0
+
+        # ------------------------------------------------------------------
+        # ⭐ NEW FEATURE: Bulk Delete
+        # ------------------------------------------------------------------
+        if "bulk_delete" in request.POST and transaction_ids:
+            qs = Statements.objects.filter(
+                id__in=transaction_ids,
+                user_group__in=request.user.groups.all(),
+            )
+
+            # Apply keyword filter so only visible rows can be deleted
+            if keyword:
+                qs = qs.filter(Description__icontains=keyword)
+
+            deleted_count = qs.delete()[0]
+        # ------------------------------------------------------------------
+        # Existing Feature: Bulk Category Update
+        # ------------------------------------------------------------------
+        elif transaction_ids and new_category_id:
             updated_count = Statements.objects.filter(
                 id__in=transaction_ids,
                 user_group__in=request.user.groups.all()
-                # <-- correct for your model
             ).update(Category_id=new_category_id)
 
+        # Reapply filter for re-render
         qs = Statements.objects.none()
         if keyword:
             qs = Statements.objects.filter(
@@ -1060,4 +1083,5 @@ class BulkCategoryUpdateView(View):
             "categories": categories,
             "keyword": keyword,
             "updated_count": updated_count,
+            "deleted_count": deleted_count,
         })

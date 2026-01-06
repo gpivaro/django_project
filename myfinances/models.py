@@ -96,54 +96,48 @@ class Statements(models.Model):
     Statements model
 
     Represents a financial transaction record. Each record belongs to:
-    - An Owner (the individual user who created/owns the record).
+    - An Owner (the individual user who uploaded the record).
     - A User Group (shared access: multiple users in the same group can view/update).
     - An optional Category (classification of the transaction).
 
-    Fields:
-    -------
-    Details       : Short string with transaction details (e.g., merchant info).
-    Posting_Date  : Date the transaction was posted by the bank.
-    Description   : Longer text description of the transaction.
-    Amount        : Transaction amount (positive or negative).
-    Type          : Transaction type (e.g., debit, credit).
-    Balance       : Running balance after the transaction (optional).
-    Check_Slip    : Optional check/slip reference text.
-    Owner         : ForeignKey to the user who owns the record.
-    Category      : ForeignKey to CategoryList for classification.
-    User_Group    : ForeignKey to Django's built-in Group model, enabling
-                    shared access across multiple users in the same group.
-    Acct_Info     : Account identifier (last 4 digits).
-    Insert_Date   : Timestamp when the record was inserted.
-    Update_Date   : Timestamp automatically updated on save.
+    A database‑level UNIQUE CONSTRAINT is added to ensure that no two
+    transactions in the same group can have the same identity. This prevents
+    duplicate uploads across users in the same group, even during race
+    conditions or future refactors.
     """
 
+    # -----------------------------
+    # Core transaction fields
+    # -----------------------------
     Details = models.CharField(max_length=50)
     Posting_Date = models.DateField()
-    Description = models.TextField()
+    Description = models.CharField(max_length=500)
     Amount = models.FloatField()
     Type = models.CharField(max_length=150)
     Balance = models.FloatField(blank=True)
     Check_Slip = models.TextField(blank=True)
 
-    # Owner: required, prevents cascade delete (records remain if user is deleted)
+    # -----------------------------
+    # Ownership & classification
+    # -----------------------------
     Owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,
+        on_delete=models.PROTECT,   # Prevent deletion of user from deleting records
         null=False,
         blank=False
     )
 
-    # Category: optional classification
     Category = models.ForeignKey(
         'CategoryList',
-        on_delete=models.SET_NULL,
+        on_delete=models.SET_NULL,  # Keep transaction even if category is deleted
         null=True,
         blank=True,
         default=None
     )
 
-    # User_Group: shared access across multiple users
+    # -----------------------------
+    # Group‑scoped access control
+    # -----------------------------
     user_group = models.ForeignKey(
         Group,
         on_delete=models.CASCADE,
@@ -151,6 +145,9 @@ class Statements(models.Model):
         help_text="User group that owns this transaction; all users in the group share access."
     )
 
+    # -----------------------------
+    # Additional metadata
+    # -----------------------------
     Acct_Info = models.CharField(max_length=4)
     Insert_Date = models.DateTimeField(default=timezone.now)
     Update_Date = models.DateTimeField(auto_now=True)
@@ -165,6 +162,34 @@ class Statements(models.Model):
 
     class Meta:
         ordering = ["-Posting_Date"]  # newest transactions first
+
+        # --------------------------------------------------------------
+        # ⭐ DATABASE‑LEVEL UNIQUE CONSTRAINT
+        # --------------------------------------------------------------
+        # This ensures that no two transactions in the same group can have
+        # the same identity. It protects against:
+        #   - Duplicate uploads by different users in the same group
+        #   - Duplicate uploads by the same user
+        #   - Race conditions during simultaneous uploads
+        #   - Future refactors accidentally removing duplicate checks
+        #
+        # This is the strongest possible guarantee of data integrity.
+        # --------------------------------------------------------------
+        constraints = [
+            models.UniqueConstraint(
+                fields=[
+                    "user_group",
+                    "Posting_Date",
+                    "Description",
+                    "Amount",
+                    "Balance",
+                    "Acct_Info",
+                    "Type",
+                    "Details",
+                ],
+                name="unique_transaction_per_group"
+            )
+        ]
 
 
 class Item(models.Model):

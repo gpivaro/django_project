@@ -38,7 +38,6 @@ class Categories(models.Model):
 
 
 class CategoryList(models.Model):
-    # Use lowercase field names for consistency
     name = models.CharField(max_length=100)
 
     label = models.CharField(
@@ -55,12 +54,20 @@ class CategoryList(models.Model):
         help_text="Assign a label to classify this category (e.g., Income, Expense, Asset, Liability)."
     )
 
-    # Tie each category to a specific user/owner
+    # Track who created the category (audit trail)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         null=False,
-        blank=False
+        blank=False,
+        related_name="owned_categories"
+    )
+
+    # ✅ Tie each category to a specific group
+    user_group = models.ForeignKey(
+        Group,
+        on_delete=models.CASCADE,
+        related_name="categories"
     )
 
     insert_date = models.DateTimeField(default=timezone.now)
@@ -69,10 +76,12 @@ class CategoryList(models.Model):
     class Meta:
         verbose_name_plural = "Category List"
         ordering = ["name"]
-        # Ensure uniqueness per owner, not globally
+        # ✅ Ensure uniqueness per group, not globally
         constraints = [
             models.UniqueConstraint(
-                fields=["owner", "name"], name="unique_category_per_owner")
+                fields=["user_group", "name"],
+                name="unique_category_per_group"
+            )
         ]
 
     def __str__(self):

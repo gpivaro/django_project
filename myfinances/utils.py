@@ -223,3 +223,16 @@ def banktransactions_upload(request, user_group):
         request,
         f"Upload complete: {uploaded_count} records added, {declined_count} records declined."
     )
+
+
+def apply_account_filter(request, qs):
+    """
+    Applies account filtering to a queryset based on ?acct=XXXX.
+    Returns (filtered_qs, selected_acct).
+    """
+    selected_acct = request.GET.get("acct", "")
+
+    if selected_acct:
+        qs = qs.filter(Acct_Info=selected_acct)
+
+    return qs, selected_acct

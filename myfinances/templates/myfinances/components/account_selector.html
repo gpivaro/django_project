@@ -1,0 +1,43 @@
+{% if acct_infos %}
+<div class="text-center mb-2">
+  <small class="text-muted font-weight-bold">Account Selection</small>
+</div>
+
+<form method="get" class="text-center mb-2" id="acctForm">
+  <div class="btn-group btn-group-toggle" data-toggle="buttons">
+    {% if not selected_acct %}
+    <label
+      class="btn btn-outline-primary active"
+      onclick="document.getElementById('acctForm').submit();"
+    >
+      <input type="radio" name="acct" value="" checked />
+      All Accounts
+    </label>
+    {% else %}
+    <label
+      class="btn btn-outline-primary"
+      onclick="document.getElementById('acctForm').submit();"
+    >
+      <input type="radio" name="acct" value="" />
+      All Accounts
+    </label>
+    {% endif %} {% for acct in acct_infos %} {% if selected_acct == acct %}
+    <label
+      class="btn btn-outline-primary active"
+      onclick="document.getElementById('acctForm').submit();"
+    >
+      <input type="radio" name="acct" value="{{ acct }}" checked />
+      {{ acct }}
+    </label>
+    {% else %}
+    <label
+      class="btn btn-outline-primary"
+      onclick="document.getElementById('acctForm').submit();"
+    >
+      <input type="radio" name="acct" value="{{ acct }}" />
+      {{ acct }}
+    </label>
+    {% endif %} {% endfor %}
+  </div>
+</form>
+{% endif %}

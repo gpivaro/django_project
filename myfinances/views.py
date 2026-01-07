@@ -1,5 +1,9 @@
 # assuming your upload logic lives here
 # Standard library
+from django.views.generic import TemplateView
+from .mixins import AccountSelectionMixin
+from .models import Statements
+from django.db.models import Sum
 from myfinances.utils import banktransactions_upload
 from myfinances.models import Statements
 from django.shortcuts import render
@@ -951,19 +955,58 @@ def balance_sheet(request):
     return render(request, "myfinances/balance_sheet.html", context)
 
 
-class LandingPageView(LoginRequiredMixin, TemplateView):
+class LandingPageView(LoginRequiredMixin, AccountSelectionMixin, TemplateView):
+    """
+    LandingPageView
+
+    This view renders the main dashboard/landing page for the user.
+    It now supports *account-level filtering* based on the Acct_Info
+    field of Statements.
+
+    New Feature:
+    ------------
+    - The user can select which account (Acct_Info) to view using
+      radio buttons on the landing page.
+    - The selected account is passed via GET (?acct=XXXX).
+    - All landing page metrics are recalculated based on the selected account.
+
+    Notes:
+    ------
+    - All queries remain group-scoped for security.
+    - If no account is selected, all accounts are included.
+    - Account filtering logic is now centralized via AccountSelectionMixin
+      and utils.apply_account_filter() for reuse across all views.
+    """
+
     template_name = "myfinances/landing.html"
-    login_url = "login"        # redirect to your login view
+    login_url = "login"
     redirect_field_name = "next"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # ✅ Group-based filter instead of Owner
+        # ------------------------------------------------------------
+        # 1. Base queryset: always group-scoped
+        # ------------------------------------------------------------
         qs = Statements.objects.filter(
             user_group__in=self.request.user.groups.all()
         )
 
+        # ------------------------------------------------------------
+        # 2. Apply account filter using shared utility
+        #    Returns filtered queryset + selected account value
+        # ------------------------------------------------------------
+        qs, selected_acct = self.apply_account_filter(self.request, qs)
+
+        # ------------------------------------------------------------
+        # 3. Add account selector context (list of accounts + selected one)
+        # ------------------------------------------------------------
+        context["acct_infos"] = self.get_acct_infos(self.request)
+        context["selected_acct"] = selected_acct
+
+        # ------------------------------------------------------------
+        # 4. Landing page metrics (now account-aware)
+        # ------------------------------------------------------------
         context["total_transactions"] = qs.count()
         context["uncategorized_count"] = qs.filter(
             Category__isnull=True).count()

@@ -61,13 +61,20 @@
           This page is your <strong>dashboard</strong> — use it as the starting
           point for managing finances.
         </li>
+        <li>
+          <strong>Account Selection</strong> — use the buttons at the top of the
+          page to instantly switch between different bank accounts. The
+          dashboard metrics update automatically based on the selected account.
+        </li>
       </ul>
     </div>
   </div>
 
-  <p class="text-center text-muted mb-5">
+  <p class="text-center text-muted mb-3">
     Manage your financial data with ease. Choose an option below to get started:
   </p>
+
+  {% include "myfinances/components/account_selector.html" %}
 
   <!-- Metrics Section -->
   <div class="row text-center mb-5">
@@ -181,7 +188,7 @@
       </div>
     </div>
 
-    <!-- NEW Bulk Update Card -->
+    <!-- Bulk Update Card -->
     <div class="col-md-5 col-lg-4 mb-4">
       <div class="card h-100 shadow-sm border-info">
         <div class="card-body text-center">

@@ -162,7 +162,7 @@
             Analyze totals by category and account over time.
           </p>
           <a
-            href="{% url 'myfinances:balance_sheet' %}"
+            href="{% url 'myfinances:balance_sheet' %}{% if selected_accounts %}?acct_info={{ selected_accounts.0|urlencode }}{% endif %}"
             class="btn btn-primary"
           >
             Go to Balance Sheet

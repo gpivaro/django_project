@@ -9,7 +9,7 @@ from myfinances.views import (CategoryListListView,
                               TransactionsDetailView,
                               TransactionsUpdateView,
                               TransactionsDeleteView,
-                              balance_sheet,
+                              BalanceSheetView,
                               LandingPageView,
                               BulkCategoryUpdateView)
 
@@ -51,8 +51,7 @@ urlpatterns = [
          TransactionsUpdateView.as_view(), name="transactions-update"),
     path("transaction/<int:pk>/delete/",
          TransactionsDeleteView.as_view(), name="transactions-delete"),
-    path("balance_sheet/",
-         balance_sheet, name="balance_sheet"),
+    path("balance_sheet/", BalanceSheetView.as_view(), name="balance_sheet"),
     path("", LandingPageView.as_view(), name="landing"),  # Landing page
     path("bulk-update/", BulkCategoryUpdateView.as_view(), name="bulk_update"),
 

@@ -1,16 +1,20 @@
-{% if acct_infos %}
+{% if available_accounts %}
 <div class="text-center mb-2">
   <small class="text-muted font-weight-bold">Account Selection</small>
 </div>
 
 <form method="get" class="text-center mb-2" id="acctForm">
+  {% for key, value in request.GET.items %} {% if key != "acct_info" %}
+  <input type="hidden" name="{{ key }}" value="{{ value }}" />
+  {% endif %} {% endfor %}
+
   <div class="btn-group btn-group-toggle" data-toggle="buttons">
-    {% if not selected_acct %}
+    {% if not selected_accounts %}
     <label
       class="btn btn-outline-primary active"
       onclick="document.getElementById('acctForm').submit();"
     >
-      <input type="radio" name="acct" value="" checked />
+      <input type="radio" name="acct_info" value="" checked />
       All Accounts
     </label>
     {% else %}
@@ -18,15 +22,16 @@
       class="btn btn-outline-primary"
       onclick="document.getElementById('acctForm').submit();"
     >
-      <input type="radio" name="acct" value="" />
+      <input type="radio" name="acct_info" value="" />
       All Accounts
     </label>
-    {% endif %} {% for acct in acct_infos %} {% if selected_acct == acct %}
+    {% endif %}<span></span>{% for acct in available_accounts %}<span> </span>
+    {% if acct in selected_accounts %}
     <label
       class="btn btn-outline-primary active"
       onclick="document.getElementById('acctForm').submit();"
     >
-      <input type="radio" name="acct" value="{{ acct }}" checked />
+      <input type="radio" name="acct_info" value="{{ acct }}" checked />
       {{ acct }}
     </label>
     {% else %}
@@ -34,7 +39,7 @@
       class="btn btn-outline-primary"
       onclick="document.getElementById('acctForm').submit();"
     >
-      <input type="radio" name="acct" value="{{ acct }}" />
+      <input type="radio" name="acct_info" value="{{ acct }}" />
       {{ acct }}
     </label>
     {% endif %} {% endfor %}

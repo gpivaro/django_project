@@ -1,26 +1,6 @@
-# assuming your upload logic lives here
-# Standard library
-from django.views.generic import TemplateView
-from .mixins import AccountSelectionMixin
-from .models import Statements
-from django.db.models import Sum
-from myfinances.utils import banktransactions_upload
-from myfinances.models import Statements
-from django.shortcuts import render
-from django.urls import reverse_lazy
-from django.views.generic import DeleteView
-from django.views.generic import UpdateView
-from myfinances.models import CategoryList
-from django.views.generic import CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-import csv
-import io
-from datetime import date, timedelta
-
-# Third-party
-import pandas as pd
-
+# ============================================================
 # Django core
+# ============================================================
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -35,22 +15,77 @@ from django.urls import reverse, reverse_lazy
 from django.utils.dateparse import parse_date
 from django.utils.timezone import now
 from django.views import View
-from django.db import IntegrityError
 from django.views.generic import (
-    TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
+    TemplateView, ListView, DetailView,
+    CreateView, UpdateView, DeleteView
 )
 
-# Local apps
-from .forms import ItemForm, StatementForm
-from .models import Categories, Users, Item, Statements, CategoryList
-from .utils import banktransactions_upload, label_transactions
+# ============================================================
+# Third‑party
+# ============================================================
+import pandas as pd
 
-# To create API using rest framework
+# ============================================================
+# Standard library
+# ============================================================
+import csv
+import io
+from datetime import date, timedelta
+
+# ============================================================
+# Local apps: models
+# ============================================================
+from myfinances.models import (
+    Categories,
+    Users,
+    Item,
+    Statements,
+    CategoryList,
+)
+
+# ============================================================
+# Local apps: forms
+# ============================================================
+from myfinances.forms import (
+    ItemForm,
+    StatementForm,
+)
+
+# ============================================================
+# Local apps: mixins
+# ============================================================
+from myfinances.mixins import AccountSelectionMixin
+
+# ============================================================
+# Local apps: utils
+# ============================================================
+from myfinances.utils import (
+    banktransactions_upload,
+    label_transactions,
+)
+
+# Balance Sheet utilities (new module)
+from myfinances.utils import (
+    get_filtered_queryset,
+    get_category_totals,
+    get_label_summary,
+    get_chart_data,
+    get_predefined_ranges,
+    export_balance_sheet_csv,
+)
+
+# ============================================================
+# Django REST Framework
+# ============================================================
 from rest_framework import viewsets
-from .serializers import CategoriesSerializer, UsersSerializer
-
+from myfinances.serializers import (
+    CategoriesSerializer,
+    UsersSerializer,
+)
 
 # Using rest framework out of the box view that handles CRUD
+
+
 class CategoriesView(viewsets.ModelViewSet):
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
@@ -795,164 +830,108 @@ class TransactionsDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
         return transaction.user_group in self.request.user.groups.all()
 
 
-def balance_sheet(request):
+class BalanceSheetView(LoginRequiredMixin, AccountSelectionMixin, View):
     """
-    Balance Sheet View with optional CSV export and predefined date ranges.
+    Render the Balance Sheet page with full filtering, chart data, category
+    summaries, and optional CSV export.
+
+    This view delegates all business logic to helper functions in
+    `balance_sheet_utils.py`, keeping the class lightweight and focused on
+    request handling and context assembly.
+
+    Responsibilities:
+    - Apply account, date, and category filters via `get_filtered_queryset()`
+    - Compute category totals, grand total, label summaries, and chart data
+    - Provide predefined date ranges for quick filtering
+    - Integrate the reusable account-selection architecture
+    - Handle CSV export without rendering the template
     """
 
-    # --- Step 1: Extract query parameters ---
-    start_date_str = request.GET.get("start_date")
-    end_date_str = request.GET.get("end_date")
-    acct_info = request.GET.get("acct_info")
-    category = request.GET.get("category")
-    export = request.GET.get("export")
+    template_name = "myfinances/balance_sheet.html"
 
-    # --- Step 2: Parse dates ---
-    start_date = parse_date(start_date_str) if start_date_str else None
-    end_date = parse_date(end_date_str) if end_date_str else None
+    def get(self, request):
+        """
+        Handle GET requests for the Balance Sheet.
 
-    if start_date and not end_date:
-        end_date = now().date()
+        Workflow:
+        1. Build the filtered queryset based on request parameters.
+        2. Compute all derived data (totals, summaries, chart data).
+        3. If `export=csv` is present, return a CSV file immediately.
+        4. Otherwise, assemble the full template context including:
+           - Filtered statements
+           - Category totals and grand total
+           - Label summary and chart data
+           - Selected/available accounts (via AccountSelectionMixin)
+           - Predefined date ranges for quick filtering
+        5. Render the Balance Sheet template.
+        """
 
-    # --- Step 4: Base queryset (✅ group-based filter) ---
-    qs = Statements.objects.filter(
-        user_group__in=request.user.groups.all()
-    )
+        # ------------------------------------------------------------
+        # 1. Build queryset using shared filtering logic
+        # ------------------------------------------------------------
+        qs = get_filtered_queryset(request)
 
-    if acct_info:
-        qs = qs.filter(Acct_Info=acct_info)
+        # Apply account filtering explicitly (ensures consistency)
+        selected_accounts = self.get_selected_accounts(request)
+        if selected_accounts:
+            qs = qs.filter(Acct_Info__in=selected_accounts)
 
-    if start_date and end_date:
-        qs = qs.filter(Posting_Date__range=[start_date, end_date])
+        # ------------------------------------------------------------
+        # 2. Compute derived data
+        # ------------------------------------------------------------
+        category_totals, grand_total = get_category_totals(qs)
+        label_summary = get_label_summary(qs)
+        chart_data = get_chart_data(qs)
 
-    if category and category != "all":
-        qs = qs.filter(Category__name=category)
+        # ------------------------------------------------------------
+        # 3. Extract raw filter parameters
+        # ------------------------------------------------------------
+        start_date_str = request.GET.get("start_date")
+        end_date_str = request.GET.get("end_date")
+        category = request.GET.get("category")
+        export = request.GET.get("export")
 
-    # --- Step 8: Group by Category ---
-    category_totals = (
-        qs.values("Category_id", "Category__name", "Category__label")
-          .annotate(total_amount=Sum("Amount"))
-          .order_by("Category__name")
-    )
+        # ------------------------------------------------------------
+        # 4. CSV export bypasses template rendering
+        # ------------------------------------------------------------
+        if export == "csv":
+            return export_balance_sheet_csv(
+                category_totals,
+                start_date_str,
+                end_date_str,
+                selected_accounts,   # normalized list
+                category,
+            )
 
-    grand_total = sum(row["total_amount"] or 0 for row in category_totals)
+        # ------------------------------------------------------------
+        # 5. Predefined date ranges
+        # ------------------------------------------------------------
+        ranges = get_predefined_ranges()
 
-    # --- Step 10: Summarize by label ---
-    label_summary = (
-        qs.values("Category__label")
-        .annotate(total_amount=Sum("Amount"))
-        .order_by("-total_amount")
-    )
+        # ------------------------------------------------------------
+        # 6. Build template context
+        # ------------------------------------------------------------
+        context = {
+            "statements": qs,  # required for test suite
+            "category_totals": category_totals,
+            "grand_total": grand_total,
+            "label_summary": label_summary,
+            "chart_data": chart_data,
 
-    # --- Step 11: Monthly totals by label ---
-    monthly_data = (
-        qs.annotate(month=TruncMonth("Posting_Date"))
-          .values("month", "Category__label")
-          .annotate(total_amount=Sum("Amount"))
-          .order_by("month", "Category__label")
-    )
+            "start_date": start_date_str,
+            "end_date": end_date_str,
 
-    chart_data = {}
-    for row in monthly_data:
-        month = row["month"].strftime("%Y-%m")
-        label = row["Category__label"]
-        chart_data.setdefault(label, {})[month] = float(
-            row["total_amount"] or 0)
+            # Reusable account selector
+            "available_accounts": self.get_available_accounts(request),
+            "selected_accounts": selected_accounts,
 
-    # ✅ Account infos also scoped by group
-    acct_infos = (
-        Statements.objects.filter(user_group__in=request.user.groups.all())
-        .values_list("Acct_Info", flat=True)
-        .distinct()
-    )
-    acct_infos = sorted(set(acct.strip() for acct in acct_infos if acct))
+            "categories": CategoryList.objects.all(),
 
-    categories = CategoryList.objects.all()
+            # Predefined ranges unpacked
+            **ranges,
+        }
 
-    # --- Step X: Handle CSV export ---
-    if export == "csv":
-        timestamp = now().strftime("%Y%m%d_%H%M%S")
-        filename = f"balance_sheet_{timestamp}.csv"
-
-        response = HttpResponse(content_type="text/csv")
-        response["Content-Disposition"] = f'attachment; filename="{filename}"'
-        writer = csv.writer(response)
-        # Header row with filters
-        writer.writerow([
-            f"Balance Sheet Export ({timestamp})",
-            f"Start Date: {start_date_str or 'N/A'}",
-            f"End Date: {end_date_str or 'N/A'}",
-            f"Account: {acct_info or 'All'}",
-            f"Category: {category or 'All'}",
-            f"Generated: {now().strftime('%Y-%m-%d %H:%M:%S')}",
-            f"Records: {len(category_totals)}"
-        ])
-        writer.writerow([])  # blank line
-        # Column headers
-        writer.writerow(["Category", "Label", "Total"])
-        # Data rows
-        for row in category_totals:
-            writer.writerow([
-                row["Category__name"] or "Uncategorized",
-                row["Category__label"],
-                f"{row['total_amount']:.2f}"
-            ])
-        # Grand total
-        writer.writerow(["TOTAL", "", f"{grand_total:.2f}"])
-        return response
-
-    # --- Step 14: Predefined ranges ---
-    today = now().date()
-    # Current month
-    current_month_start = today.replace(day=1)
-    current_month_end = today
-    # Last month
-    first_day_this_month = today.replace(day=1)
-    last_month_end = first_day_this_month - timedelta(days=1)
-    last_month_start = last_month_end.replace(day=1)
-    # Last 3 months (start at first day of month 3 months ago, end at last day of previous month)
-    month = today.month - 3
-    year = today.year
-    if month <= 0:
-        month += 12
-        year -= 1
-    three_months_start = date(year, month, 1)
-    # End = last day of last month
-    three_months_end = last_month_end
-    # Last year
-    last_year_start = date(today.year - 1, 1, 1)
-    last_year_end = date(today.year - 1, 12, 31)
-    # Current year
-    current_year_start = date(today.year, 1, 1)
-    current_year_end = today
-
-    # --- Step 15: Build context ---
-    context = {
-        "statements": qs,  # <-- REQUIRED FOR TESTS
-        "category_totals": category_totals,
-        "grand_total": grand_total,
-        "label_summary": label_summary,
-        "chart_data": chart_data,
-        "start_date": start_date_str,
-        "end_date": end_date_str or str(end_date),
-        "acct_infos": acct_infos,
-        "selected_acct": acct_info,
-        "categories": categories,
-        # Predefined ranges
-        "today": today,
-        "current_month_start": current_month_start,
-        "current_month_end": current_month_end,
-        "last_month_start": last_month_start,
-        "last_month_end": last_month_end,
-        "three_months_start": three_months_start,
-        "three_months_end": three_months_end,
-        "last_year_start": last_year_start,
-        "last_year_end": last_year_end,
-        "current_year_start": current_year_start,
-        "current_year_end": current_year_end,
-    }
-
-    return render(request, "myfinances/balance_sheet.html", context)
+        return render(request, self.template_name, context)
 
 
 class LandingPageView(LoginRequiredMixin, AccountSelectionMixin, TemplateView):
@@ -960,22 +939,26 @@ class LandingPageView(LoginRequiredMixin, AccountSelectionMixin, TemplateView):
     LandingPageView
 
     This view renders the main dashboard/landing page for the user.
-    It now supports *account-level filtering* based on the Acct_Info
-    field of Statements.
+    It now uses the unified reusable account-selection architecture
+    shared across the entire application.
 
-    New Feature:
-    ------------
-    - The user can select which account (Acct_Info) to view using
-      radio buttons on the landing page.
-    - The selected account is passed via GET (?acct=XXXX).
-    - All landing page metrics are recalculated based on the selected account.
+    Account Selection (Updated Architecture)
+    ----------------------------------------
+    - The user selects one or more accounts via the reusable
+      account_selector.html component.
+    - The selected account(s) are passed via GET (?acct_info=...).
+    - AccountSelectionMixin provides:
+        * get_available_accounts()
+        * get_selected_accounts()
+    - Filtering is now performed directly in the queryset using
+      the selected account list.
 
     Notes:
     ------
     - All queries remain group-scoped for security.
     - If no account is selected, all accounts are included.
-    - Account filtering logic is now centralized via AccountSelectionMixin
-      and utils.apply_account_filter() for reuse across all views.
+    - This view no longer uses the old apply_account_filter() or
+      get_acct_infos() methods.
     """
 
     template_name = "myfinances/landing.html"
@@ -993,19 +976,26 @@ class LandingPageView(LoginRequiredMixin, AccountSelectionMixin, TemplateView):
         )
 
         # ------------------------------------------------------------
-        # 2. Apply account filter using shared utility
-        #    Returns filtered queryset + selected account value
+        # 2. Account filtering (new architecture)
+        #    - selected_accounts is a list (possibly empty)
+        #    - If empty: no filtering applied
         # ------------------------------------------------------------
-        qs, selected_acct = self.apply_account_filter(self.request, qs)
+        selected_accounts = self.get_selected_accounts(self.request)
+
+        if selected_accounts:
+            qs = qs.filter(Acct_Info__in=selected_accounts)
 
         # ------------------------------------------------------------
-        # 3. Add account selector context (list of accounts + selected one)
+        # 3. Add account selector context
+        #    - available_accounts: list of all accounts for the user
+        #    - selected_accounts: list of chosen accounts
         # ------------------------------------------------------------
-        context["acct_infos"] = self.get_acct_infos(self.request)
-        context["selected_acct"] = selected_acct
+        context["available_accounts"] = self.get_available_accounts(
+            self.request)
+        context["selected_accounts"] = selected_accounts
 
         # ------------------------------------------------------------
-        # 4. Landing page metrics (now account-aware)
+        # 4. Landing page metrics (account-aware)
         # ------------------------------------------------------------
         context["total_transactions"] = qs.count()
         context["uncategorized_count"] = qs.filter(
@@ -1017,7 +1007,7 @@ class LandingPageView(LoginRequiredMixin, AccountSelectionMixin, TemplateView):
         return context
 
 
-class BulkCategoryUpdateView(View):
+class BulkCategoryUpdateView(LoginRequiredMixin, View):
     """
     BulkCategoryUpdateView
 

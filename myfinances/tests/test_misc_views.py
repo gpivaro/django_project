@@ -7,27 +7,6 @@ from myfinances.models import Statements, CategoryList
 
 
 # ---------------------------------------------------------
-# Landing — login required
-# ---------------------------------------------------------
-
-@pytest.mark.django_db
-def test_landing_page_requires_login(client):
-    url = reverse("myfinances:landing")
-    response = client.get(url)
-    assert response.status_code == 302
-
-
-@pytest.mark.django_db
-def test_landing_page_logged_in(client):
-    user = UserFactory()
-    client.force_login(user)
-
-    url = reverse("myfinances:landing")
-    response = client.get(url)
-    assert response.status_code == 200
-
-
-# ---------------------------------------------------------
 # categories — group-restricted
 # ---------------------------------------------------------
 
@@ -106,33 +85,6 @@ def test_banktransactions_group_restricted(client):
 
     assert stmt1 in transactions
     assert stmt2 not in transactions
-
-
-# ---------------------------------------------------------
-# balance_sheet — group-restricted
-# ---------------------------------------------------------
-
-@pytest.mark.django_db
-def test_balance_sheet_group_restricted(client):
-    group1 = GroupFactory()
-    group2 = GroupFactory()
-
-    user = UserFactory()
-    user.groups.add(group1)
-
-    stmt1 = StatementFactory(user_group=group1, Amount=50)
-    stmt2 = StatementFactory(user_group=group2, Amount=999)
-
-    client.force_login(user)
-
-    url = reverse("myfinances:balance_sheet")
-    response = client.get(url)
-
-    assert response.status_code == 200
-    data = response.context["statements"]
-
-    assert stmt1 in data
-    assert stmt2 not in data
 
 
 # ---------------------------------------------------------

@@ -1,3 +1,10 @@
+from myfinances.models import Statements
+from django.http import HttpResponse
+from datetime import date, timedelta
+from django.utils.dateparse import parse_date
+from django.utils.timezone import now
+from django.db.models.functions import TruncMonth
+from django.db.models import Sum
 from django.contrib.auth.models import Group
 import os
 import csv
@@ -236,3 +243,169 @@ def apply_account_filter(request, qs):
         qs = qs.filter(Acct_Info=selected_acct)
 
     return qs, selected_acct
+
+
+def get_filtered_queryset(request):
+    """
+    Return a queryset of Statements filtered by:
+    - The user's group membership (security boundary)
+    - Optional date range (Posting_Date)
+    - Optional category name
+
+    Notes:
+    ------
+    • Account filtering is intentionally NOT done here.
+      The BalanceSheetView applies account filtering via
+      `get_selected_accounts()` using Acct_Info__in, which
+      correctly supports multi-account selection.
+
+    • This function must remain side‑effect free and only
+      apply filters that are universally valid across all
+      Balance Sheet operations (CSV export, charts, totals).
+    """
+
+    # ------------------------------------------------------------
+    # 1. Base queryset: always group‑scoped for security
+    # ------------------------------------------------------------
+    qs = Statements.objects.filter(
+        user_group__in=request.user.groups.all()
+    )
+
+    # ------------------------------------------------------------
+    # 2. Extract raw GET parameters
+    # ------------------------------------------------------------
+    start_date_str = request.GET.get("start_date")
+    end_date_str = request.GET.get("end_date")
+    category = request.GET.get("category")
+
+    # ------------------------------------------------------------
+    # 3. Parse dates safely
+    # ------------------------------------------------------------
+    start_date = parse_date(start_date_str) if start_date_str else None
+    end_date = parse_date(end_date_str) if end_date_str else None
+
+    # If user provides only a start date, assume "until today"
+    if start_date and not end_date:
+        end_date = now().date()
+
+    # ------------------------------------------------------------
+    # 4. Apply date filtering using the correct model field
+    # ------------------------------------------------------------
+    if start_date and end_date:
+        qs = qs.filter(Posting_Date__range=[start_date, end_date])
+
+    # ------------------------------------------------------------
+    # 5. Apply category filtering
+    # ------------------------------------------------------------
+    if category and category != "all":
+        qs = qs.filter(Category__name=category)
+
+    return qs
+
+
+def get_category_totals(qs):
+    totals = (
+        qs.values("Category_id", "Category__name", "Category__label")
+          .annotate(total_amount=Sum("Amount"))
+          .order_by("Category__name")
+    )
+    grand_total = sum(row["total_amount"] or 0 for row in totals)
+    return totals, grand_total
+
+
+def get_label_summary(qs):
+    return (
+        qs.values("Category__label")
+          .annotate(total_amount=Sum("Amount"))
+          .order_by("-total_amount")
+    )
+
+
+def get_chart_data(qs):
+    monthly_data = (
+        qs.annotate(month=TruncMonth("Posting_Date"))
+          .values("month", "Category__label")
+          .annotate(total_amount=Sum("Amount"))
+          .order_by("month", "Category__label")
+    )
+
+    chart_data = {}
+    for row in monthly_data:
+        month = row["month"].strftime("%Y-%m")
+        label = row["Category__label"]
+        chart_data.setdefault(label, {})[month] = float(
+            row["total_amount"] or 0)
+
+    return chart_data
+
+
+def get_predefined_ranges():
+    today = now().date()
+
+    current_month_start = today.replace(day=1)
+    current_month_end = today
+
+    first_day_this_month = today.replace(day=1)
+    last_month_end = first_day_this_month - timedelta(days=1)
+    last_month_start = last_month_end.replace(day=1)
+
+    month = today.month - 3
+    year = today.year
+    if month <= 0:
+        month += 12
+        year -= 1
+    three_months_start = date(year, month, 1)
+    three_months_end = last_month_end
+
+    last_year_start = date(today.year - 1, 1, 1)
+    last_year_end = date(today.year - 1, 12, 31)
+
+    current_year_start = date(today.year, 1, 1)
+    current_year_end = today
+
+    return {
+        "today": today,
+        "current_month_start": current_month_start,
+        "current_month_end": current_month_end,
+        "last_month_start": last_month_start,
+        "last_month_end": last_month_end,
+        "three_months_start": three_months_start,
+        "three_months_end": three_months_end,
+        "last_year_start": last_year_start,
+        "last_year_end": last_year_end,
+        "current_year_start": current_year_start,
+        "current_year_end": current_year_end,
+    }
+
+
+def export_balance_sheet_csv(category_totals, start_date_str, end_date_str, acct_info, category):
+    timestamp = now().strftime("%Y%m%d_%H%M%S")
+    filename = f"balance_sheet_{timestamp}.csv"
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    writer = csv.writer(response)
+
+    writer.writerow([
+        f"Balance Sheet Export ({timestamp})",
+        f"Start Date: {start_date_str or 'N/A'}",
+        f"End Date: {end_date_str or 'N/A'}",
+        f"Account: {acct_info or 'All'}",
+        f"Category: {category or 'All'}",
+        f"Generated: {now().strftime('%Y-%m-%d %H:%M:%S')}",
+        f"Records: {len(category_totals)}"
+    ])
+    writer.writerow([])
+    writer.writerow(["Category", "Label", "Total"])
+
+    for row in category_totals:
+        writer.writerow([
+            row["Category__name"] or "Uncategorized",
+            row["Category__label"],
+            f"{row['total_amount']:.2f}"
+        ])
+
+    grand_total = sum(row["total_amount"] or 0 for row in category_totals)
+    writer.writerow(["TOTAL", "", f"{grand_total:.2f}"])
+
+    return response

@@ -23,7 +23,10 @@
   </div>
 </div>
 
-<div class="d-flex justify-content-center mb-3">
+{% include "myfinances/components/account_selector.html" %}
+
+
+<div class="d-flex justify-content-center mb-1" style="padding-top: 1rem;">
   <div class="btn-group" role="group">
     <a href="?start_date={{ current_month_start|date:'Y-m-d' }}&end_date={{ current_month_end|date:'Y-m-d' }}" class="btn btn-outline-primary btn-sm">Current Month</a>
     <a href="?start_date={{ last_month_start|date:'Y-m-d' }}&end_date={{ last_month_end|date:'Y-m-d' }}" class="btn btn-outline-primary btn-sm">Last Month</a>
@@ -34,51 +37,69 @@
   </div>
 </div>
 
-<!-- Filter form: date range + account + category -->
-<form method="get" class="form-inline justify-content-center mb-3">
-  <!-- Date range -->
+<!-- ============================================================
+     Balance Sheet Filters
+     Includes:
+       - Reusable account selector component
+       - Date range filters
+       - Category filter
+       - Apply + Reset controls
+     This form submits GET parameters used by BalanceSheetView
+     to filter the queryset and compute totals/chart data.
+   ============================================================ -->
+    
+
+<form method="get" class="form-inline justify-content-center mb-2">
+
+  <!-- ============================
+       Date Range Filters (Row 1)
+       ============================ -->
   <div class="form-group mr-2">
     <label for="start_date" class="mr-2">Start Date</label>
-    <input type="date" id="start_date" name="start_date"
+    <input type="date"
+           id="start_date"
+           name="start_date"
            class="form-control form-control-sm text-center"
-           value="{{ start_date }}" />
+           value="{{ start_date|default_if_none:'' }}">
   </div>
+
   <div class="form-group mr-2">
     <label for="end_date" class="mr-2">End Date</label>
-    <input type="date" id="end_date" name="end_date"
+    <input type="date"
+           id="end_date"
+           name="end_date"
            class="form-control form-control-sm text-center"
-           value="{{ end_date }}" />
+           value="{{ end_date|default_if_none:'' }}">
   </div>
 
-  <!-- Account filter -->
-  <div class="form-group mr-3">
-    <label for="acct_info" class="mr-2">Account</label>
-    <select id="acct_info" name="acct_info" class="form-control form-control-sm">
-      <option value="">All</option>
-      {% for acct in acct_infos %}
-        <option value="{{ acct }}" {% if acct == selected_acct %}selected{% endif %}>
-          {{ acct }}
-        </option>
-      {% endfor %}
-    </select>
-  </div>
+  <!-- Force a new line -->
+  <div class="w-100 my-2"></div>
 
-  <!-- Category filter -->
+  <!-- ============================
+       Category + Buttons (Row 2)
+       ============================ -->
   <div class="form-group mr-3">
     <label for="category" class="mr-2">Category</label>
-    <select id="category" name="category" class="form-control form-control-sm">
+    <select id="category"
+            name="category"
+            class="form-control form-control-sm">
       <option value="all">All Categories</option>
       {% for cat in categories %}
-        <option value="{{ cat.name }}" {% if request.GET.category == cat.name %}selected{% endif %}>
+        <option value="{{ cat.name }}"
+                {% if request.GET.category == cat.name %}selected{% endif %}>
           {{ cat.name }}
         </option>
       {% endfor %}
     </select>
   </div>
 
-  <!-- Apply + Reset buttons -->
   <button type="submit" class="btn btn-primary btn-sm mr-2">Filter</button>
-  <a href="{% url 'myfinances:balance_sheet' %}" class="btn btn-secondary btn-sm">Reset</a>
+
+  <a href="{% url 'myfinances:balance_sheet' %}"
+     class="btn btn-secondary btn-sm">
+    Reset
+  </a>
+
 </form>
 
 <!-- Active filters summary -->
@@ -86,8 +107,13 @@
   {% if start_date and end_date %}
     <span class="badge badge-info mr-2">Date: {{ start_date }} – {{ end_date }}</span>
   {% endif %}
-  {% if selected_acct %}
-    <span class="badge badge-secondary mr-2">Account: {{ selected_acct }}</span>
+  {% if selected_accounts %}
+  <span class="badge badge-secondary mr-2">
+    Account:
+    {% for acct in selected_accounts %}
+      {{ acct }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+  </span>
   {% endif %}
   {% if request.GET.category and request.GET.category != "all" %}
     <span class="badge badge-warning">Category: {{ request.GET.category }}</span>
@@ -142,9 +168,19 @@
 </script>
 
 <div class="d-flex justify-content-center mb-2">
-  <a class="btn btn-outline-primary btn-sm" href="?export=csv{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}{% if selected_acct %}&acct_info={{ selected_acct }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% else %}&category=all{% endif %}">
-    Export CSV
-  </a>
+    {% with encoded=request.GET.urlencode %}
+        {% if selected_accounts %}
+            <a class="btn btn-outline-primary btn-sm"
+               href="?export=csv&acct_info={{ selected_accounts|safe }}&{{ encoded }}">
+                Export CSV
+            </a>
+        {% else %}
+            <a class="btn btn-outline-primary btn-sm"
+               href="?export=csv&{{ encoded }}">
+                Export CSV
+            </a>
+        {% endif %}
+    {% endwith %}
 </div>
 
 <!-- Balance sheet table -->

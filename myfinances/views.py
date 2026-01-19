@@ -561,27 +561,35 @@ def banktransactions(request):
 
 # Using Python Class Views to View Model. Listview
 
-class TransactionsListView(LoginRequiredMixin, ListView):
+class TransactionsListView(LoginRequiredMixin, AccountSelectionMixin, ListView):
     """
     Displays a paginated list of Statement transactions for the logged-in user.
 
+    Now uses the unified account-selection architecture shared across:
+    - Landing Page
+    - Balance Sheet
+    - Bulk Update
+    - Transactions List (this view)
+
     Features:
-    - Pagination with dynamic page size (?page_size=10|20|50|100|all).
-    - Filtering by description (case-insensitive substring match).
-    - Filtering by category (via CategoryList model).
-    - Filtering by date range (?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD).
-    - Displays a total sum of the Amount column for the filtered queryset.
-    - Exposes available categories for dropdown filtering in the template.
-    - CSV export of filtered transactions (?export=csv).
-    - Predefined date ranges for quick selection (current month, last month, last 3 months, last year, current year).
+    - Pagination with dynamic page size (?page_size=10|20|50|100|all)
+    - Filtering by description, category, date range
+    - Account filtering via AccountSelectionMixin
+    - Total amount calculation
+    - Category dropdown
+    - CSV export
+    - Predefined date ranges
     """
 
     model = Statements
-    template_name = 'myfinances/transactions_list.html'
-    context_object_name = 'transactions'
-    ordering = ['-Posting_Date', '-id']
+    template_name = "myfinances/transactions_list.html"
+    context_object_name = "transactions"
+    ordering = ["-Posting_Date", "-id"]
     paginate_by = 20
 
+    # ------------------------------------------------------------
+    # Pagination logic (unchanged)
+    # ------------------------------------------------------------
     def get_paginate_by(self, queryset):
         page_size = self.request.GET.get("page_size")
         description = self.request.GET.get("description")
@@ -597,12 +605,28 @@ class TransactionsListView(LoginRequiredMixin, ListView):
                 return max(1, min(size, 500))
         return self.paginate_by
 
+    # ------------------------------------------------------------
+    # Queryset with unified account filtering
+    # ------------------------------------------------------------
     def get_queryset(self):
-        # ✅ Filter by user_group instead of Owner
-        qs = super().get_queryset().filter(
-            user_group__in=self.request.user.groups.all()
-        ).order_by(*self.ordering)
+        qs = (
+            super()
+            .get_queryset()
+            .filter(user_group__in=self.request.user.groups.all())
+            .select_related("Category")  # N+1 safe
+            .order_by(*self.ordering)
+        )
 
+        # --------------------------------------------------------
+        # ⭐ Unified account selection (same as LandingPageView)
+        # --------------------------------------------------------
+        selected_accounts = self.get_selected_accounts(self.request)
+        if selected_accounts:
+            qs = qs.filter(Acct_Info__in=selected_accounts)
+
+        # --------------------------------------------------------
+        # Additional filters (existing behavior preserved)
+        # --------------------------------------------------------
         description = self.request.GET.get("description")
         category = self.request.GET.get("category")
         start_date_str = self.request.GET.get("start_date")
@@ -620,21 +644,28 @@ class TransactionsListView(LoginRequiredMixin, ListView):
 
         return qs
 
+    # ------------------------------------------------------------
+    # Context with unified account selector
+    # ------------------------------------------------------------
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         qs = self.get_queryset()
+
+        # Categories for dropdown
         ctx["categories"] = CategoryList.objects.all()
+
+        # Total amount + record count
         ctx["total_amount"] = qs.aggregate(total=Sum("Amount"))["total"] or 0
         ctx["record_count"] = qs.count()
 
-        # Expose current page size
+        # Page size
         page_size = self.request.GET.get("page_size")
         if not page_size:
-            if ctx.get('is_paginated'):
-                page_size = str(ctx['paginator'].per_page)
+            if ctx.get("is_paginated"):
+                page_size = str(ctx["paginator"].per_page)
             else:
                 page_size = "all"
-        ctx['current_page_size'] = page_size
+        ctx["current_page_size"] = page_size
 
         # Active filters
         ctx["active_description"] = self.request.GET.get("description", "")
@@ -642,16 +673,24 @@ class TransactionsListView(LoginRequiredMixin, ListView):
         ctx["active_start_date"] = self.request.GET.get("start_date", "")
         ctx["active_end_date"] = self.request.GET.get("end_date", "")
 
-        # Predefined ranges
+        # --------------------------------------------------------
+        # ⭐ Unified account selector context
+        # --------------------------------------------------------
+        ctx["available_accounts"] = self.get_available_accounts(self.request)
+        ctx["selected_accounts"] = self.get_selected_accounts(self.request)
+
+        # --------------------------------------------------------
+        # Predefined date ranges
+        # --------------------------------------------------------
         today = now().date()
-        # Current month
+
         current_month_start = today.replace(day=1)
         current_month_end = today
-        # Last month
+
         first_day_this_month = today.replace(day=1)
         last_month_end = first_day_this_month - timedelta(days=1)
         last_month_start = last_month_end.replace(day=1)
-        # Last 3 months (up to last day of last month)
+
         month = today.month - 3
         year = today.year
         if month <= 0:
@@ -659,30 +698,34 @@ class TransactionsListView(LoginRequiredMixin, ListView):
             year -= 1
         three_months_start = date(year, month, 1)
         three_months_end = last_month_end
-        # Last year
+
         last_year_start = date(today.year - 1, 1, 1)
         last_year_end = date(today.year - 1, 12, 31)
-        # Current year
+
         current_year_start = date(today.year, 1, 1)
         current_year_end = today
 
-        ctx.update({
-            "current_month_start": current_month_start,
-            "current_month_end": current_month_end,
-            "last_month_start": last_month_start,
-            "last_month_end": last_month_end,
-            "three_months_start": three_months_start,
-            "three_months_end": three_months_end,
-            "last_year_start": last_year_start,
-            "last_year_end": last_year_end,
-            "current_year_start": current_year_start,
-            "current_year_end": current_year_end,
-        })
+        ctx.update(
+            {
+                "current_month_start": current_month_start,
+                "current_month_end": current_month_end,
+                "last_month_start": last_month_start,
+                "last_month_end": last_month_end,
+                "three_months_start": three_months_start,
+                "three_months_end": three_months_end,
+                "last_year_start": last_year_start,
+                "last_year_end": last_year_end,
+                "current_year_start": current_year_start,
+                "current_year_end": current_year_end,
+            }
+        )
 
         return ctx
 
+    # ------------------------------------------------------------
+    # CSV Export (unchanged)
+    # ------------------------------------------------------------
     def get(self, request, *args, **kwargs):
-        # Handle CSV export
         if request.GET.get("export") == "csv":
             qs = self.get_queryset()
             timestamp = now().strftime("%Y%m%d_%H%M%S")
@@ -691,35 +734,38 @@ class TransactionsListView(LoginRequiredMixin, ListView):
             response = HttpResponse(content_type="text/csv")
             response["Content-Disposition"] = f'attachment; filename="{filename}"'
             writer = csv.writer(response)
-            # Header row with filters
-            writer.writerow([
-                f"Transactions Export ({timestamp})",
-                f"Description filter: {request.GET.get('description') or 'None'}",
-                f"Category filter: {request.GET.get('category') or 'All'}",
-                f"Date range: {request.GET.get('start_date') or 'N/A'} → {request.GET.get('end_date') or 'N/A'}",
-                f"Generated: {now().strftime('%Y-%m-%d %H:%M:%S')}",
-                f"Records: {qs.count()}"
-            ])
+
+            writer.writerow(
+                [
+                    f"Transactions Export ({timestamp})",
+                    f"Description filter: {request.GET.get('description') or 'None'}",
+                    f"Category filter: {request.GET.get('category') or 'All'}",
+                    f"Date range: {request.GET.get('start_date') or 'N/A'} → {request.GET.get('end_date') or 'N/A'}",
+                    f"Generated: {now().strftime('%Y-%m-%d %H:%M:%S')}",
+                    f"Records: {qs.count()}",
+                ]
+            )
             writer.writerow([])
-            # Column headers
             writer.writerow(
                 ["Date", "Account", "Category", "Description", "Amount"])
-            # Data rows
+
             for tx in qs:
-                writer.writerow([
-                    tx.Posting_Date.strftime("%Y-%m-%d"),
-                    tx.Acct_Info,
-                    tx.Category.name if tx.Category else "Uncategorized",
-                    tx.Description,
-                    f"{tx.Amount:.2f}"
-                ])
-            # Add total row
+                writer.writerow(
+                    [
+                        tx.Posting_Date.strftime("%Y-%m-%d"),
+                        tx.Acct_Info,
+                        tx.Category.name if tx.Category else "Uncategorized",
+                        tx.Description,
+                        f"{tx.Amount:.2f}",
+                    ]
+                )
+
             total = qs.aggregate(total=Sum("Amount"))["total"] or 0
             writer.writerow([])
             writer.writerow(["", "", "", "TOTAL", f"{total:.2f}"])
 
             return response
-        # Normal HTML response
+
         return super().get(request, *args, **kwargs)
 
 
@@ -835,10 +881,6 @@ class BalanceSheetView(LoginRequiredMixin, AccountSelectionMixin, View):
     Render the Balance Sheet page with full filtering, chart data, category
     summaries, and optional CSV export.
 
-    This view delegates all business logic to helper functions in
-    `balance_sheet_utils.py`, keeping the class lightweight and focused on
-    request handling and context assembly.
-
     Responsibilities:
     - Apply account, date, and category filters via `get_filtered_queryset()`
     - Compute category totals, grand total, label summaries, and chart data
@@ -851,19 +893,11 @@ class BalanceSheetView(LoginRequiredMixin, AccountSelectionMixin, View):
 
     def get(self, request):
         """
-        Handle GET requests for the Balance Sheet.
-
         Workflow:
         1. Build the filtered queryset based on request parameters.
         2. Compute all derived data (totals, summaries, chart data).
         3. If `export=csv` is present, return a CSV file immediately.
-        4. Otherwise, assemble the full template context including:
-           - Filtered statements
-           - Category totals and grand total
-           - Label summary and chart data
-           - Selected/available accounts (via AccountSelectionMixin)
-           - Predefined date ranges for quick filtering
-        5. Render the Balance Sheet template.
+        4. Otherwise, assemble the full template context.
         """
 
         # ------------------------------------------------------------
@@ -871,7 +905,7 @@ class BalanceSheetView(LoginRequiredMixin, AccountSelectionMixin, View):
         # ------------------------------------------------------------
         qs = get_filtered_queryset(request)
 
-        # Apply account filtering explicitly (ensures consistency)
+        # Multi-account filtering (standard architecture)
         selected_accounts = self.get_selected_accounts(request)
         if selected_accounts:
             qs = qs.filter(Acct_Info__in=selected_accounts)
@@ -895,6 +929,19 @@ class BalanceSheetView(LoginRequiredMixin, AccountSelectionMixin, View):
         # 4. CSV export bypasses template rendering
         # ------------------------------------------------------------
         if export == "csv":
+
+            # ⭐ Normalize JSON-encoded account lists
+            # Example: ['["CHK1","SAV1"]'] → ["CHK1","SAV1"]
+            if (
+                len(selected_accounts) == 1
+                and isinstance(selected_accounts[0], str)
+                and selected_accounts[0].startswith("[")
+            ):
+                try:
+                    selected_accounts = json.loads(selected_accounts[0])
+                except Exception:
+                    selected_accounts = []
+
             return export_balance_sheet_csv(
                 category_totals,
                 start_date_str,
@@ -912,7 +959,7 @@ class BalanceSheetView(LoginRequiredMixin, AccountSelectionMixin, View):
         # 6. Build template context
         # ------------------------------------------------------------
         context = {
-            "statements": qs,  # required for test suite
+            "statements": qs,
             "category_totals": category_totals,
             "grand_total": grand_total,
             "label_summary": label_summary,
@@ -1055,9 +1102,13 @@ class BulkCategoryUpdateView(LoginRequiredMixin, View):
         qs = Statements.objects.none()  # default: no transactions
 
         if keyword:
-            qs = Statements.objects.filter(
-                Description__icontains=keyword,
-                user_group__in=request.user.groups.all()   # group-scoped filter
+            qs = (
+                Statements.objects
+                .filter(
+                    Description__icontains=keyword,
+                    user_group__in=request.user.groups.all()
+                )
+                .select_related("Category")   # ← FIX
             )
 
         categories = CategoryList.objects.all()
@@ -1086,7 +1137,7 @@ class BulkCategoryUpdateView(LoginRequiredMixin, View):
             qs = Statements.objects.filter(
                 id__in=transaction_ids,
                 user_group__in=request.user.groups.all(),
-            )
+            ).select_related("Category")   # ← FIX
 
             # Apply keyword filter so only visible rows can be deleted
             if keyword:
@@ -1108,7 +1159,7 @@ class BulkCategoryUpdateView(LoginRequiredMixin, View):
             qs = Statements.objects.filter(
                 Description__icontains=keyword,
                 user_group__in=request.user.groups.all()
-            )
+            ).select_related("Category")   # ← FIX
 
         categories = CategoryList.objects.all()
         return render(request, self.template_name, {

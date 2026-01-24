@@ -81,6 +81,25 @@ except:
 # Application definition
 
 INSTALLED_APPS = [
+    # Default django apps
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    'django.contrib.humanize',
+    "debug_toolbar",
+
+    # Django Rest Framework
+    "rest_framework",
+    # Crispy forms for blog app
+    "crispy_forms",
+    "crispy_bootstrap4",
+
+    # Users site app
+    "users.apps.UsersConfig",
+
     # Myfinances app
     "myfinances.apps.MyfinancesappConfig",
     # Analytics app
@@ -92,32 +111,19 @@ INSTALLED_APPS = [
     # Resume site app
     "resumesite.apps.ResumesiteConfig",
     # Blog site app
-    "blog.apps.BlogConfig",
-    # Users site app
-    "users.apps.UsersConfig",
-    # Django Rest Framework
-    "rest_framework",
-    # Crispy forms for blog app
-    "crispy_forms",
-    "crispy_bootstrap4",
-    # Default django apps
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    'django.contrib.humanize'
+    "blog.apps.BlogConfig"
+
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware"
 ]
 
 ROOT_URLCONF = "django_project.urls"
@@ -243,3 +249,8 @@ sentry_sdk.init(
     # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True,
 )
+
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]

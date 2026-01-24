@@ -1,0 +1,169 @@
+<!--
+  statement_filters.html
+  Unified Filter Component for Statement-Based Views
+
+  Responsibilities:
+  - Provide a reusable filter bar for all Statement-related pages.
+  - Supports filtering by:
+        * Description
+        * Category
+        * Date range (start_date, end_date)
+        * Multi-account selection (acct_info)
+  - Automatically preserves unrelated GET parameters (pagination, export flags, etc.)
+  - Integrates with:
+        * AccountSelectionMixin
+        * StatementFilterMixin
+  - Used by:
+        * Transactions List
+        * Balance Sheet
+        * Landing Page
+        * Bulk Update
+        * Any future Statement-based views
+
+  Notes:
+  - This component must be included from templates that need filtering.
+  - Ensure your view provides:
+        available_accounts
+        selected_accounts
+        categories
+        active_description
+        active_category
+        active_start_date
+        active_end_date
+        current_month_start, current_month_end
+        last_month_start, last_month_end
+        three_months_start, three_months_end
+        current_year_start, current_year_end
+        last_year_start, last_year_end
+-->
+
+{% comment %} @formatter:off {% endcomment %}
+
+<form method="get" id="filtersForm" class="mb-3">
+
+  {# ------------------------------------------------------------ #}
+  {# Preserve all GET params except those explicitly overridden   #}
+  {# ------------------------------------------------------------ #}
+  {% for key, value in request.GET.items %}
+    {% if key not in "acct_info start_date end_date category description" %}
+      <input type="hidden" name="{{ key }}" value="{{ value }}">
+    {% endif %}
+  {% endfor %}
+
+  <div class="row">
+
+    {# ------------------------------------------------------------ #}
+    {# Description search                                           #}
+    {# ------------------------------------------------------------ #}
+    <div class="col-md-3 mb-2">
+      <input
+        type="text"
+        name="description"
+        class="form-control"
+        placeholder="Search description..."
+        value="{{ active_description }}"
+        onchange="document.getElementById('filtersForm').submit();"
+      >
+    </div>
+
+    {# ------------------------------------------------------------ #}
+    {# Category dropdown                                            #}
+    {# ------------------------------------------------------------ #}
+    <div class="col-md-3 mb-2">
+      <select
+        name="category"
+        class="form-control"
+        onchange="document.getElementById('filtersForm').submit();"
+      >
+        <option value="all">All Categories</option>
+        {% for cat in categories %}
+          <option value="{{ cat.name }}"
+            {% if active_category == cat.name %}selected{% endif %}
+          >
+            {{ cat.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    {# ------------------------------------------------------------ #}
+    {# Date range inputs                                            #}
+    {# ------------------------------------------------------------ #}
+    <div class="col-md-3 mb-2">
+      <input
+        type="date"
+        name="start_date"
+        class="form-control"
+        value="{{ active_start_date }}"
+        onchange="document.getElementById('filtersForm').submit();"
+      >
+    </div>
+
+    <div class="col-md-3 mb-2">
+      <input
+        type="date"
+        name="end_date"
+        class="form-control"
+        value="{{ active_end_date }}"
+        onchange="document.getElementById('filtersForm').submit();"
+      >
+    </div>
+
+  </div>
+
+  {# -------------------------------------------------------------- #}
+  {# Multi-account selector                                         #}
+  {# -------------------------------------------------------------- #}
+  {% if available_accounts %}
+    <div class="text-center mt-3 mb-2">
+      <small class="text-muted font-weight-bold">Accounts</small>
+    </div>
+
+    <div class="btn-group-toggle d-flex flex-wrap justify-content-center" data-toggle="buttons">
+
+      {# All Accounts #}
+      <label class="btn btn-outline-primary mx-1 {% if not selected_accounts %}active{% endif %}">
+        <input
+          type="checkbox"
+          name="acct_info"
+          value=""
+          {% if not selected_accounts %}checked{% endif %}
+          onchange="document.getElementById('filtersForm').submit();"
+        >
+        All
+      </label>
+
+      {# Individual accounts #}
+      {% for acct in available_accounts %}
+        <label class="btn btn-outline-primary mx-1 {% if acct in selected_accounts %}active{% endif %}">
+          <input
+            type="checkbox"
+            name="acct_info"
+            value="{{ acct }}"
+            {% if acct in selected_accounts %}checked{% endif %}
+            onchange="document.getElementById('filtersForm').submit();"
+          >
+          {{ acct }}
+        </label>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {# -------------------------------------------------------------- #}
+  {# Predefined date ranges                                         #}
+  {# -------------------------------------------------------------- #}
+  <div class="text-center mt-3">
+    <small class="text-muted font-weight-bold">Quick Ranges</small>
+  </div>
+
+  <div class="d-flex flex-wrap justify-content-center mt-2">
+    <button name="start_date" value="{{ current_month_start }}" class="btn btn-sm btn-light mx-1">This Month</button>
+    <button name="start_date" value="{{ last_month_start }}" class="btn btn-sm btn-light mx-1">Last Month</button>
+    <button name="start_date" value="{{ three_months_start }}" class="btn btn-sm btn-light mx-1">Last 3 Months</button>
+    <button name="start_date" value="{{ current_year_start }}" class="btn btn-sm btn-light mx-1">This Year</button>
+    <button name="start_date" value="{{ last_year_start }}" class="btn btn-sm btn-light mx-1">Last Year</button>
+  </div>
+
+</form>
+
+{% comment %} @formatter:on {% endcomment %}

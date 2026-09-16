@@ -22,8 +22,8 @@ def parse_table_line(line):
     """
     Robust CSV parser that respects quoted fields.
     Handles commas inside quotes (e.g., addresses).
+    Uses Python's built-in CSV reader for correctness.
     """
-    # Use Python's CSV reader to parse the line correctly
     reader = csv.reader(StringIO(line), skipinitialspace=True)
     return next(reader)
 
@@ -34,9 +34,21 @@ def parse_table_line(line):
 def gusto_payroll(uploaded_file):
     """
     Ingests a raw Gusto payroll CSV file uploaded via Django.
+
+    Steps:
+    1. Read uploaded CSV file into memory.
+    2. Identify payroll period blocks.
+    3. Extract each payroll table.
+    4. Combine into a single DataFrame.
+    5. Clean, normalize, convert numeric/date fields.
+    6. Generate hash_key for deduplication.
+    7. Load into database.
+    8. Return (inserted_count, skipped_count).
     """
 
-    # Read file directly from Django InMemoryUploadedFile
+    # ---------------------------------------------------------
+    # Step 1: Read file directly from Django InMemoryUploadedFile
+    # ---------------------------------------------------------
     try:
         raw_text = uploaded_file.read().decode("utf-8")
         lines = raw_text.splitlines()
@@ -47,14 +59,11 @@ def gusto_payroll(uploaded_file):
     # ---------------------------------------------------------
     # Step 2: Identify payroll period blocks
     # ---------------------------------------------------------
-    # Gusto payroll CSV contains multiple "Payroll period" sections.
-    # We find the line numbers where each period starts.
     period_indices = []
     for i, line in enumerate(lines):
         if "Payroll period" in line:
             period_indices.append(i)
 
-    # If no payroll periods found, skip ingestion
     if not period_indices:
         print("⚠️ No payroll periods found in Gusto report — skipping.")
         return
@@ -71,7 +80,6 @@ def gusto_payroll(uploaded_file):
         start = period_indices[idx]
         end = period_indices[idx + 1]
 
-        # Extract block of lines belonging to this payroll period
         block = lines[start:end]
 
         # Find header line (contains "Last Name" and "First Name")
@@ -81,7 +89,6 @@ def gusto_payroll(uploaded_file):
                 header_line_index = j
                 break
 
-        # If no header found, skip this block
         if header_line_index is None:
             continue
 
@@ -90,7 +97,6 @@ def gusto_payroll(uploaded_file):
         for line in block[header_line_index:]:
             if line.strip() == "":
                 break
-            # Replace "," with "-" to not split address
             table_lines.append(line)
 
         # Parse header row
@@ -111,14 +117,16 @@ def gusto_payroll(uploaded_file):
             parsed = parse_table_line(line)
             parsed = [p.replace('"', '').strip() for p in parsed]
 
-            # Only accept rows with correct number of columns
             if len(parsed) == len(header) - 1:
                 parsed.append(payroll_period_clean)
                 rows.append(parsed)
 
         # Build DataFrame for this payroll period
         df = pd.DataFrame(rows, columns=header)
+
+        # Drop address column (not needed)
         df = df.drop(columns="Work Address")
+
         tables.append(df)
 
     # ---------------------------------------------------------
@@ -130,8 +138,9 @@ def gusto_payroll(uploaded_file):
     payroll_df = payroll_df[~payroll_df["Last Name"].str.contains(
         "Payroll Totals", na=False)]
 
-    # Build full staff member name
-
+    # ---------------------------------------------------------
+    # Step 4a: Build short staff member name (First + Last Initial)
+    # ---------------------------------------------------------
     payroll_df["Staff Member"] = payroll_df.apply(
         lambda row: build_staff_short_name(
             row["First Name"], row["Last Name"]),
@@ -147,7 +156,9 @@ def gusto_payroll(uploaded_file):
     ]
     payroll_df = payroll_df[cols]
 
-    # Split payroll period into start and end dates
+    # ---------------------------------------------------------
+    # Step 4b: Split payroll period into start and end dates
+    # ---------------------------------------------------------
     payroll_df['Payroll Period Start'] = payroll_df['Payroll Period'].apply(
         lambda x: x.split('-')[0])
     payroll_df['Payroll Period End'] = payroll_df['Payroll Period'].apply(
@@ -171,16 +182,20 @@ def gusto_payroll(uploaded_file):
     payroll_df = payroll_df.reset_index(drop=True)
 
     # ---------------------------------------------------------
-    # Step 5: Load cleaned payroll into DB
+    # Step 5: Clean DataFrame before hashing
     # ---------------------------------------------------------
     payroll_df = payroll_df.replace("", None)
     payroll_df = payroll_df.replace(" ", None)
     payroll_df = payroll_df.replace("nan", None)
     payroll_df = payroll_df.replace("NaN", None)
 
+    # Add initials column
     payroll_df["employee_initials"] = payroll_df["Staff Member"].apply(
         to_initials)
 
+    # ---------------------------------------------------------
+    # Step 5b: Generate hash_key for deduplication
+    # ---------------------------------------------------------
     KEY_COLUMNS = [
         "Staff Member",
         "Payroll Period",
@@ -190,7 +205,12 @@ def gusto_payroll(uploaded_file):
     payroll_df["hash_key"] = payroll_df.apply(
         lambda row: generate_hash(row.to_dict(), KEY_COLUMNS), axis=1)
 
+    # ---------------------------------------------------------
+    # Step 6: Load cleaned payroll into DB
+    # ---------------------------------------------------------
     inserted, skipped = load_gusto_to_db(payroll_df)
+
+    # Return counts to Django view
     return inserted, skipped
 
 

@@ -4,20 +4,52 @@ from clinic_dash_pro.models import GustoPayroll
 
 
 def load_gusto_to_db(gusto_df):
+    """
+    Load cleaned Gusto payroll rows into the database.
+
+    This function:
+    - Iterates through each row in the cleaned DataFrame.
+    - Converts the row into a dictionary.
+    - Performs deduplication using the hash_key column.
+    - Inserts new rows into the GustoPayroll model.
+    - Tracks how many rows were inserted vs skipped.
+    - Prints a load report.
+    - Returns (inserted_count, skipped_count) to the caller.
+
+    Parameters
+    ----------
+    gusto_df : pandas.DataFrame
+        Cleaned payroll data with normalized fields and a hash_key column.
+
+    Returns
+    -------
+    tuple
+        (inserted, skipped)
+        inserted : int — number of new rows added to the database
+        skipped  : int — number of duplicate rows ignored
+    """
+
     inserted = 0
     skipped = 0
 
+    # Iterate through each row in the DataFrame
     for _, row in gusto_df.iterrows():
         row_dict = row.to_dict()
 
-        # Deduplication
+        # ---------------------------------------------------------
+        # Deduplication: skip rows whose hash_key already exists
+        # ---------------------------------------------------------
         exists = GustoPayroll.objects.filter(
-            hash_key=row_dict["hash_key"]).exists()
+            hash_key=row_dict["hash_key"]
+        ).exists()
 
         if exists:
             skipped += 1
             continue
 
+        # ---------------------------------------------------------
+        # Insert new payroll row
+        # ---------------------------------------------------------
         GustoPayroll.objects.create(
             staff_member=row_dict.get("Staff Member"),
             employee_initials=row_dict.get("employee_initials"),
@@ -68,6 +100,9 @@ def load_gusto_to_db(gusto_df):
 
         inserted += 1
 
+    # ---------------------------------------------------------
+    # Load Report
+    # ---------------------------------------------------------
     print("\n=== GUSTO LOAD REPORT ===")
     print(f"Inserted new rows: {inserted}")
     print(f"Skipped duplicates: {skipped}")

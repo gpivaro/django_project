@@ -2,3 +2,29 @@
 <h1>Clinic Dash Pro</h1>
 <p>Welcome to your financial dashboard.</p>
 
+<hr>
+
+<h2>Upload Reports</h2>
+<p>Select a report type below to upload new data.</p>
+
+<div style="margin-top: 20px;">
+
+    <a href="{% url 'upload_gusto' %}">
+        <button style="padding: 10px 20px; margin: 10px; font-size: 16px;">
+            Xero (Categorized Transactions)
+        </button>
+    </a>
+
+    <a href="{% url 'upload_gusto' %}">
+        <button style="padding: 10px 20px; margin: 10px; font-size: 16px;">
+            Gusto (Payroll)
+        </button>
+    </a>
+
+    <a href="{% url 'upload_gusto' %}">
+        <button style="padding: 10px 20px; margin: 10px; font-size: 16px;">
+            Jane (Claims)
+        </button>
+    </a>
+
+</div>

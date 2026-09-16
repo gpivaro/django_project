@@ -1,0 +1,22 @@
+
+<!-- clinic_dash_pro\templates\clinic_dash_pro\upload_gusto.html -->
+<h1>Upload Gusto Payroll</h1>
+
+{% if errors %}
+<div style="color:red;">
+    {% for e in errors %}
+        <p>{{ e }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="gusto" required>
+    <button type="submit">Upload</button>
+</form>
+
+
+<a href="{% url 'clinicdashpro_home' %}">
+    <button style="padding: 10px 20px; margin-top: 20px;">Back to Home</button>
+</a>

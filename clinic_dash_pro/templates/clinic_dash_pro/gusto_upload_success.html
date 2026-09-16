@@ -1,0 +1,12 @@
+<!-- gusto_upload_success.html -->
+<h1>Gusto Upload Successful</h1>
+
+<p>Inserted rows: {{ inserted }}</p>
+<p>Skipped duplicates: {{ skipped }}</p>
+<p>Total rows in database: {{ count }}</p>
+<p>Payroll Period Range: {{ start }} → {{ end }}</p>
+
+
+<a href="{% url 'clinicdashpro_home' %}">
+    <button style="padding: 10px 20px; margin-top: 20px;">Back to Home</button>
+</a>

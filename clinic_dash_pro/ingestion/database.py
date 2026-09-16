@@ -1,5 +1,6 @@
 # database.py
 
+from clinic_dash_pro.models import XeroTransaction
 from clinic_dash_pro.models import GustoPayroll
 
 
@@ -104,6 +105,45 @@ def load_gusto_to_db(gusto_df):
     # Load Report
     # ---------------------------------------------------------
     print("\n=== GUSTO LOAD REPORT ===")
+    print(f"Inserted new rows: {inserted}")
+    print(f"Skipped duplicates: {skipped}")
+    print("==========================\n")
+
+    return inserted, skipped
+
+
+def load_xero_to_db(xero_df):
+    inserted = 0
+    skipped = 0
+
+    for idx, row in xero_df.iterrows():
+        row_dict = row.to_dict()
+
+        if idx % 100 == 0:
+            print(
+                f"[Xero] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}")
+
+        # Deduplication
+        if XeroTransaction.objects.filter(hash_key=row_dict["hash_key"]).exists():
+            skipped += 1
+            continue
+
+        XeroTransaction.objects.create(
+            date=row_dict.get("date"),
+            account_type=row_dict.get("account_type"),
+            related_account=row_dict.get("related_account"),
+            contact=row_dict.get("contact"),
+            description=row_dict.get("description"),
+            debit=row_dict.get("debit"),
+            credit=row_dict.get("credit"),
+            gross=row_dict.get("gross"),
+            category=row_dict.get("category"),
+            hash_key=row_dict.get("hash_key"),
+        )
+
+        inserted += 1
+
+    print("\n=== XERO LOAD REPORT ===")
     print(f"Inserted new rows: {inserted}")
     print(f"Skipped duplicates: {skipped}")
     print("==========================\n")

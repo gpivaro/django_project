@@ -1,8 +1,9 @@
 # views.py
 
 from django.shortcuts import render, redirect
-from clinic_dash_pro.models import GustoPayroll
-from clinic_dash_pro.ingestion.gusto import gusto_payroll
+from clinic_dash_pro.models import GustoPayroll, XeroTransaction
+from clinic_dash_pro.ingestion.gusto import gusto_ingest
+from clinic_dash_pro.ingestion.xero import xero_ingest
 
 
 def clinicdashpro_home(request):
@@ -48,7 +49,7 @@ def upload_gusto(request):
             })
 
         # Run ingestion pipeline
-        inserted, skipped = gusto_payroll(gusto_file)
+        inserted, skipped = gusto_ingest(gusto_file)
 
         # Store ingestion results in session
         request.session["gusto_inserted"] = inserted
@@ -94,6 +95,47 @@ def gusto_upload_success(request):
 
     # Render success page
     return render(request, "clinic_dash_pro/gusto_upload_success.html", {
+        "count": count,
+        "start": start,
+        "end": end,
+        "inserted": inserted,
+        "skipped": skipped,
+    })
+
+
+def upload_xero(request):
+    if request.method == "POST":
+
+        xero_file = request.FILES.get("xero")
+
+        if not xero_file or not xero_file.name.endswith(".xlsx"):
+            return render(request, "clinic_dash_pro/upload_xero.html", {
+                "errors": ["Xero file must be an Excel .xlsx file"]
+            })
+
+        inserted, skipped = xero_ingest(xero_file)
+
+        request.session["xero_inserted"] = inserted
+        request.session["xero_skipped"] = skipped
+
+        return redirect("xero_upload_success")
+
+    return render(request, "clinic_dash_pro/upload_xero.html")
+
+
+def xero_upload_success(request):
+    inserted = request.session.get("xero_inserted", 0)
+    skipped = request.session.get("xero_skipped", 0)
+
+    count = XeroTransaction.objects.count()
+
+    if count > 0:
+        start = XeroTransaction.objects.earliest("date").date
+        end = XeroTransaction.objects.latest("date").date
+    else:
+        start = end = None
+
+    return render(request, "clinic_dash_pro/xero_upload_success.html", {
         "count": count,
         "start": start,
         "end": end,

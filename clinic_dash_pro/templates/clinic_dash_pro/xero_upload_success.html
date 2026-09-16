@@ -1,0 +1,13 @@
+<!-- xero_upload_success.html -->
+<h1>Xero Upload Successful</h1>
+
+<p>Inserted rows: {{ inserted }}</p>
+<p>Skipped duplicates: {{ skipped }}</p>
+<p>Total Xero transactions: {{ count }}</p>
+<p>Date range: {{ start }} → {{ end }}</p>
+
+
+
+<a href="{% url 'clinicdashpro_home' %}">
+    <button style="padding: 10px 20px; margin-top: 20px;">Back to Home</button>
+</a>

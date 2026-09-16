@@ -108,3 +108,35 @@ class GustoPayroll(models.Model):
             "Angela P (2025-06-08 → 2025-06-21)"
         """
         return f"{self.staff_member} ({self.payroll_period_start} → {self.payroll_period_end})"
+
+
+# models.py (add this below GustoPayroll)
+
+class XeroTransaction(models.Model):
+    """
+    Represents a single financial transaction imported from Xero.
+
+    Each row corresponds to one ledger entry.
+    Deduplication is enforced using the `hash_key` field.
+    """
+
+    # Core transaction fields
+    date = models.DateField(null=True, blank=True)
+    account_type = models.CharField(max_length=255, null=True, blank=True)
+    related_account = models.CharField(max_length=255, null=True, blank=True)
+    contact = models.CharField(max_length=255, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+
+    # Monetary fields
+    debit = models.FloatField(null=True, blank=True)
+    credit = models.FloatField(null=True, blank=True)
+    gross = models.FloatField(null=True, blank=True)
+
+    category = models.CharField(max_length=255, null=True, blank=True)
+
+    # Deduplication + audit
+    hash_key = models.CharField(max_length=64, unique=True)
+    insert_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.date} — {self.contact} — {self.description}"

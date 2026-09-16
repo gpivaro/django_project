@@ -1,0 +1,11 @@
+from django.db import connection
+
+with connection.cursor() as cursor:
+    cursor.execute("DROP TABLE IF EXISTS clinic_dash_pro_gustopayroll;")
+    cursor.execute("DROP TABLE IF EXISTS clinic_dash_pro_xerotransaction;")
+    cursor.execute("DELETE FROM django_migrations WHERE app='clinic_dash_pro';")
+
+
+
+python manage.py makemigrations clinic_dash_pro
+python manage.py migrate clinic_dash_pro

@@ -31,7 +31,7 @@ def parse_table_line(line):
 # ---------------------------------------------------------
 # Main Gusto Payroll Ingestion Function
 # ---------------------------------------------------------
-def gusto_payroll(uploaded_file):
+def gusto_ingest(uploaded_file):
     """
     Ingests a raw Gusto payroll CSV file uploaded via Django.
 
@@ -216,4 +216,4 @@ def gusto_payroll(uploaded_file):
 
 # Allow running this file directly
 if __name__ == "__main__":
-    gusto_payroll()
+    gusto_ingest()

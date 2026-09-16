@@ -84,6 +84,9 @@ urlpatterns = [
     path("analytics/", include("analyticsapp.urls")),
     # urls for the Myfinances
     path("myfinances/", include("myfinances.urls")),
+    # urls for the ClinicDashPro
+    path('clinicdashpro/', include('clinic_dash_pro.urls')),
+
 ]
 
 if settings.DEBUG:

@@ -111,7 +111,9 @@ INSTALLED_APPS = [
     # Resume site app
     "resumesite.apps.ResumesiteConfig",
     # Blog site app
-    "blog.apps.BlogConfig"
+    "blog.apps.BlogConfig",
+    # Clinic Dash Pro - SLP OnCAll Financial Suite
+    "clinic_dash_pro.apps.ClinicDashProConfig"
 
 ]
 

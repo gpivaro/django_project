@@ -1,9 +1,10 @@
 # views.py
 
 from django.shortcuts import render, redirect
-from clinic_dash_pro.models import GustoPayroll, XeroTransaction
+from clinic_dash_pro.models import GustoPayroll, XeroTransaction, JaneStaffSale, JaneProcessedClaim
 from clinic_dash_pro.ingestion.gusto import gusto_ingest
 from clinic_dash_pro.ingestion.xero import xero_ingest
+from clinic_dash_pro.ingestion.jane import jane_staff_sales_ingest, jane_processed_claims_ingest
 
 
 def clinicdashpro_home(request):
@@ -136,6 +137,89 @@ def xero_upload_success(request):
         start = end = None
 
     return render(request, "clinic_dash_pro/xero_upload_success.html", {
+        "count": count,
+        "start": start,
+        "end": end,
+        "inserted": inserted,
+        "skipped": skipped,
+    })
+
+
+def upload_jane_staff_sales(request):
+    if request.method == "POST":
+
+        jane_file = request.FILES.get("jane_staff_sales")
+
+        if not jane_file or not jane_file.name.endswith(".csv"):
+            return render(request, "clinic_dash_pro/upload_jane_sales.html", {
+                "errors": ["Jane Sales file must be a CSV file"]
+            })
+
+        inserted, skipped = jane_staff_sales_ingest(jane_file)
+
+        request.session["jane_sales_inserted"] = inserted
+        request.session["jane_sales_skipped"] = skipped
+
+        return redirect("jane_staff_sales_upload_success")
+
+    return render(request, "clinic_dash_pro/upload_jane_staff_sales.html")
+
+
+def jane_staff_sales_upload_success(request):
+    inserted = request.session.get("jane_sales_inserted", 0)
+    skipped = request.session.get("jane_sales_skipped", 0)
+
+    count = JaneStaffSale.objects.count()
+
+    if count > 0:
+        start = JaneStaffSale.objects.earliest("purchase_date").purchase_date
+        end = JaneStaffSale.objects.latest("purchase_date").purchase_date
+    else:
+        start = end = None
+
+    return render(request, "clinic_dash_pro/jane_staff_sales_upload_success.html", {
+        "count": count,
+        "start": start,
+        "end": end,
+        "inserted": inserted,
+        "skipped": skipped,
+    })
+
+
+def upload_jane_processed_claims(request):
+    if request.method == "POST":
+
+        jane_file = request.FILES.get("jane_processed_claims")
+
+        if not jane_file or not jane_file.name.endswith(".csv"):
+            return render(request, "clinic_dash_pro/upload_jane_processed_claims.html", {
+                "errors": ["Jane Processed Claims file must be a CSV file"]
+            })
+
+        inserted, skipped = jane_processed_claims_ingest(jane_file)
+
+        request.session["jane_claims_inserted"] = inserted
+        request.session["jane_claims_skipped"] = skipped
+
+        return redirect("jane_processed_claims_upload_success")
+
+    return render(request, "clinic_dash_pro/upload_jane_processed_claims.html")
+
+
+def jane_processed_claims_upload_success(request):
+    inserted = request.session.get("jane_claims_inserted", 0)
+    skipped = request.session.get("jane_claims_skipped", 0)
+
+    count = JaneProcessedClaim.objects.count()
+
+    if count > 0:
+        start = JaneProcessedClaim.objects.earliest(
+            "payment_date").payment_date
+        end = JaneProcessedClaim.objects.latest("payment_date").payment_date
+    else:
+        start = end = None
+
+    return render(request, "clinic_dash_pro/jane_processed_claims_upload_success.html", {
         "count": count,
         "start": start,
         "end": end,

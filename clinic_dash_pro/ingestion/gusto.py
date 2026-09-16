@@ -9,7 +9,6 @@ from clinic_dash_pro.helper.helper import (
     auto_numeric_columns,
     generate_hash,
     to_initials,
-    normalize_name,
     build_staff_short_name
 )
 from clinic_dash_pro.ingestion.database import load_gusto_to_db

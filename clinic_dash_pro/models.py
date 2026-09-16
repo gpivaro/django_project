@@ -140,3 +140,54 @@ class XeroTransaction(models.Model):
 
     def __str__(self):
         return f"{self.date} — {self.contact} — {self.description}"
+
+
+class JaneStaffSale(models.Model):
+    """
+    Represents a single billing item from Jane's 'Sales by Staff Member' export.
+    Each row corresponds to one billed service.
+    """
+
+    staff_member = models.CharField(max_length=255, null=True, blank=True)
+    employee_initials = models.CharField(max_length=50, null=True, blank=True)
+
+    purchase_date = models.DateField(null=True, blank=True)
+    invoice_date = models.DateField(null=True, blank=True)
+    item = models.CharField(max_length=255, null=True, blank=True)
+    status = models.CharField(max_length=50, null=True, blank=True)
+
+    subtotal = models.FloatField(null=True, blank=True)
+    total = models.FloatField(null=True, blank=True)
+    collected = models.FloatField(null=True, blank=True)
+    balance = models.FloatField(null=True, blank=True)
+
+    # Deduplication + audit
+    hash_key = models.CharField(max_length=64, unique=True)
+    insert_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.purchase_date} — {self.staff_member} — {self.item}"
+
+
+class JaneProcessedClaim(models.Model):
+    """
+    Represents a single payment/claim from Jane's Payments export.
+    """
+
+    payment_date = models.DateField(null=True, blank=True)
+    payer = models.CharField(max_length=255, null=True, blank=True)
+    payment_method = models.CharField(max_length=255, null=True, blank=True)
+    reference_number = models.CharField(max_length=255, null=True, blank=True)
+    applied_to = models.TextField(null=True, blank=True)
+    claim_count = models.FloatField(null=True, blank=True)
+
+    amount = models.FloatField(null=True, blank=True)
+    processing_fee = models.FloatField(null=True, blank=True)
+    amount_paid_to_clinic = models.FloatField(null=True, blank=True)
+
+    # Deduplication + audit
+    hash_key = models.CharField(max_length=64, unique=True)
+    insert_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.payment_date} — {self.payer} — {self.amount}"

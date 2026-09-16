@@ -1,0 +1,10 @@
+<h1>Jane Processed Claims Upload Successful</h1>
+
+<p>Inserted rows: {{ inserted }}</p>
+<p>Skipped duplicates: {{ skipped }}</p>
+<p>Total Jane Claims rows: {{ count }}</p>
+<p>Date range: {{ start }} → {{ end }}</p>
+
+<a href="{% url 'clinicdashpro_home' %}">
+    <button style="padding: 10px 20px; margin-top: 20px;">Back to Home</button>
+</a>

@@ -1,0 +1,19 @@
+<h1>Upload Jane Processed Claims</h1>
+
+{% if errors %}
+<div style="color:red;">
+    {% for e in errors %}
+        <p>{{ e }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="jane_processed_claims" required>
+    <button type="submit">Upload</button>
+</form>
+
+<a href="{% url 'clinicdashpro_home' %}">
+    <button style="padding: 10px 20px; margin-top: 20px;">Back to Home</button>
+</a>

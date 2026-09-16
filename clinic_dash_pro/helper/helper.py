@@ -928,7 +928,42 @@ def get_last_initial(last_name):
     return last_name.strip()[0].upper()
 
 
-def build_staff_short_name(first, last):
-    first = (first or "").strip().title()
+def build_staff_short_name(first=None, last=None, full_name=None):
+    """
+    Builds a short staff name in the format:
+        First L
+    Works whether the caller provides:
+        - first + last
+        - full_name only
+    """
+
+    def clean(s):
+        if not s:
+            return ""
+        return str(s).strip().title()
+
+    def get_last_initial(name):
+        if not name:
+            return ""
+        name = name.strip()
+        return name[0].upper()
+
+    # If full_name is provided, split it
+    if full_name:
+        full_name = clean(full_name)
+
+        parts = full_name.split()
+
+        if len(parts) == 1:
+            # Only one name provided → treat as first name only
+            first = parts[0]
+            last = ""
+        else:
+            first = parts[0]
+            last = parts[-1]  # last token is last name (handles middle names)
+
+    # If first/last provided directly
+    first = clean(first)
     last_initial = get_last_initial(last)
+
     return f"{first} {last_initial}".strip()

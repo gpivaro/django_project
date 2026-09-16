@@ -1,7 +1,7 @@
 # database.py
 
-from clinic_dash_pro.models import XeroTransaction
-from clinic_dash_pro.models import GustoPayroll
+from clinic_dash_pro.models import JaneProcessedClaim
+from clinic_dash_pro.models import GustoPayroll, XeroTransaction, JaneStaffSale, JaneProcessedClaim
 
 
 def load_gusto_to_db(gusto_df):
@@ -34,7 +34,7 @@ def load_gusto_to_db(gusto_df):
     skipped = 0
 
     # Iterate through each row in the DataFrame
-    for _, row in gusto_df.iterrows():
+    for idx, row in gusto_df.iterrows():
         row_dict = row.to_dict()
 
         # ---------------------------------------------------------
@@ -101,6 +101,10 @@ def load_gusto_to_db(gusto_df):
 
         inserted += 1
 
+        if idx % 500 == 0:
+            print(
+                f"[Jane Claims] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(gusto_df):,}")
+
     # ---------------------------------------------------------
     # Load Report
     # ---------------------------------------------------------
@@ -143,9 +147,92 @@ def load_xero_to_db(xero_df):
 
         inserted += 1
 
+        if idx % 500 == 0:
+            print(
+                f"[Jane Claims] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(xero_df):,}")
+
     print("\n=== XERO LOAD REPORT ===")
     print(f"Inserted new rows: {inserted}")
     print(f"Skipped duplicates: {skipped}")
     print("==========================\n")
+
+    return inserted, skipped
+
+
+def load_jane_sales_to_db(jane_df):
+    inserted = 0
+    skipped = 0
+
+    for idx, row in jane_df.iterrows():
+        row_dict = row.to_dict()
+
+        # Deduplication
+        if JaneStaffSale.objects.filter(hash_key=row_dict["hash_key"]).exists():
+            skipped += 1
+            continue
+
+        JaneStaffSale.objects.create(
+            staff_member=row_dict.get("staff_member"),
+            employee_initials=row_dict.get("employee_initials"),
+            purchase_date=row_dict.get("purchase_date"),
+            invoice_date=row_dict.get("invoice_date"),
+            item=row_dict.get("item"),
+            status=row_dict.get("status"),
+            subtotal=row_dict.get("subtotal"),
+            total=row_dict.get("total"),
+            collected=row_dict.get("collected"),
+            balance=row_dict.get("balance"),
+            hash_key=row_dict.get("hash_key"),
+        )
+
+        inserted += 1
+
+        if idx % 500 == 0:
+            print(
+                f"[Jane Staff Sales] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(jane_df):,}")
+
+    print("\n=== JANE SALES LOAD REPORT ===")
+    print(f"Inserted new rows: {inserted}")
+    print(f"Skipped duplicates: {skipped}")
+    print("==============================\n")
+
+    return inserted, skipped
+
+
+def load_jane_processed_claims_to_db(jane_df):
+    inserted = 0
+    skipped = 0
+
+    for idx, row in jane_df.iterrows():
+        row_dict = row.to_dict()
+
+        # Deduplication
+        if JaneProcessedClaim.objects.filter(hash_key=row_dict["hash_key"]).exists():
+            skipped += 1
+            continue
+
+        JaneProcessedClaim.objects.create(
+            payment_date=row_dict.get("payment_date"),
+            payer=row_dict.get("payer"),
+            payment_method=row_dict.get("payment_method"),
+            reference_number=row_dict.get("reference_number"),
+            applied_to=row_dict.get("applied_to"),
+            claim_count=row_dict.get("claim_count"),
+            amount=row_dict.get("amount"),
+            processing_fee=row_dict.get("processing_fee"),
+            amount_paid_to_clinic=row_dict.get("amount_paid_to_clinic"),
+            hash_key=row_dict.get("hash_key"),
+        )
+
+        inserted += 1
+
+        if idx % 500 == 0:
+            print(
+                f"[Jane Claims] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(jane_df):,}")
+
+    print("\n=== JANE PROCESSED CLAIMS LOAD REPORT ===")
+    print(f"Inserted new rows: {inserted}")
+    print(f"Skipped duplicates: {skipped}")
+    print("=========================================\n")
 
     return inserted, skipped

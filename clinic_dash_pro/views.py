@@ -1,6 +1,6 @@
 # views.py
 
-import pandas as pd
+
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
@@ -10,6 +10,7 @@ from clinic_dash_pro.ingestion.gusto import gusto_ingest
 from clinic_dash_pro.ingestion.xero import xero_ingest
 from clinic_dash_pro.ingestion.jane import jane_sessions_ingest, jane_processed_claims_ingest
 from datetime import date, timedelta
+from clinic_dash_pro.reports.generate_reports import GenerateReport
 
 
 @login_required
@@ -360,12 +361,17 @@ def reports_home(request):
     # Pull data for all sources to process
     xero_data = XeroTransaction.objects.all().values()
     gusto_data = GustoPayroll.objects.all().values()
-    jane_staff_data = JaneSessions.objects.all().values()
+    jane_sessions_data = JaneSessions.objects.all().values()
     jane_claims_data = JaneProcessedClaim.objects.all().values()
+
+    # Call the Reporting Section
+    reports = GenerateReport(
+        gusto_data, jane_sessions_data, jane_claims_data, xero_data)
+    reports.get_operational_report()
 
     context = {"xero_data_cnt": len(xero_data),
                "gusto_data_cnt": len(gusto_data),
-               "jane_staff_data_cnt": len(jane_staff_data),
+               "jane_sessions_data_cnt": len(jane_sessions_data),
                "jane_claims_data_cnt": len(jane_claims_data)
                }
 

@@ -12,7 +12,7 @@ current_year = periods["current_year"]
 latest_closed_year = periods["latest_closed_year"]
 
 # ---------------------------------------------------------
-# 6. Operational Expense Report (Xero)
+# 1. Operational Expense Report (Xero)
 # ---------------------------------------------------------
 
 
@@ -183,35 +183,3 @@ def report_operational_expenses(xero_df):
     print(exp_asset_lst_final)
 
     return xero_df, final
-
-
-def get_periods():
-    """
-    Returns:
-        - current_month: Period[M]
-        - latest_closed_month: Period[M]
-        - current_year: Period[Y]
-        - latest_closed_year: Period[Y]
-    """
-
-    today = pd.Timestamp.today()   # <-- FIX: use pandas Timestamp
-
-    # Current month
-    current_month = today.to_period("M")
-
-    # Latest closed month (previous month)
-    latest_closed_month = (today.replace(
-        day=1) - pd.Timedelta(days=1)).to_period("M")
-
-    # Current year
-    current_year = today.to_period("Y")
-
-    # Latest closed year (previous year)
-    latest_closed_year = (today.to_period("Y") - 1)
-
-    return {
-        "current_month": current_month,
-        "latest_closed_month": latest_closed_month,
-        "current_year": current_year,
-        "latest_closed_year": latest_closed_year,
-    }

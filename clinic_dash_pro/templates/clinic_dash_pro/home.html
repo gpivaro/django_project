@@ -145,10 +145,10 @@
         <div class="status-box">
             <div class="status-card">
                 <h3>Jane Staff Sessions</h3>
-                <p>Total records: {{ jane_sales.count }}</p>
-                <p>Date range: {{ jane_sales.start }} → {{ jane_sales.end }}</p>
-                <p>Latest: {{ jane_sales.latest }}</p>
-                {% if jane_sales.stale %}
+                <p>Total records: {{ jane_sessions.count }}</p>
+                <p>Date range: {{ jane_sessions.start }} → {{ jane_sessions.end }}</p>
+                <p>Latest: {{ jane_sessions.latest }}</p>
+                {% if jane_sessions.stale %}
                     <p class="stale">⚠ Over 15 days old</p>
                 {% else %}
                     <p class="fresh">✔ Fresh</p>

@@ -1032,3 +1032,35 @@ def ty_ly_py(df, column):
     df.drop(columns=["year_diff"], inplace=True)
 
     return df
+
+
+def get_periods():
+    """
+    Returns:
+        - current_month: Period[M]
+        - latest_closed_month: Period[M]
+        - current_year: Period[Y]
+        - latest_closed_year: Period[Y]
+    """
+
+    today = pd.Timestamp.today()   # <-- FIX: use pandas Timestamp
+
+    # Current month
+    current_month = today.to_period("M")
+
+    # Latest closed month (previous month)
+    latest_closed_month = (today.replace(
+        day=1) - pd.Timedelta(days=1)).to_period("M")
+
+    # Current year
+    current_year = today.to_period("Y")
+
+    # Latest closed year (previous year)
+    latest_closed_year = (today.to_period("Y") - 1)
+
+    return {
+        "current_month": current_month,
+        "latest_closed_month": latest_closed_month,
+        "current_year": current_year,
+        "latest_closed_year": latest_closed_year,
+    }

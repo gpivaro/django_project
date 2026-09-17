@@ -1,7 +1,7 @@
 # database.py
 
 from clinic_dash_pro.models import JaneProcessedClaim
-from clinic_dash_pro.models import GustoPayroll, XeroTransaction, JaneStaffSale, JaneProcessedClaim
+from clinic_dash_pro.models import GustoPayroll, XeroTransaction, JaneSessions, JaneProcessedClaim
 
 
 def load_gusto_to_db(gusto_df):
@@ -155,7 +155,7 @@ def load_xero_to_db(xero_df):
     return inserted, skipped
 
 
-def load_jane_sales_to_db(jane_df):
+def load_jane_sessions_to_db(jane_df):
     inserted = 0
     skipped = 0
 
@@ -167,11 +167,11 @@ def load_jane_sales_to_db(jane_df):
                 f"[Jane Staff Sales] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(jane_df):,}")
 
         # Deduplication
-        if JaneStaffSale.objects.filter(hash_key=row_dict["hash_key"]).exists():
+        if JaneSessions.objects.filter(hash_key=row_dict["hash_key"]).exists():
             skipped += 1
             continue
 
-        JaneStaffSale.objects.create(
+        JaneSessions.objects.create(
             staff_member=row_dict.get("staff_member"),
             employee_initials=row_dict.get("employee_initials"),
             purchase_date=row_dict.get("purchase_date"),

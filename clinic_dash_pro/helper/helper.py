@@ -974,3 +974,61 @@ def is_stale(latest_date, days=15):
     if not latest_date:
         return True
     return latest_date < (date.today() - timedelta(days=days))
+
+
+def ty_ly_py(df, column):
+    """
+    Classify each row based on the year difference between df[column] and today:
+        TY = This Year
+        LY = Last Year
+        PY = Prior Year (2 years ago)
+        OY = Older Year (3+ years ago)
+
+    Supports:
+        - datetime64 columns
+        - period dtype columns (e.g., period[Y-DEC])
+    """
+
+    current_year = datetime.now().year
+
+    col = df[column]
+
+    # ---------------------------------------------------------
+    # Handle Period dtype (e.g., period[Y-DEC])
+    # ---------------------------------------------------------
+    if isinstance(col.dtype, pd.PeriodDtype):
+        df["year_diff"] = current_year - col.dt.year
+
+    # ---------------------------------------------------------
+    # Handle datetime dtype
+    # ---------------------------------------------------------
+    elif pd.api.types.is_datetime64_any_dtype(col):
+        df["year_diff"] = current_year - col.dt.year
+
+    # ---------------------------------------------------------
+    # Handle object/string dates
+    # ---------------------------------------------------------
+    else:
+        # Convert to datetime safely
+        col_dt = pd.to_datetime(col, errors="coerce")
+        df["year_diff"] = current_year - col_dt.dt.year
+
+    # ---------------------------------------------------------
+    # Classification
+    # ---------------------------------------------------------
+    def classify(diff):
+        if pd.isna(diff):
+            return "OY"
+        if diff == 0:
+            return "TY"
+        if diff == 1:
+            return "LY"
+        if diff == 2:
+            return "PY"
+        return "OY"
+
+    df["ty_ly_py"] = df["year_diff"].apply(classify)
+
+    df.drop(columns=["year_diff"], inplace=True)
+
+    return df

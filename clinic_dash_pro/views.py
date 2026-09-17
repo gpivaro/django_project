@@ -1,15 +1,18 @@
 # views.py
 
+import pandas as pd
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from clinic_dash_pro.models import GustoPayroll, XeroTransaction, JaneStaffSale, JaneProcessedClaim
+from clinic_dash_pro.models import GustoPayroll, XeroTransaction, JaneSessions, JaneProcessedClaim
 from clinic_dash_pro.ingestion.gusto import gusto_ingest
 from clinic_dash_pro.ingestion.xero import xero_ingest
-from clinic_dash_pro.ingestion.jane import jane_staff_sales_ingest, jane_processed_claims_ingest
+from clinic_dash_pro.ingestion.jane import jane_sessions_ingest, jane_processed_claims_ingest
 from datetime import date, timedelta
 
 
+@login_required
 def clinicdashpro_home(request):
 
     def get_model_status(model, date_field):
@@ -40,19 +43,20 @@ def clinicdashpro_home(request):
 
     gusto_status = get_model_status(GustoPayroll, "payroll_period_end")
     xero_status = get_model_status(XeroTransaction, "date")
-    jane_sales_status = get_model_status(JaneStaffSale, "purchase_date")
+    jane_sessions_status = get_model_status(JaneSessions, "purchase_date")
     jane_claims_status = get_model_status(JaneProcessedClaim, "payment_date")
 
     context = {
         "gusto": gusto_status,
         "xero": xero_status,
-        "jane_sales": jane_sales_status,
+        "jane_sessions": jane_sessions_status,
         "jane_claims": jane_claims_status,
     }
 
     return render(request, "clinic_dash_pro/home.html", context)
 
 
+@login_required
 def upload_gusto(request):
     """
     Handle Gusto payroll CSV uploads.
@@ -99,6 +103,7 @@ def upload_gusto(request):
     return render(request, "clinic_dash_pro/upload_gusto.html")
 
 
+@login_required
 def gusto_upload_success(request):
     """
     Display results of the Gusto payroll upload.
@@ -140,6 +145,7 @@ def gusto_upload_success(request):
     })
 
 
+@login_required
 def upload_xero(request):
     if request.method == "POST":
 
@@ -160,6 +166,7 @@ def upload_xero(request):
     return render(request, "clinic_dash_pro/upload_xero.html")
 
 
+@login_required
 def xero_upload_success(request):
     inserted = request.session.get("xero_inserted", 0)
     skipped = request.session.get("xero_skipped", 0)
@@ -181,39 +188,41 @@ def xero_upload_success(request):
     })
 
 
-def upload_jane_staff_sales(request):
+@login_required
+def upload_jane_sessions(request):
     if request.method == "POST":
 
-        jane_file = request.FILES.get("jane_staff_sales")
+        jane_file = request.FILES.get("jane_staff_sessions")
 
         if not jane_file or not jane_file.name.endswith(".csv"):
-            return render(request, "clinic_dash_pro/upload_jane_sales.html", {
-                "errors": ["Jane Sales file must be a CSV file"]
+            return render(request, "clinic_dash_pro/upload_jane_sessions.html", {
+                "errors": ["Jane Sessions file must be a CSV file"]
             })
 
-        inserted, skipped = jane_staff_sales_ingest(jane_file)
+        inserted, skipped = jane_sessions_ingest(jane_file)
 
-        request.session["jane_sales_inserted"] = inserted
-        request.session["jane_sales_skipped"] = skipped
+        request.session["jane_sessions_inserted"] = inserted
+        request.session["jane_sessions_skipped"] = skipped
 
-        return redirect("jane_staff_sales_upload_success")
+        return redirect("jane_sessions_upload_success")
 
-    return render(request, "clinic_dash_pro/upload_jane_staff_sales.html")
+    return render(request, "clinic_dash_pro/upload_jane_sessions.html")
 
 
-def jane_staff_sales_upload_success(request):
-    inserted = request.session.get("jane_sales_inserted", 0)
-    skipped = request.session.get("jane_sales_skipped", 0)
+@login_required
+def jane_sessions_upload_success(request):
+    inserted = request.session.get("jane_sessions_inserted", 0)
+    skipped = request.session.get("jane_sessions_skipped", 0)
 
-    count = JaneStaffSale.objects.count()
+    count = JaneSessions.objects.count()
 
     if count > 0:
-        start = JaneStaffSale.objects.earliest("purchase_date").purchase_date
-        end = JaneStaffSale.objects.latest("purchase_date").purchase_date
+        start = JaneSessions.objects.earliest("purchase_date").purchase_date
+        end = JaneSessions.objects.latest("purchase_date").purchase_date
     else:
         start = end = None
 
-    return render(request, "clinic_dash_pro/jane_staff_sales_upload_success.html", {
+    return render(request, "clinic_dash_pro/jane_sessions_upload_success.html", {
         "count": count,
         "start": start,
         "end": end,
@@ -222,6 +231,7 @@ def jane_staff_sales_upload_success(request):
     })
 
 
+@login_required
 def upload_jane_processed_claims(request):
     if request.method == "POST":
 
@@ -242,6 +252,7 @@ def upload_jane_processed_claims(request):
     return render(request, "clinic_dash_pro/upload_jane_processed_claims.html")
 
 
+@login_required
 def jane_processed_claims_upload_success(request):
     inserted = request.session.get("jane_claims_inserted", 0)
     skipped = request.session.get("jane_claims_skipped", 0)
@@ -282,11 +293,11 @@ def xero_list(request):
     )
 
 
-def jane_sales_list(request):
+def jane_sessions_list(request):
     return generic_list_view(
         request,
-        JaneStaffSale,
-        "Jane Sales Records",
+        JaneSessions,
+        "Jane Sessions Records",
         "purchase_date"
     )
 
@@ -300,6 +311,7 @@ def jane_claims_list(request):
     )
 
 
+@login_required
 def generic_list_view(request, model, title, date_field):
     # Filtering
     q = request.GET.get("q", "").strip()
@@ -340,3 +352,21 @@ def generic_list_view(request, model, title, date_field):
         "sort": sort,
         "q": q,
     })
+
+
+@login_required
+def reports_home(request):
+
+    # Pull data for all sources to process
+    xero_data = XeroTransaction.objects.all().values()
+    gusto_data = GustoPayroll.objects.all().values()
+    jane_staff_data = JaneSessions.objects.all().values()
+    jane_claims_data = JaneProcessedClaim.objects.all().values()
+
+    context = {"xero_data_cnt": len(xero_data),
+               "gusto_data_cnt": len(gusto_data),
+               "jane_staff_data_cnt": len(jane_staff_data),
+               "jane_claims_data_cnt": len(jane_claims_data)
+               }
+
+    return render(request, "clinic_dash_pro/report_home.html", context)

@@ -81,7 +81,18 @@
 <p>Welcome to your financial dashboard.</p>
 
 <hr>
-<h2 class="section-title">Reports Overview</h2>
+<div class="status-wrapper">
+    <div class="status-container">
+        <!-- Report -->
+        <div class="status-box">
+            <a href="{% url 'reports_home' %}">
+                <button class="upload-btn">Go to Reports</button>
+            </a>
+        </div>
+    </div>
+</div>
+
+<h2 class="section-title">Applications Data Overview</h2>
 
 <div class="status-wrapper">
     <div class="status-container">
@@ -143,11 +154,11 @@
                     <p class="fresh">✔ Fresh</p>
                 {% endif %}
             </div>
-            <a href="{% url 'upload_jane_staff_sales' %}">
+            <a href="{% url 'upload_jane_sessions' %}">
                 <button class="upload-btn">Upload Jane Staff Sessions</button>
             </a>
             <br>
-            <a href="{% url 'jane_sales_list' %}">
+            <a href="{% url 'jane_sessions_list' %}">
                 <button class="upload-btn">View Jane Data</button>
             </a>
         </div>
@@ -176,3 +187,7 @@
 
     </div>
 </div>
+
+
+
+

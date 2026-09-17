@@ -142,9 +142,9 @@ class XeroTransaction(models.Model):
         return f"{self.date} — {self.contact} — {self.description}"
 
 
-class JaneStaffSale(models.Model):
+class JaneSessions(models.Model):
     """
-    Represents a single billing item from Jane's 'Sales by Staff Member' export.
+    Represents a single billing item from Jane's 'Sessions by Staff Member' export.
     Each row corresponds to one billed service.
     """
 

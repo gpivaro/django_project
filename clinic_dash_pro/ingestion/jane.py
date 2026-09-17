@@ -2,7 +2,7 @@ import pandas as pd
 import hashlib
 
 from clinic_dash_pro.helper.helper import normalize_columns, auto_numeric_columns, to_initials, build_staff_short_name
-from clinic_dash_pro.ingestion.database import load_jane_sales_to_db, load_jane_processed_claims_to_db
+from clinic_dash_pro.ingestion.database import load_jane_sessions_to_db, load_jane_processed_claims_to_db
 
 # ---------------------------------------------------------
 # Utility: Count number of claims in applied_to column
@@ -69,9 +69,9 @@ def replace_with_regex(df, column, replace_text, new_text):
     return df
 
 
-def make_jane_sales_hash(row):
+def make_jane_sessions_hash(row):
     """
-    Stable hash for Jane Sales rows.
+    Stable hash for Jane Sessions rows.
     Identical rows inside the same file are treated as distinct.
     Identical rows across uploads are deduped.
     """
@@ -105,15 +105,15 @@ def make_jane_sales_hash(row):
     return hashlib.sha256(key.encode("utf-8")).hexdigest()
 
 
-def jane_staff_sales_ingest(uploaded_file):
+def jane_sessions_ingest(uploaded_file):
     """
-    Ingest Jane 'Sales by Staff Member' CSV file.
+    Ingest Jane 'Sessions by Staff Member' CSV file.
     """
 
     try:
         df = pd.read_csv(uploaded_file)
     except Exception as e:
-        print(f"❌ Error reading Jane Sales file: {e}")
+        print(f"❌ Error reading Jane Sessions file: {e}")
         return 0, 0
 
     jane_df = df.copy()
@@ -153,10 +153,10 @@ def jane_staff_sales_ingest(uploaded_file):
     jane_df["_row_id"] = jane_df.index
 
     # Generate hash keys
-    jane_df["hash_key"] = jane_df.apply(make_jane_sales_hash, axis=1)
+    jane_df["hash_key"] = jane_df.apply(make_jane_sessions_hash, axis=1)
 
     # Load into DB
-    inserted, skipped = load_jane_sales_to_db(jane_df)
+    inserted, skipped = load_jane_sessions_to_db(jane_df)
 
     return inserted, skipped
 

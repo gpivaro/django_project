@@ -1,6 +1,6 @@
-<!-- clinic_dash_pro\templates\clinic_dash_pro\upload_jane_staff_sales.html -->
-
-<h1>Upload Jane Staff Sales Report</h1>
+<!-- clinic_dash_pro\templates\clinic_dash_pro\upload_jane_sessions.html -->
+{% load static %}
+<h1>Upload Jane Sessions Report</h1>
 
 {% if errors %}
 <div style="color:red;">
@@ -12,10 +12,13 @@
 
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    <input type="file" name="jane_staff_sales" required>
+    <input type="file" name="jane_staff_sessions" required>
     <button type="submit">Upload</button>
 </form>
 
+<div class="col-12 col-lg-4">
+<img src="{% static 'staticfiles/clinic_dash_pro/images/jane_sales_by_staff_report.png' %}"/>
+</div>
 <a href="{% url 'clinicdashpro_home' %}">
     <button style="padding: 10px 20px; margin-top: 20px;">Back to Home</button>
 </a>

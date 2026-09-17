@@ -1,5 +1,6 @@
 <!-- home.html -->
 
+
 <style>
     .status-wrapper {
         display: flex;
@@ -89,7 +90,7 @@
         <div class="status-box">
             <div class="status-card">
                 <h3>Gusto Payroll</h3>
-                <p>Total rows: {{ gusto.count }}</p>
+                <p>Total records: {{ gusto.count }}</p>
                 <p>Date range: {{ gusto.start }} → {{ gusto.end }}</p>
                 <p>Latest: {{ gusto.latest }}</p>
                 {% if gusto.stale %}
@@ -101,13 +102,17 @@
             <a href="{% url 'upload_gusto' %}">
                 <button class="upload-btn">Upload Gusto Payroll</button>
             </a>
+            <br>
+            <a href="{% url 'gusto_list' %}">
+                <button class="upload-btn">View Gusto Data</button>
+            </a>
         </div>
 
         <!-- Xero -->
         <div class="status-box">
             <div class="status-card">
                 <h3>Xero Transactions</h3>
-                <p>Total rows: {{ xero.count }}</p>
+                <p>Total records: {{ xero.count }}</p>
                 <p>Date range: {{ xero.start }} → {{ xero.end }}</p>
                 <p>Latest: {{ xero.latest }}</p>
                 {% if xero.stale %}
@@ -119,13 +124,17 @@
             <a href="{% url 'upload_xero' %}">
                 <button class="upload-btn">Upload Xero Transactions</button>
             </a>
+            <br>
+            <a href="{% url 'xero_list' %}">
+                <button class="upload-btn">View Xero Data</button>
+            </a>
         </div>
 
         <!-- Jane Sales -->
         <div class="status-box">
             <div class="status-card">
-                <h3>Jane Sales</h3>
-                <p>Total rows: {{ jane_sales.count }}</p>
+                <h3>Jane Staff Sessions</h3>
+                <p>Total records: {{ jane_sales.count }}</p>
                 <p>Date range: {{ jane_sales.start }} → {{ jane_sales.end }}</p>
                 <p>Latest: {{ jane_sales.latest }}</p>
                 {% if jane_sales.stale %}
@@ -135,7 +144,11 @@
                 {% endif %}
             </div>
             <a href="{% url 'upload_jane_staff_sales' %}">
-                <button class="upload-btn">Upload Jane Sales</button>
+                <button class="upload-btn">Upload Jane Staff Sessions</button>
+            </a>
+            <br>
+            <a href="{% url 'jane_sales_list' %}">
+                <button class="upload-btn">View Jane Data</button>
             </a>
         </div>
 
@@ -143,7 +156,7 @@
         <div class="status-box">
             <div class="status-card">
                 <h3>Jane Claims</h3>
-                <p>Total rows: {{ jane_claims.count }}</p>
+                <p>Total records: {{ jane_claims.count }}</p>
                 <p>Date range: {{ jane_claims.start }} → {{ jane_claims.end }}</p>
                 <p>Latest: {{ jane_claims.latest }}</p>
                 {% if jane_claims.stale %}
@@ -154,6 +167,10 @@
             </div>
             <a href="{% url 'upload_jane_processed_claims' %}">
                 <button class="upload-btn">Upload Jane Claims</button>
+            </a>
+            <br>
+            <a href="{% url 'jane_claims_list' %}">
+                <button class="upload-btn">View Jane Claims Data</button>
             </a>
         </div>
 

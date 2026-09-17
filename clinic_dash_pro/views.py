@@ -1,5 +1,7 @@
 # views.py
 
+from django.core.paginator import Paginator
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from clinic_dash_pro.models import GustoPayroll, XeroTransaction, JaneStaffSale, JaneProcessedClaim
 from clinic_dash_pro.ingestion.gusto import gusto_ingest
@@ -259,4 +261,82 @@ def jane_processed_claims_upload_success(request):
         "end": end,
         "inserted": inserted,
         "skipped": skipped,
+    })
+
+
+def gusto_list(request):
+    return generic_list_view(
+        request,
+        GustoPayroll,
+        "Gusto Payroll Records",
+        "payroll_period_start"
+    )
+
+
+def xero_list(request):
+    return generic_list_view(
+        request,
+        XeroTransaction,
+        "Xero Transactions",
+        "date"
+    )
+
+
+def jane_sales_list(request):
+    return generic_list_view(
+        request,
+        JaneStaffSale,
+        "Jane Sales Records",
+        "purchase_date"
+    )
+
+
+def jane_claims_list(request):
+    return generic_list_view(
+        request,
+        JaneProcessedClaim,
+        "Jane Processed Claims",
+        "payment_date"
+    )
+
+
+def generic_list_view(request, model, title, date_field):
+    # Filtering
+    q = request.GET.get("q", "").strip()
+
+    queryset = model.objects.all()
+
+    if q:
+        queryset = queryset.filter(
+            Q(id__icontains=q) |
+            Q(hash_key__icontains=q) |
+            Q(insert_date__icontains=q)
+        )
+
+    # Sorting
+    sort = request.GET.get("sort", date_field)
+    if sort.startswith("-"):
+        queryset = queryset.order_by(sort)
+    else:
+        queryset = queryset.order_by(sort)
+
+    # Pagination
+    paginator = Paginator(queryset, 50)
+    page = request.GET.get("page")
+    items = paginator.get_page(page)
+
+    # Get all fields dynamically
+    EXCLUDE_FIELDS = ("id", "hash_key", "insert_date")
+
+    fields = [
+        f.name for f in model._meta.get_fields()
+        if f.concrete and f.name not in EXCLUDE_FIELDS
+    ]
+
+    return render(request, "clinic_dash_pro/list_view.html", {
+        "title": title,
+        "items": items,
+        "fields": fields,
+        "sort": sort,
+        "q": q,
     })

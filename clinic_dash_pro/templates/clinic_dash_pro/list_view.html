@@ -1,0 +1,60 @@
+<!-- clinic_dash_pro\templates\clinic_dash_pro\list_view.html -->
+
+{% load getattr_extras %}
+
+<h2 style="text-align:center;">{{ title }}</h2>
+
+<a href="{% url 'clinicdashpro_home' %}">
+    <button style="padding: 10px 20px; margin-top: 20px;">Back to Home</button>
+</a>
+
+
+<div style="text-align:center; margin-bottom:20px;">
+    <form method="GET">
+        <input type="text" name="q" value="{{ q }}" placeholder="Filter..." 
+               style="padding:6px; width:250px;">
+        <button type="submit" style="padding:6px 12px;">Search</button>
+    </form>
+</div>
+
+<table border="1" cellpadding="6" cellspacing="0" style="width:100%; font-size:0.9rem;">
+    <thead>
+        <tr>
+            {% for field in fields %}
+                <th>
+                    <a href="?sort={{ field }}{% if q %}&q={{ q }}{% endif %}">
+                        {{ field }}
+                    </a>
+                    |
+                    <a href="?sort=-{{ field }}{% if q %}&q={{ q }}{% endif %}">
+                        ↓
+                    </a>
+                </th>
+            {% endfor %}
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for item in items %}
+            <tr>
+                {% for field in fields %}
+                    <td>{{ item|get_field:field }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div style="margin-top:20px; text-align:center;">
+    {% if items.has_previous %}
+        <a href="?page={{ items.previous_page_number }}&sort={{ sort }}&q={{ q }}">Previous</a>
+    {% endif %}
+
+    <span style="margin:0 10px;">
+        Page {{ items.number }} of {{ items.paginator.num_pages }}
+    </span>
+
+    {% if items.has_next %}
+        <a href="?page={{ items.next_page_number }}&sort={{ sort }}&q={{ q }}">Next</a>
+    {% endif %}
+</div>

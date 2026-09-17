@@ -25,4 +25,11 @@ urlpatterns = [
          name='jane_staff_sales_upload_success'),
     path("upload/jane/claims/success/", views.jane_processed_claims_upload_success,
          name="jane_processed_claims_upload_success"),
+
+    # Basic List view
+    path("list/gusto/", views.gusto_list, name="gusto_list"),
+    path("list/xero/", views.xero_list, name="xero_list"),
+    path("list/jane/sales/", views.jane_sales_list, name="jane_sales_list"),
+    path("list/jane/claims/", views.jane_claims_list, name="jane_claims_list"),
+
 ]

@@ -37,6 +37,10 @@ def load_gusto_to_db(gusto_df):
     for idx, row in gusto_df.iterrows():
         row_dict = row.to_dict()
 
+        if idx % 500 == 0:
+            print(
+                f"[Gusto Payroll] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(gusto_df):,}")
+
         # ---------------------------------------------------------
         # Deduplication: skip rows whose hash_key already exists
         # ---------------------------------------------------------
@@ -101,10 +105,6 @@ def load_gusto_to_db(gusto_df):
 
         inserted += 1
 
-        if idx % 500 == 0:
-            print(
-                f"[Jane Claims] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(gusto_df):,}")
-
     # ---------------------------------------------------------
     # Load Report
     # ---------------------------------------------------------
@@ -123,9 +123,9 @@ def load_xero_to_db(xero_df):
     for idx, row in xero_df.iterrows():
         row_dict = row.to_dict()
 
-        if idx % 100 == 0:
+        if idx % 500 == 0:
             print(
-                f"[Xero] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}")
+                f"[Xero Claims] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(xero_df):,}")
 
         # Deduplication
         if XeroTransaction.objects.filter(hash_key=row_dict["hash_key"]).exists():
@@ -147,10 +147,6 @@ def load_xero_to_db(xero_df):
 
         inserted += 1
 
-        if idx % 500 == 0:
-            print(
-                f"[Jane Claims] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(xero_df):,}")
-
     print("\n=== XERO LOAD REPORT ===")
     print(f"Inserted new rows: {inserted}")
     print(f"Skipped duplicates: {skipped}")
@@ -165,6 +161,10 @@ def load_jane_sales_to_db(jane_df):
 
     for idx, row in jane_df.iterrows():
         row_dict = row.to_dict()
+
+        if idx % 500 == 0:
+            print(
+                f"[Jane Staff Sales] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(jane_df):,}")
 
         # Deduplication
         if JaneStaffSale.objects.filter(hash_key=row_dict["hash_key"]).exists():
@@ -187,11 +187,7 @@ def load_jane_sales_to_db(jane_df):
 
         inserted += 1
 
-        if idx % 500 == 0:
-            print(
-                f"[Jane Staff Sales] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(jane_df):,}")
-
-    print("\n=== JANE SALES LOAD REPORT ===")
+    print("\n=== JANE STAFF SALES LOAD REPORT ===")
     print(f"Inserted new rows: {inserted}")
     print(f"Skipped duplicates: {skipped}")
     print("==============================\n")
@@ -205,6 +201,10 @@ def load_jane_processed_claims_to_db(jane_df):
 
     for idx, row in jane_df.iterrows():
         row_dict = row.to_dict()
+
+        if idx % 500 == 0:
+            print(
+                f"[Jane Claims] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(jane_df):,}")
 
         # Deduplication
         if JaneProcessedClaim.objects.filter(hash_key=row_dict["hash_key"]).exists():
@@ -225,10 +225,6 @@ def load_jane_processed_claims_to_db(jane_df):
         )
 
         inserted += 1
-
-        if idx % 500 == 0:
-            print(
-                f"[Jane Claims] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(jane_df):,}")
 
     print("\n=== JANE PROCESSED CLAIMS LOAD REPORT ===")
     print(f"Inserted new rows: {inserted}")

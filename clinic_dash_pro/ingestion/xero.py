@@ -121,8 +121,6 @@ def xero_ingest(uploaded_file):
     # Generate hash keys
     xero_df["hash_key"] = xero_df.apply(make_xero_hash, axis=1)
 
-    print(xero_df)
-
     # Load into DB
     inserted, skipped = load_xero_to_db(xero_df)
 

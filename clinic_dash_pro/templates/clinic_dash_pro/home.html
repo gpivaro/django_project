@@ -1,16 +1,18 @@
 <!-- home.html -->
-<h1>Clinic Dash Pro</h1>
-<p>Welcome to your financial dashboard.</p>
-
-<hr>
-<h2>Reports Overview</h2>
 
 <style>
+    .status-wrapper {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
     .status-container {
         display: flex;
         flex-wrap: wrap;
         gap: 15px;
         margin-top: 20px;
+        justify-content: center; /* ensures children are centered too */
     }
 
     .status-box {
@@ -66,84 +68,94 @@
         color: red;
         font-weight: bold;
     }
+    
+    .section-title {
+    text-align: center;
+    }
+
 </style>
 
-<div class="status-container">
 
-    <!-- Gusto -->
-    <div class="status-box">
-        <div class="status-card">
-            <h3>Gusto Payroll</h3>
-            <p>Total rows: {{ gusto.count }}</p>
-            <p>Date range: {{ gusto.start }} → {{ gusto.end }}</p>
-            <p>Latest: {{ gusto.latest }}</p>
-            {% if gusto.stale %}
-                <p class="stale">⚠ Over 15 days old</p>
-            {% else %}
-                <p class="fresh">✔ Fresh</p>
-            {% endif %}
+<h1>Clinic Dash Pro</h1>
+<p>Welcome to your financial dashboard.</p>
+
+<hr>
+<h2 class="section-title">Reports Overview</h2>
+
+<div class="status-wrapper">
+    <div class="status-container">
+
+        <!-- Gusto -->
+        <div class="status-box">
+            <div class="status-card">
+                <h3>Gusto Payroll</h3>
+                <p>Total rows: {{ gusto.count }}</p>
+                <p>Date range: {{ gusto.start }} → {{ gusto.end }}</p>
+                <p>Latest: {{ gusto.latest }}</p>
+                {% if gusto.stale %}
+                    <p class="stale">⚠ Over 15 days old</p>
+                {% else %}
+                    <p class="fresh">✔ Fresh</p>
+                {% endif %}
+            </div>
+            <a href="{% url 'upload_gusto' %}">
+                <button class="upload-btn">Upload Gusto Payroll</button>
+            </a>
         </div>
 
-        <a href="{% url 'upload_gusto' %}">
-            <button class="upload-btn">Upload Gusto Payroll</button>
-        </a>
-    </div>
-
-    <!-- Xero -->
-    <div class="status-box">
-        <div class="status-card">
-            <h3>Xero Transactions</h3>
-            <p>Total rows: {{ xero.count }}</p>
-            <p>Date range: {{ xero.start }} → {{ xero.end }}</p>
-            <p>Latest: {{ xero.latest }}</p>
-            {% if xero.stale %}
-                <p class="stale">⚠ Over 15 days old</p>
-            {% else %}
-                <p class="fresh">✔ Fresh</p>
-            {% endif %}
+        <!-- Xero -->
+        <div class="status-box">
+            <div class="status-card">
+                <h3>Xero Transactions</h3>
+                <p>Total rows: {{ xero.count }}</p>
+                <p>Date range: {{ xero.start }} → {{ xero.end }}</p>
+                <p>Latest: {{ xero.latest }}</p>
+                {% if xero.stale %}
+                    <p class="stale">⚠ Over 15 days old</p>
+                {% else %}
+                    <p class="fresh">✔ Fresh</p>
+                {% endif %}
+            </div>
+            <a href="{% url 'upload_xero' %}">
+                <button class="upload-btn">Upload Xero Transactions</button>
+            </a>
         </div>
 
-        <a href="{% url 'upload_xero' %}">
-            <button class="upload-btn">Upload Xero Transactions</button>
-        </a>
-    </div>
-
-    <!-- Jane Sales -->
-    <div class="status-box">
-        <div class="status-card">
-            <h3>Jane Sales</h3>
-            <p>Total rows: {{ jane_sales.count }}</p>
-            <p>Date range: {{ jane_sales.start }} → {{ jane_sales.end }}</p>
-            <p>Latest: {{ jane_sales.latest }}</p>
-            {% if jane_sales.stale %}
-                <p class="stale">⚠ Over 15 days old</p>
-            {% else %}
-                <p class="fresh">✔ Fresh</p>
-            {% endif %}
+        <!-- Jane Sales -->
+        <div class="status-box">
+            <div class="status-card">
+                <h3>Jane Sales</h3>
+                <p>Total rows: {{ jane_sales.count }}</p>
+                <p>Date range: {{ jane_sales.start }} → {{ jane_sales.end }}</p>
+                <p>Latest: {{ jane_sales.latest }}</p>
+                {% if jane_sales.stale %}
+                    <p class="stale">⚠ Over 15 days old</p>
+                {% else %}
+                    <p class="fresh">✔ Fresh</p>
+                {% endif %}
+            </div>
+            <a href="{% url 'upload_jane_staff_sales' %}">
+                <button class="upload-btn">Upload Jane Sales</button>
+            </a>
         </div>
 
-        <a href="{% url 'upload_jane_staff_sales' %}">
-            <button class="upload-btn">Upload Jane Sales</button>
-        </a>
-    </div>
-
-    <!-- Jane Claims -->
-    <div class="status-box">
-        <div class="status-card">
-            <h3>Jane Claims</h3>
-            <p>Total rows: {{ jane_claims.count }}</p>
-            <p>Date range: {{ jane_claims.start }} → {{ jane_claims.end }}</p>
-            <p>Latest: {{ jane_claims.latest }}</p>
-            {% if jane_claims.stale %}
-                <p class="stale">⚠ Over 15 days old</p>
-            {% else %}
-                <p class="fresh">✔ Fresh</p>
-            {% endif %}
+        <!-- Jane Claims -->
+        <div class="status-box">
+            <div class="status-card">
+                <h3>Jane Claims</h3>
+                <p>Total rows: {{ jane_claims.count }}</p>
+                <p>Date range: {{ jane_claims.start }} → {{ jane_claims.end }}</p>
+                <p>Latest: {{ jane_claims.latest }}</p>
+                {% if jane_claims.stale %}
+                    <p class="stale">⚠ Over 15 days old</p>
+                {% else %}
+                    <p class="fresh">✔ Fresh</p>
+                {% endif %}
+            </div>
+            <a href="{% url 'upload_jane_processed_claims' %}">
+                <button class="upload-btn">Upload Jane Claims</button>
+            </a>
         </div>
 
-        <a href="{% url 'upload_jane_processed_claims' %}">
-            <button class="upload-btn">Upload Jane Claims</button>
-        </a>
     </div>
-
 </div>

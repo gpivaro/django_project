@@ -3,34 +3,147 @@
 <p>Welcome to your financial dashboard.</p>
 
 <hr>
+<h2>Reports Overview</h2>
 
-<h2>Upload Reports</h2>
-<p>Select a report type below to upload new data.</p>
+<style>
+    .status-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 20px;
+    }
 
-<div style="margin-top: 20px;">
+    .status-box {
+        flex: 1;
+        min-width: 220px;
+        max-width: 260px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
 
-    <a href="{% url 'upload_xero' %}">
-        <button style="padding: 10px 20px; margin: 10px; font-size: 16px;">
-            Xero (Categorized Transactions)
-        </button>
-    </a>
+    .status-card {
+        padding: 12px 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: #fafafa;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 10px;
+    }
 
-    <a href="{% url 'upload_gusto' %}">
-        <button style="padding: 10px 20px; margin: 10px; font-size: 16px;">
-            Gusto (Payroll)
-        </button>
-    </a>
+    .status-card h3 {
+        margin-top: 0;
+        font-size: 1rem;
+        margin-bottom: 8px;
+    }
 
-    <a href="{% url 'upload_jane_staff_sales' %}">
-        <button style="padding: 10px 20px; margin: 10px; font-size: 16px;">
-            Jane Staff Sales (Sessions)
-        </button>
-    </a>
+    .status-card p {
+        margin: 4px 0;
+        font-size: 0.85rem;
+    }
 
-    <a href="{% url 'upload_jane_processed_claims' %}">
-        <button style="padding: 10px 20px; margin: 10px; font-size: 16px;">
-            Jane (Processed Claims)
-        </button>
-    </a>
+    .upload-btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        border: none;
+        background: #99a0a7;
+        color: white;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .upload-btn:hover {
+        background: #0056b3;
+    }
+
+    .fresh {
+        color: green;
+        font-weight: bold;
+    }
+
+    .stale {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<div class="status-container">
+
+    <!-- Gusto -->
+    <div class="status-box">
+        <div class="status-card">
+            <h3>Gusto Payroll</h3>
+            <p>Total rows: {{ gusto.count }}</p>
+            <p>Date range: {{ gusto.start }} → {{ gusto.end }}</p>
+            <p>Latest: {{ gusto.latest }}</p>
+            {% if gusto.stale %}
+                <p class="stale">⚠ Over 15 days old</p>
+            {% else %}
+                <p class="fresh">✔ Fresh</p>
+            {% endif %}
+        </div>
+
+        <a href="{% url 'upload_gusto' %}">
+            <button class="upload-btn">Upload Gusto Payroll</button>
+        </a>
+    </div>
+
+    <!-- Xero -->
+    <div class="status-box">
+        <div class="status-card">
+            <h3>Xero Transactions</h3>
+            <p>Total rows: {{ xero.count }}</p>
+            <p>Date range: {{ xero.start }} → {{ xero.end }}</p>
+            <p>Latest: {{ xero.latest }}</p>
+            {% if xero.stale %}
+                <p class="stale">⚠ Over 15 days old</p>
+            {% else %}
+                <p class="fresh">✔ Fresh</p>
+            {% endif %}
+        </div>
+
+        <a href="{% url 'upload_xero' %}">
+            <button class="upload-btn">Upload Xero Transactions</button>
+        </a>
+    </div>
+
+    <!-- Jane Sales -->
+    <div class="status-box">
+        <div class="status-card">
+            <h3>Jane Sales</h3>
+            <p>Total rows: {{ jane_sales.count }}</p>
+            <p>Date range: {{ jane_sales.start }} → {{ jane_sales.end }}</p>
+            <p>Latest: {{ jane_sales.latest }}</p>
+            {% if jane_sales.stale %}
+                <p class="stale">⚠ Over 15 days old</p>
+            {% else %}
+                <p class="fresh">✔ Fresh</p>
+            {% endif %}
+        </div>
+
+        <a href="{% url 'upload_jane_staff_sales' %}">
+            <button class="upload-btn">Upload Jane Sales</button>
+        </a>
+    </div>
+
+    <!-- Jane Claims -->
+    <div class="status-box">
+        <div class="status-card">
+            <h3>Jane Claims</h3>
+            <p>Total rows: {{ jane_claims.count }}</p>
+            <p>Date range: {{ jane_claims.start }} → {{ jane_claims.end }}</p>
+            <p>Latest: {{ jane_claims.latest }}</p>
+            {% if jane_claims.stale %}
+                <p class="stale">⚠ Over 15 days old</p>
+            {% else %}
+                <p class="fresh">✔ Fresh</p>
+            {% endif %}
+        </div>
+
+        <a href="{% url 'upload_jane_processed_claims' %}">
+            <button class="upload-btn">Upload Jane Claims</button>
+        </a>
+    </div>
 
 </div>

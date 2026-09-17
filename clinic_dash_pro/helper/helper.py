@@ -1,5 +1,6 @@
 # helper.py
 
+from datetime import date, timedelta
 import math
 from dateutil import parser
 from datetime import datetime
@@ -967,3 +968,9 @@ def build_staff_short_name(first=None, last=None, full_name=None):
     last_initial = get_last_initial(last)
 
     return f"{first} {last_initial}".strip()
+
+
+def is_stale(latest_date, days=15):
+    if not latest_date:
+        return True
+    return latest_date < (date.today() - timedelta(days=days))

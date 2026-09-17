@@ -5,16 +5,50 @@ from clinic_dash_pro.models import GustoPayroll, XeroTransaction, JaneStaffSale,
 from clinic_dash_pro.ingestion.gusto import gusto_ingest
 from clinic_dash_pro.ingestion.xero import xero_ingest
 from clinic_dash_pro.ingestion.jane import jane_staff_sales_ingest, jane_processed_claims_ingest
+from datetime import date, timedelta
 
 
 def clinicdashpro_home(request):
-    """
-    Render the ClinicDashPro home page.
 
-    This is the landing page for the app and does not perform
-    any data processing. It simply returns the home template.
-    """
-    return render(request, "clinic_dash_pro/home.html")
+    def get_model_status(model, date_field):
+        count = model.objects.count()
+
+        if count == 0:
+            return {
+                "count": 0,
+                "start": None,
+                "end": None,
+                "latest": None,
+                "stale": True,
+            }
+
+        start = model.objects.earliest(date_field).__dict__[date_field]
+        end = model.objects.latest(date_field).__dict__[date_field]
+        latest = end
+
+        stale = latest < (date.today() - timedelta(days=15))
+
+        return {
+            "count": count,
+            "start": start,
+            "end": end,
+            "latest": latest,
+            "stale": stale,
+        }
+
+    gusto_status = get_model_status(GustoPayroll, "payroll_period_end")
+    xero_status = get_model_status(XeroTransaction, "date")
+    jane_sales_status = get_model_status(JaneStaffSale, "purchase_date")
+    jane_claims_status = get_model_status(JaneProcessedClaim, "payment_date")
+
+    context = {
+        "gusto": gusto_status,
+        "xero": xero_status,
+        "jane_sales": jane_sales_status,
+        "jane_claims": jane_claims_status,
+    }
+
+    return render(request, "clinic_dash_pro/home.html", context)
 
 
 def upload_gusto(request):

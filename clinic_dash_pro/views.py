@@ -402,6 +402,9 @@ def reports_home(request):
         gusto_data, jane_sessions_data, jane_claims_data, xero_data)
     monthly_operational_expenses_assets = reports.get_operational_report()
 
-    context = {"report_data": monthly_operational_expenses_assets}
+    monthy_report = reports.get_unified_financials()
+
+    context = {"monthly_operational_expenses_assets": monthly_operational_expenses_assets,
+               "monthy_report": monthy_report}
 
     return render(request, "clinic_dash_pro/report_home.html", context)

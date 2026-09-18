@@ -152,7 +152,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for row in report_data %}
+                {% for row in monthly_operational_expenses_assets %}
                 <tr>
                     <td style="text-align:center;">{{ row.period_month }}</td>
                     <td style="text-align:center;">{{ row.ty_ly_py }}</td>
@@ -178,7 +178,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-{{ report_data|json_script:"report-data-json" }}
+{{ monthly_operational_expenses_assets|json_script:"report-data-json" }}
 
 <script src="{% static 'clinic_dash_pro/js/expenses_monthly_yoy_chart.js' %}"></script>
 

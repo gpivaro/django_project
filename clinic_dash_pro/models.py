@@ -153,8 +153,10 @@ class JaneSessions(models.Model):
 
     purchase_date = models.DateField(null=True, blank=True)
     invoice_date = models.DateField(null=True, blank=True)
+    invoice_number = models.CharField(max_length=50, null=True, blank=True)
     item = models.CharField(max_length=255, null=True, blank=True)
     status = models.CharField(max_length=50, null=True, blank=True)
+    payer = models.CharField(max_length=255, null=True, blank=True)
 
     subtotal = models.FloatField(null=True, blank=True)
     total = models.FloatField(null=True, blank=True)

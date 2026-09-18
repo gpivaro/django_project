@@ -122,8 +122,8 @@ def jane_sessions_ingest(uploaded_file):
     jane_df = normalize_columns(jane_df)
 
     # Drop columns not needed for merging
-    jane_df.drop(columns=['location', 'patient_guid', 'patient',
-                 'payer', 'income_category', 'details'], inplace=True)
+    jane_df.drop(columns=['location', 'patient_guid',
+                 'patient', 'income_category', 'details'], inplace=True)
 
     # Convert dates
     jane_df["purchase_date"] = pd.to_datetime(

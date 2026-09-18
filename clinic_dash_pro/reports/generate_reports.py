@@ -1,6 +1,9 @@
 # clinic_dash_pro\reports\generate_reports
 import pandas as pd
 from .xero_reports import report_operational_expenses
+from .accrual_reports import build_accrual_payroll
+from .revenue_report import merge_claims_sessions
+from .unified_reports import build_unified_financials
 
 
 class GenerateReport:
@@ -32,3 +35,34 @@ class GenerateReport:
             str)
 
         return monthly_operational_expenses_assets.to_dict(orient="records")
+
+    def get_accrual_payroll(self):
+        monthly_payroll_by_staff, monthly_payroll = build_accrual_payroll(
+            self.gusto_df, self.jane_sessions_df)
+
+        return monthly_payroll_by_staff, monthly_payroll
+
+    def get_accrual_revenue(self):
+
+        claims_sessions_merged = merge_claims_sessions(
+            self.jane_claims_df, self.jane_sessions_df)
+        return claims_sessions_merged
+
+    def get_unified_financials(self):
+
+        # Call your own methods
+        monthly_operational = pd.DataFrame(
+            report_operational_expenses(self.xero_df))
+
+        _, monthly_payroll = self.get_accrual_payroll()
+
+        monthly_revenue = self.get_accrual_revenue()
+
+        # Build unified report
+        unified_financials = build_unified_financials(
+            monthly_revenue=monthly_revenue,
+            monthly_payroll=monthly_payroll,
+            monthly_operational=monthly_operational
+        )
+
+        return unified_financials.to_dict(orient="records")

@@ -108,6 +108,7 @@
         font-size: 0.75rem;
     }
 
+    /* Sticky header */
     thead th {
         position: sticky;
         top: 0;
@@ -118,6 +119,26 @@
         font-weight: 600;
         color: #005a9e;
         z-index: 10;
+
+        /* Light vertical column divider */
+        border-right: 1px solid #d0d0d0;
+    }
+
+    thead th:last-child {
+        border-right: none;
+    }
+
+    /* Sort icons */
+    .sort-icon {
+        font-size: 12px;
+        margin-left: 4px;
+        color: #0078D4;
+    }
+
+    /* Column hover highlight */
+    thead th:hover {
+        background-color: #d9ecff;
+        cursor: pointer;
     }
 
     thead th a {
@@ -130,18 +151,33 @@
         text-decoration: underline;
     }
 
+    /* Body cells */
     tbody td {
         padding: 8px 10px;
         border-bottom: 1px solid #ddd;
-        text-align: left;
+        border-right: 1px solid #e3e3e3;
+        text-align: center;
     }
 
+    tbody td:last-child {
+        border-right: none;
+    }
+
+    /* Alternating rows */
     tbody tr:nth-child(even) {
         background-color: #f7f7f7;
     }
 
+    /* Hover highlight */
     tbody tr:hover {
         background-color: #e9f3ff;
+    }
+
+    /* Total row */
+    .total-row {
+        background-color: #e6f2ff;
+        font-weight: 600;
+        text-align: center;
     }
 
     /* Pagination */
@@ -208,10 +244,10 @@
             {% for field in fields %}
                 <th>
                     <a href="?sort={{ field }}{% if q %}&q={{ q }}{% endif %}">
-                        {{ field }}
+                        {{ field }} <span class="sort-icon">▲</span>
                     </a>
                     <a href="?sort=-{{ field }}{% if q %}&q={{ q }}{% endif %}">
-                        ↓
+                        <span class="sort-icon">▼</span>
                     </a>
                 </th>
             {% endfor %}
@@ -226,6 +262,13 @@
                 {% endfor %}
             </tr>
         {% endfor %}
+
+        <!-- TOTAL ROW -->
+        <tr class="total-row">
+            <td colspan="{{ fields|length }}">
+                Total Records: {{ items.paginator.count }}
+            </td>
+        </tr>
     </tbody>
 </table>
 

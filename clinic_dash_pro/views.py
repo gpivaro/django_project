@@ -278,11 +278,36 @@ def jane_processed_claims_upload_success(request):
 
 @login_required
 def gusto_list(request):
+
+    REMOVE_FIELDS = [
+        "time_off_hours",
+        "time_off_amount",
+        "time_off_rate",
+        "employee_type",
+        "payment",
+        "additional_earnings",
+        "federal_income_tax_employee",
+        "social_security_employee",
+        "medicare_employee",
+        "additional_medicare_employee",
+        "social_security_employer",
+        "medicare_employer",
+        "tx_suta_employer",
+        "futa_employer",
+        "reimbursements",
+        "donations",
+        "check_amount",
+        "insert_date",
+        "hash_key",
+        "id",
+    ]
+
     return generic_list_view(
         request,
         GustoPayroll,
         "Gusto Payroll Records",
-        "payroll_period_start"
+        "payroll_period_start",
+        remove_fields=REMOVE_FIELDS
     )
 
 
@@ -317,14 +342,20 @@ def jane_claims_list(request):
 
 
 @login_required
-def generic_list_view(request, model, title, date_field):
+def generic_list_view(request, model, title, date_field, remove_fields=None):
+
     # Filtering
     q = request.GET.get("q", "").strip()
 
     queryset = model.objects.all()
 
-    # Get all fields dynamically
-    EXCLUDE_FIELDS = ("id", "hash_key", "insert_date")
+    # Fields
+    EXCLUDE_DEFAULT = ("id", "hash_key", "insert_date")
+
+    if remove_fields:
+        EXCLUDE_FIELDS = set(EXCLUDE_DEFAULT) | set(remove_fields)
+    else:
+        EXCLUDE_FIELDS = EXCLUDE_DEFAULT
 
     fields = [
         f.name for f in model._meta.get_fields()

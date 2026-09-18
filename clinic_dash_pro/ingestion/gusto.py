@@ -207,6 +207,7 @@ def gusto_ingest(uploaded_file):
     # ---------------------------------------------------------
     # Step 6: Load cleaned payroll into DB
     # ---------------------------------------------------------
+
     inserted, skipped = load_gusto_to_db(payroll_df)
 
     # Return counts to Django view

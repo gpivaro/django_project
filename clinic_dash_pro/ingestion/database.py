@@ -1,5 +1,6 @@
 # database.py
 
+import pandas as pd
 from clinic_dash_pro.models import JaneProcessedClaim
 from clinic_dash_pro.models import GustoPayroll, XeroTransaction, JaneSessions, JaneProcessedClaim
 
@@ -52,6 +53,10 @@ def load_gusto_to_db(gusto_df):
             skipped += 1
             continue
 
+        # FIX: convert NaN → None
+        row_dict = {k: (None if pd.isna(v) else v)
+                    for k, v in row_dict.items()}
+
         # ---------------------------------------------------------
         # Insert new payroll row
         # ---------------------------------------------------------
@@ -62,30 +67,32 @@ def load_gusto_to_db(gusto_df):
             payroll_period=row_dict.get("Payroll Period"),
             department=row_dict.get("Department"),
 
-            regular_hours=row_dict.get("Regular Hours"),
-            regular_amount=row_dict.get("Regular Amount"),
-            regular_rate=row_dict.get("Regular Rate"),
+            regular_hours=row_dict.get("Regular (Hours)"),
+            regular_amount=row_dict.get("Regular (Amount)"),
+            regular_rate=row_dict.get("Regular (Rate)"),
 
-            time_off_hours=row_dict.get("Time Off Hours"),
-            time_off_amount=row_dict.get("Time Off Amount"),
-            time_off_rate=row_dict.get("Time Off Rate"),
+            time_off_hours=row_dict.get("Time Off (Hours)"),
+            time_off_amount=row_dict.get("Time Off (Amount)"),
+            time_off_rate=row_dict.get("Time Off (Rate)"),
 
             additional_earnings=row_dict.get("Additional Earnings"),
             gross_earnings=row_dict.get("Gross Earnings"),
 
             employee_taxes=row_dict.get("Employee Taxes"),
             federal_income_tax_employee=row_dict.get(
-                "Federal Income Tax Employee"),
-            social_security_employee=row_dict.get("Social Security Employee"),
-            medicare_employee=row_dict.get("Medicare Employee"),
+                "Federal Income Tax (Employee)"),
+            social_security_employee=row_dict.get(
+                "Social Security (Employee)"),
+            medicare_employee=row_dict.get("Medicare (Employee)"),
             additional_medicare_employee=row_dict.get(
-                "Additional Medicare Employee"),
+                "Additional Medicare (Employee)"),
 
             employer_taxes=row_dict.get("Employer Taxes"),
-            social_security_employer=row_dict.get("Social Security Employer"),
-            medicare_employer=row_dict.get("Medicare Employer"),
-            tx_suta_employer=row_dict.get("TX SUTA Employer"),
-            futa_employer=row_dict.get("FUTA Employer"),
+            social_security_employer=row_dict.get(
+                "Social Security (Employer)"),
+            medicare_employer=row_dict.get("Medicare (Employer)"),
+            tx_suta_employer=row_dict.get("TX SUTA (Employer)"),
+            futa_employer=row_dict.get("FUTA (Employer)"),
 
             net_pay=row_dict.get("Net Pay"),
             reimbursements=row_dict.get("Reimbursements"),

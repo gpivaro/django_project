@@ -3,245 +3,251 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<style>
-    body {
-        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-        margin: 40px;
-        background-color: #f9f9f9;
-    }
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+        }
 
-    .page-title {
-        font-size: 32px;
-        font-weight: 600;
-        color: #333;
-        text-align: center;
-        margin-bottom: 10px;
-    }
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
 
-    /* Top bar: count + search + clear + back */
-    .top-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-        max-width: 1200px;
-    }
+        /* Top bar: count + search + clear + back */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            max-width: 800px;
+        }
 
-    .record-count {
-        font-size: 16px;
-        color: #444;
-        font-weight: 500;
-    }
+        .record-count {
+            display: flex;
+            font-size: 16px;
+            color: #444;
+            font-weight: 500;
+            background-color:lightgreen;
+            padding: 8px;
+        }
 
-    .search-controls {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+        .search-controls {
+            display: flex;
+            align-items: left;
+            gap: 10px;
+        }
 
-    .search-controls input[type="text"] {
-        padding: 10px;
-        width: 260px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 15px;
-        background: #fff;
-    }
+        .search-controls input[type="text"] {
+            padding: 10px;
+            width: 260px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            background: #fff;
+        }
 
-    .search-controls button {
-        padding: 10px 18px;
-        border: none;
-        border-radius: 6px;
-        font-size: 15px;
-        cursor: pointer;
-    }
+        .search-controls button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+        }
 
-    .search-btn {
-        background-color: #0078D4;
-        color: white;
-    }
+        .search-btn {
+            background-color: #0078D4;
+            color: white;
+        }
 
-    .search-btn:hover {
-        background-color: #005a9e;
-    }
+        .search-btn:hover {
+            background-color: #005a9e;
+        }
 
-    .clear-btn {
-        background-color: #999;
-        color: white;
-    }
+        .clear-btn {
+            background-color: #999;
+            color: white;
+        }
 
-    .clear-btn:hover {
-        background-color: #777;
-    }
+        .clear-btn:hover {
+            background-color: #777;
+        }
 
-    .back-btn {
-        background-color: #666;
-        color: white;
-        padding: 10px 22px;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        cursor: pointer;
-    }
+        .back-btn {
+            background-color: #666;
+            color: white;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
 
-    .back-btn:hover {
-        background-color: #444;
-    }
+        .back-btn:hover {
+            background-color: #444;
+        }
 
-    /* Sorting + searching hint */
-    .hint {
-        text-align: center;
-        font-size: 14px;
-        color: #555;
-        margin-bottom: 15px;
-    }
+        /* Sorting + searching hint */
+        .hint {
+            text-align: left;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 15px;
+        }
 
-    /* Table styling */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        background-color: #fff;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        font-size: 0.75rem;
-    }
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            font-size: 0.75rem;
+        }
 
-    /* Sticky header */
-    thead th {
-        position: sticky;
-        top: 0;
-        background: #eef6ff;
-        border-bottom: 2px solid #0078D4;
-        padding: 10px;
-        text-align: center;
-        font-weight: 600;
-        color: #005a9e;
-        z-index: 10;
+        /* Sticky header */
+        thead th {
+            position: sticky;
+            top: 0;
+            background: #eef6ff;
+            border-bottom: 2px solid #0078D4;
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            color: #005a9e;
+            z-index: 10;
 
-        /* Light vertical column divider */
-        border-right: 1px solid #d0d0d0;
-    }
+            /* Light vertical column divider */
+            border-right: 1px solid #d0d0d0;
+        }
 
-    thead th:last-child {
-        border-right: none;
-    }
+        thead th:last-child {
+            border-right: none;
+        }
 
-    /* Sort icons */
-    .sort-icon {
-        font-size: 12px;
-        margin-left: 4px;
-        color: #0078D4;
-    }
+        /* Sort icons */
+        .sort-icon {
+            font-size: 12px;
+            margin-left: 4px;
+            color: #0078D4;
+        }
 
-    /* Column hover highlight */
-    thead th:hover {
-        background-color: #d9ecff;
-        cursor: pointer;
-    }
+        /* Column hover highlight */
+        thead th:hover {
+            background-color: #d9ecff;
+            cursor: pointer;
+        }
 
-    thead th a {
-        color: #005a9e;
-        text-decoration: none;
-        font-weight: 600;
-    }
+        thead th a {
+            color: #005a9e;
+            text-decoration: none;
+            font-weight: 600;
+        }
 
-    thead th a:hover {
-        text-decoration: underline;
-    }
+        thead th a:hover {
+            text-decoration: underline;
+        }
 
-    /* Body cells */
-    tbody td {
-        padding: 8px 10px;
-        border-bottom: 1px solid #ddd;
-        border-right: 1px solid #e3e3e3;
-        text-align: center;
-    }
+        /* Body cells */
+        tbody td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #e3e3e3;
+            text-align: center;
+        }
 
-    tbody td:last-child {
-        border-right: none;
-    }
+        tbody td:last-child {
+            border-right: none;
+        }
 
-    /* Alternating rows */
-    tbody tr:nth-child(even) {
-        background-color: #f7f7f7;
-    }
+        /* Alternating rows */
+        tbody tr:nth-child(even) {
+            background-color: #f7f7f7;
+        }
 
-    /* Hover highlight */
-    tbody tr:hover {
-        background-color: #e9f3ff;
-    }
+        /* Hover highlight */
+        tbody tr:hover {
+            background-color: #e9f3ff;
+        }
 
-    /* Total row */
-    .total-row {
-        background-color: #e6f2ff;
-        font-weight: 600;
-        text-align: center;
-    }
+        /* Total row */
+        .total-row {
+            background-color: #e6f2ff;
+            font-weight: 600;
+            text-align: center;
+        }
 
-    /* Pagination */
-    .pagination {
-        margin-top: 20px;
-        text-align: center;
-        font-size: 15px;
-    }
+        /* Pagination */
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
 
-    .pagination a {
-        margin: 0 10px;
-        color: #0078D4;
-        text-decoration: none;
-        font-weight: 600;
-    }
+        .pagination a {
+            margin: 0 10px;
+            color: #0078D4;
+            text-decoration: none;
+            font-weight: 600;
+        }
 
-    .pagination a:hover {
-        text-decoration: underline;
-    }
-</style>
+        .pagination a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 
 <body>
 
-<h1 class="page-title">{{ title }}</h1>
+    <h1 class="page-title">{{ title }}</h1>
 
-<div class="top-bar">
+    <div class="top-bar">
 
-    <!-- LEFT: Total count -->
-    <div class="record-count">
-        Total Records: {{ items.paginator.count }}
-    </div>
-
-    <!-- CENTER: Search + Clear -->
-    <div class="search-controls">
-        <form method="GET" style="display:flex; align-items:center; gap:10px;">
-            <input type="text" name="q" value="{{ q }}" placeholder="Filter...">
-
-            <button type="submit" class="search-btn">Search</button>
-
-            <!-- Clear button resets the query -->
-            <a href="?">
-                <button type="button" class="clear-btn">Clear</button>
+        <!-- RIGHT: Back button -->
+        <div>
+            <a href="{% url 'clinicdashpro_home' %}">
+                <button class="back-btn">Back to Home</button>
             </a>
-        </form>
+        </div>
+
+
+
+        <!-- CENTER: Search + Clear -->
+        <div class="search-controls">
+            <form method="GET" style="display:flex; align-items:center; gap:10px;">
+                <input type="text" name="q" value="{{ q }}" placeholder="Filter...">
+
+                <button type="submit" class="search-btn">Search</button>
+
+                <!-- Clear button resets the query -->
+                <a href="?">
+                    <button type="button" class="clear-btn">Clear</button>
+                </a>
+            </form>
+        </div>
+        <!-- LEFT: Total count -->
+        <div class="record-count">
+            Total Records: {{ items.paginator.count }}
+        </div>
+
+
     </div>
 
-    <!-- RIGHT: Back button -->
-    <div>
-        <a href="{% url 'clinicdashpro_home' %}">
-            <button class="back-btn">Back to Home</button>
-        </a>
+    <div class="hint">
+        You can <strong>search</strong> using the box above and <strong>sort</strong> any column by clicking its header.
     </div>
 
-</div>
-
-<div class="hint">
-    You can <strong>search</strong> using the box above and <strong>sort</strong> any column by clicking its header.
-</div>
-
-<table>
-    <thead>
-        <tr>
-            {% for field in fields %}
+    <table>
+        <thead>
+            <tr>
+                {% for field in fields %}
                 <th>
                     <a href="?sort={{ field }}{% if q %}&q={{ q }}{% endif %}">
                         {{ field }} <span class="sort-icon">▲</span>
@@ -250,39 +256,40 @@
                         <span class="sort-icon">▼</span>
                     </a>
                 </th>
-            {% endfor %}
-        </tr>
-    </thead>
-
-    <tbody>
-        {% for item in items %}
-            <tr>
-                {% for field in fields %}
-                    <td>{{ item|get_field:field }}</td>
                 {% endfor %}
             </tr>
-        {% endfor %}
+        </thead>
 
-        <!-- TOTAL ROW -->
-        <tr class="total-row">
-            <td colspan="{{ fields|length }}">
-                Total Records: {{ items.paginator.count }}
-            </td>
-        </tr>
-    </tbody>
-</table>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                {% for field in fields %}
+                <td>{{ item|get_field:field }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
 
-<div class="pagination">
-    {% if items.has_previous %}
+            <!-- TOTAL ROW -->
+            <tr class="total-row">
+                <td colspan="{{ fields|length }}">
+                    Total Records: {{ items.paginator.count }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        {% if items.has_previous %}
         <a href="?page={{ items.previous_page_number }}&sort={{ sort }}&q={{ q }}">Previous</a>
-    {% endif %}
+        {% endif %}
 
-    <span>Page {{ items.number }} of {{ items.paginator.num_pages }}</span>
+        <span>Page {{ items.number }} of {{ items.paginator.num_pages }}</span>
 
-    {% if items.has_next %}
+        {% if items.has_next %}
         <a href="?page={{ items.next_page_number }}&sort={{ sort }}&q={{ q }}">Next</a>
-    {% endif %}
-</div>
+        {% endif %}
+    </div>
 
 </body>
+
 </html>

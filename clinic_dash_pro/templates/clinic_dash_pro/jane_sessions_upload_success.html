@@ -1,38 +1,137 @@
-<!-- clinic_dash_pro\templates\clinic_dash_pro\jane_sales_upload_success.html -->
+{% load static %}
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jane Sessions Upload Completed</title>
 
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+        }
 
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+        }
 
-<!-- jane_processed_claims_upload_success.html -->
-<style>
-    .status-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-top: 20px;
-        justify-content: center;
-        /* ensures children are centered too */
-    }
-</style>
-<div>
-    <h1>Jane Sessions Upload Successful</h1>
+        .layout {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            max-width: 1200px;
+        }
+
+        .summary-box {
+            background: #eef6ff;
+            border-left: 5px solid #0078D4;
+            padding: 20px;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .summary-box h2 {
+            margin-top: 0;
+            font-size: 22px;
+            color: #005a9e;
+        }
+
+        .summary-box p {
+            margin: 8px 0;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .metrics-box {
+            background: #fff;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            flex: 1;
+            max-width: 450px;
+            text-align: left;
+        }
+
+        .metrics-box p {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        .metrics-box strong {
+            color: #0078D4;
+        }
+
+        .button-row {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .button-row button {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+
+        .upload-btn {
+            background-color: #0078D4;
+            color: white;
+        }
+
+        .upload-btn:hover {
+            background-color: #005a9e;
+        }
+
+        .back-btn {
+            background-color: #666;
+            color: white;
+        }
+
+        .back-btn:hover {
+            background-color: #444;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1 class="page-title">Jane Sessions Upload Completed</h1>
+
+<div class="layout">
+
+    <div class="summary-box">
+        <h2>Your Jane Sessions File Was Processed</h2>
+        <p>Clinic Dash Pro imported your staff session data and updated your operational records.</p>
+        <p>New rows were added, and duplicates were skipped.</p>
+        <p>Your session reporting is now fully up to date.</p>
+    </div>
+
+    <div class="metrics-box">
+        <p><strong>Inserted Rows:</strong> {{ inserted }}</p>
+        <p><strong>Skipped Duplicates:</strong> {{ skipped }}</p>
+        <p><strong>Total Rows in Database:</strong> {{ count }}</p>
+        <p><strong>Date Range:</strong> {{ start }} → {{ end }}</p>
+
+        <div class="button-row">
+            <a href="{% url 'upload_jane_sessions' %}">
+                <button class="upload-btn">Upload Another Sessions File</button>
+            </a>
+            <a href="{% url 'clinicdashpro_home' %}">
+                <button class="back-btn">Back to Home</button>
+            </a>
+        </div>
+    </div>
+
 </div>
-<div>
-    <p>Inserted rows: {{ inserted }}</p>
-    <p>Skipped duplicates: {{ skipped }}</p>
-    <p>Total rows in database: {{ count }}</p>
-    <p>Payroll Period Range: {{ start }} → {{ end }}</p>
-</div>
-<div class="status-container"></div>
-<div>
 
-
-
-    <a href="{% url 'upload_jane_sessions' %}">
-        <button style="padding: 10px 20px; margin-top: 20px;">Upload Jane Sessions</button>
-    </a>
-    <a href="{% url 'clinicdashpro_home' %}">
-        <button style="padding: 10px 20px; margin-top: 20px;">Back to Home</button>
-    </a>
-</div>
-</div>
+</body>
+</html>

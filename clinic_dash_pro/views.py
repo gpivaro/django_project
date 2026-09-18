@@ -150,7 +150,7 @@ def gusto_upload_success(request):
 def upload_xero(request):
     if request.method == "POST":
 
-        xero_file = request.FILES.get("xero")
+        xero_file = request.FILES.get("xero_transactions")
 
         if not xero_file or not xero_file.name.endswith(".xlsx"):
             return render(request, "clinic_dash_pro/upload_xero.html", {
@@ -276,6 +276,7 @@ def jane_processed_claims_upload_success(request):
     })
 
 
+@login_required
 def gusto_list(request):
     return generic_list_view(
         request,
@@ -285,6 +286,7 @@ def gusto_list(request):
     )
 
 
+@login_required
 def xero_list(request):
     return generic_list_view(
         request,
@@ -294,6 +296,7 @@ def xero_list(request):
     )
 
 
+@login_required
 def jane_sessions_list(request):
     return generic_list_view(
         request,
@@ -303,6 +306,7 @@ def jane_sessions_list(request):
     )
 
 
+@login_required
 def jane_claims_list(request):
     return generic_list_view(
         request,
@@ -319,25 +323,6 @@ def generic_list_view(request, model, title, date_field):
 
     queryset = model.objects.all()
 
-    if q:
-        queryset = queryset.filter(
-            Q(id__icontains=q) |
-            Q(hash_key__icontains=q) |
-            Q(insert_date__icontains=q)
-        )
-
-    # Sorting
-    sort = request.GET.get("sort", date_field)
-    if sort.startswith("-"):
-        queryset = queryset.order_by(sort)
-    else:
-        queryset = queryset.order_by(sort)
-
-    # Pagination
-    paginator = Paginator(queryset, 50)
-    page = request.GET.get("page")
-    items = paginator.get_page(page)
-
     # Get all fields dynamically
     EXCLUDE_FIELDS = ("id", "hash_key", "insert_date")
 
@@ -345,6 +330,23 @@ def generic_list_view(request, model, title, date_field):
         f.name for f in model._meta.get_fields()
         if f.concrete and f.name not in EXCLUDE_FIELDS
     ]
+
+    if q:
+        search_filters = Q()
+        for f in fields:
+            search_filters |= Q(**{f"{f}__icontains": q})
+        queryset = queryset.filter(search_filters)
+
+    # Sorting
+    sort = request.GET.get("sort", date_field)
+    if sort.lstrip("-") not in fields:
+        sort = date_field
+    queryset = queryset.order_by(sort)
+
+    # Pagination
+    paginator = Paginator(queryset, 50)
+    page = request.GET.get("page")
+    items = paginator.get_page(page)
 
     return render(request, "clinic_dash_pro/list_view.html", {
         "title": title,
@@ -367,12 +369,8 @@ def reports_home(request):
     # Call the Reporting Section
     reports = GenerateReport(
         gusto_data, jane_sessions_data, jane_claims_data, xero_data)
-    reports.get_operational_report()
+    monthly_operational_expenses_assets = reports.get_operational_report()
 
-    context = {"xero_data_cnt": len(xero_data),
-               "gusto_data_cnt": len(gusto_data),
-               "jane_sessions_data_cnt": len(jane_sessions_data),
-               "jane_claims_data_cnt": len(jane_claims_data)
-               }
+    context = {"report_data": monthly_operational_expenses_assets}
 
     return render(request, "clinic_dash_pro/report_home.html", context)

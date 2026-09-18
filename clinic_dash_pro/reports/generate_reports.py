@@ -25,6 +25,10 @@ class GenerateReport:
 
     def get_operational_report(self):
 
-        _, operational_df = report_operational_expenses(self.xero_df)
+        monthly_operational_expenses_assets = report_operational_expenses(
+            self.xero_df)
 
-        print(operational_df)
+        monthly_operational_expenses_assets['period_month'] = monthly_operational_expenses_assets['period_month'].astype(
+            str)
+
+        return monthly_operational_expenses_assets.to_dict(orient="records")

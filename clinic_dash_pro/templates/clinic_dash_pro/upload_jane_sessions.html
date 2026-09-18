@@ -1,24 +1,198 @@
-<!-- clinic_dash_pro\templates\clinic_dash_pro\upload_jane_sessions.html -->
 {% load static %}
-<h1>Upload Jane Sessions Report</h1>
 
-{% if errors %}
-<div style="color:red;">
-    {% for e in errors %}
-        <p>{{ e }}</p>
-    {% endfor %}
-</div>
-{% endif %}
+<!DOCTYPE html>
+<html lang="en">
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <input type="file" name="jane_staff_sessions" required>
-    <button type="submit">Upload</button>
-</form>
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Jane Sessions Report</title>
 
-<div class="col-12 col-lg-4">
-<img src="{% static 'staticfiles/clinic_dash_pro/images/jane_sales_by_staff_report.png' %}"/>
-</div>
-<a href="{% url 'clinicdashpro_home' %}">
-    <button style="padding: 10px 20px; margin-top: 20px;">Back to Home</button>
-</a>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* Main horizontal layout */
+        .layout {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            max-width: 1200px;
+        }
+
+        /* Guidance box */
+        .guidance-box {
+            background: #eef6ff;
+            border-left: 5px solid #0078D4;
+            padding: 20px;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .guidance-box h2 {
+            margin-top: 0;
+            font-size: 22px;
+            color: #005a9e;
+        }
+
+        .guidance-box p {
+            margin: 8px 0;
+            font-size: 15px;
+            color: #333;
+        }
+
+        /* Image box */
+        .image-box {
+            flex: 1;
+            text-align: left;
+        }
+
+        .image-box img {
+            width: 100%;
+            max-width: 650px;
+            /* bigger image */
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 12px;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Upload box */
+        .upload-box {
+            background: #fff;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            max-width: 350px;
+        }
+
+        .upload-box input[type="file"] {
+            width: 90%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: #fafafa;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .upload-box button {
+            background-color: #0078D4;
+            color: white;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 95%;
+
+
+        }
+
+        .upload-box {
+            text-align: center;
+        }
+
+        .upload-box button:hover {
+            background-color: #005a9e;
+            text-align: center;
+        }
+
+        /* Back button aligned right */
+        .back-button {
+            margin-top: 5px;
+
+        }
+
+        .back-button button {
+            background-color: #666;
+            color: white;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .back-button button:hover {
+            background-color: #444;
+        }
+
+        .error-box {
+            color: red;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1 class="page-title">Upload Jane Sessions Report</h1>
+
+    <div class="layout">
+
+        <!-- LEFT: Guidance -->
+        <div class="guidance-box">
+            <h2>Where to get this report in Jane</h2>
+            <p>To upload your Jane Sessions CSV, follow these steps inside the Jane app:</p>
+            <p>1. Go to <strong>Reports → Sales → Sales by Staff</strong>.</p>
+            <p>2. Select the date range you want to export.</p>
+            <p>3. Click <strong>Export</strong> and choose <strong>CSV</strong>.</p>
+            <p>4. Save the file to your computer, then upload it using the panel on the right.</p>
+            <p>This CSV contains all staff sessions and is required for <strong>Clinic Dash Pro</strong> to generate
+                operational and financial insights.</p>
+            <br>
+
+            {% if errors %}
+            <div class="error-box">
+                {% for e in errors %}
+                <p>{{ e }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- CENTER: Screenshot -->
+            <div class="image-box">
+                <img src="{% static 'clinic_dash_pro/images/jane_sales_by_staff_report.png' %}"
+                    alt="Jane Report Screenshot">
+            </div>
+        </div>
+
+
+
+        <!-- RIGHT: Upload box -->
+        <div class="upload-box">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label><strong>Select your Jane Sessions CSV file:</strong><br></label><br>
+                <input type="file" name="jane_staff_sessions" required>
+                <button type="submit">Upload Report</button>
+            </form>
+
+            <!-- Back button aligned right -->
+            <div class="back-button">
+                <a href="{% url 'clinicdashpro_home' %}">
+                    <button>Back to Home</button>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+
+</body>
+
+</html>

@@ -1,19 +1,185 @@
-<h1>Upload Jane Processed Claims</h1>
+{% load static %}
 
-{% if errors %}
-<div style="color:red;">
-    {% for e in errors %}
-        <p>{{ e }}</p>
-    {% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Jane Claims Report</title>
+
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* Main horizontal layout */
+        .layout {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            max-width: 1200px;
+        }
+
+        /* Guidance box */
+        .guidance-box {
+            background: #eef6ff;
+            border-left: 5px solid #0078D4;
+            padding: 20px;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .guidance-box h2 {
+            margin-top: 0;
+            font-size: 22px;
+            color: #005a9e;
+        }
+
+        .guidance-box p {
+            margin: 8px 0;
+            font-size: 15px;
+            color: #333;
+        }
+
+        /* Image box */
+        .image-box {
+            flex: 1;
+            text-align: left;
+        }
+
+        .image-box img {
+            width: 100%;
+            max-width: 650px;
+            /* bigger image */
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 12px;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Upload box */
+        .upload-box {
+            background: #fff;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            max-width: 350px;
+        }
+
+        .upload-box input[type="file"] {
+            width: 90%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: #fafafa;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .upload-box button {
+            background-color: #0078D4;
+            color: white;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 95%;
+            
+            
+        }
+
+        .upload-box{
+            text-align: center;
+        }
+
+        .upload-box button:hover {
+            background-color: #005a9e;
+            text-align: center;
+        }
+
+        /* Back button aligned right */
+        .back-button {
+            margin-top: 5px;
+            
+        }
+
+        .back-button button {
+            background-color: #666;
+            color: white;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .back-button button:hover {
+            background-color: #444;
+        }
+
+        .error-box {
+            color: red;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1 class="page-title">Upload Jane Claims Report</h1>
+
+<div class="layout">
+
+    <div class="guidance-box">
+        <h2>Where to get this report in Jane</h2>
+        <p>To upload your Jane Claims CSV:</p>
+        <p>1. Go to <strong>Reports → Insurance → Claims</strong>.</p>
+        <p>2. Select the date range.</p>
+        <p>3. Click <strong>Export → CSV</strong>.</p>
+        <p>This file contains insurance claim submissions used by <strong>Clinic Dash Pro</strong> to compute receivables and reimbursement KPIs.</p>
+
+        {% if errors %}
+        <div class="error-box">
+            {% for e in errors %}
+            <p>{{ e }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="image-box">
+            <img src="{% static 'clinic_dash_pro/images/jane_transactions_report.png' %}" alt="Jane Claims Screenshot">
+        </div>
+    </div>
+
+    <div class="upload-box">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label><strong>Select your Jane Claims CSV:</strong><br></label><br>
+            <input type="file" name="jane_processed_claims" required>
+            <button type="submit">Upload Report</button>
+        </form>
+
+        <div class="back-button">
+            <a href="{% url 'clinicdashpro_home' %}">
+                <button>Back to Home</button>
+            </a>
+        </div>
+    </div>
+
 </div>
-{% endif %}
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <input type="file" name="jane_processed_claims" required>
-    <button type="submit">Upload</button>
-</form>
-
-<a href="{% url 'clinicdashpro_home' %}">
-    <button style="padding: 10px 20px; margin-top: 20px;">Back to Home</button>
-</a>
+</body>
+</html>

@@ -1,23 +1,173 @@
+{% load static %}
 
-<!-- clinic_dash_pro\templates\clinic_dash_pro\upload_xero.html -->
-<h1>Upload Xero Payroll</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Xero Categorized Transactions</title>
 
-{% if errors %}
-<div style="color:red;">
-    {% for e in errors %}
-        <p>{{ e }}</p>
-    {% endfor %}
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .layout {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            max-width: 1200px;
+        }
+
+        .guidance-box {
+            background: #eef6ff;
+            border-left: 5px solid #0078D4;
+            padding: 20px;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .guidance-box h2 {
+            margin-top: 0;
+            font-size: 22px;
+            color: #005a9e;
+        }
+
+        .guidance-box p {
+            margin: 8px 0;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .image-box {
+            flex: 1;
+            text-align: left;
+        }
+
+        .image-box img {
+            width: 100%;
+            max-width: 650px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 12px;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .upload-box {
+            background: #fff;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            flex: 1;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        .upload-box input[type="file"] {
+            width: 90%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: #fafafa;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .upload-box button {
+            background-color: #0078D4;
+            color: white;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 95%;
+        }
+
+        .upload-box button:hover {
+            background-color: #005a9e;
+        }
+
+        .back-button {
+            margin-top: 5px;
+        }
+
+        .back-button button {
+            background-color: #666;
+            color: white;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .back-button button:hover {
+            background-color: #444;
+        }
+
+        .error-box {
+            color: red;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1 class="page-title">Upload Xero Categorized Transactions</h1>
+
+<div class="layout">
+
+    <div class="guidance-box">
+        <h2>Where to get this report in Xero</h2>
+        <p>To upload your Xero categorized transactions CSV:</p>
+        <p>1. Go to <strong>Accounting → Bank Accounts</strong>.</p>
+        <p>2. Select the bank account you want to export.</p>
+        <p>3. Click <strong>Bank Statements → Export</strong>.</p>
+        <p>4. Choose <strong>CSV</strong> and download the file.</p>
+        <p>This file contains categorized transactions used by <strong>Clinic Dash Pro</strong> to compute monthly operational totals.</p>
+
+        {% if errors %}
+        <div class="error-box">
+            {% for e in errors %}
+            <p>{{ e }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="image-box">
+            <img src="{% static 'clinic_dash_pro/images/xero_accounts_report.png' %}" alt="Xero Export Screenshot">
+        </div>
+    </div>
+
+    <div class="upload-box">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label><strong>Select your Xero XLSX file:</strong><br></label><br>
+            <input type="file" name="xero_transactions" required>
+            <button type="submit">Upload Report</button>
+        </form>
+
+        <div class="back-button">
+            <a href="{% url 'clinicdashpro_home' %}">
+                <button>Back to Home</button>
+            </a>
+        </div>
+    </div>
+
 </div>
-{% endif %}
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <input type="file" name="xero" required>
-    <button type="submit">Upload</button>
-</form>
-
-
-
-<a href="{% url 'clinicdashpro_home' %}">
-    <button style="padding: 10px 20px; margin-top: 20px;">Back to Home</button>
-</a>
+</body>
+</html>

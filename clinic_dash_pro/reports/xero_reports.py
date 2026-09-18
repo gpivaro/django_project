@@ -41,21 +41,6 @@ def report_operational_expenses(xero_df):
         for category in xero_df["category"].unique()
     }
 
-    # -----------------------------
-    # Categories
-    # -----------------------------
-
-    categories_totals = pd.DataFrame([
-        {
-            "category": category,
-            "total_amount": df_cat[df_cat["period_month"] == latest_closed_month]["gross"].sum(),
-            "total_amount_year": df_cat[df_cat["period_year"] == current_year]["gross"].sum(),
-        }
-        for category, df_cat in category_dfs.items()
-    ]).sort_values("total_amount_year")
-
-    print(categories_totals.reset_index(drop=True))
-
     expenses = category_dfs["Expense"]
     assets = category_dfs["Asset"]
 
@@ -88,6 +73,10 @@ def report_operational_expenses(xero_df):
 
     monthly_expenses_assets = monthly.reset_index()
 
+    return monthly_expenses_assets
+
+
+def report_operational_expenses_ytd(monthly_expenses_assets):
     # -----------------------------
     # YTD Summary
     # -----------------------------
@@ -105,6 +94,10 @@ def report_operational_expenses(xero_df):
 
     ytd["ty_ly_py"] = operational_current_year["ty_ly_py"].unique()
 
+    return ytd
+
+
+def report_operational_expenses_lifetime(monthly, monthly_expenses_assets):
     # -----------------------------
     # GRAND TOTAL
     # -----------------------------
@@ -118,68 +111,4 @@ def report_operational_expenses(xero_df):
 
     grand_total["ty_ly_py"] = 'All Time'
 
-    # Return combined dataset
-    final = pd.concat([monthly_expenses_assets, ytd,
-                      grand_total], ignore_index=True)
-
-    # Print sections
-
-    print("\n==============================")
-    print(" Operational Expenses + Assets - Excluding Payroll ")
-    print("===============================")
-    print(final)
-
-    # -----------------------------
-    # Expenses Breakdown
-    # -----------------------------
-
-    expenses_assets_df = pd.concat([expenses, assets], axis=0)
-
-    expenses_assets_agg = (
-        expenses_assets_df.groupby(
-            ["period_year", "period_quarter", "period_month",
-             "category", "related_account"]
-        )["amount"]
-        .sum()
-    ).reset_index()
-
-    # Filter for latest CLOSED month
-    exp_asset_lst = expenses_assets_agg[
-        expenses_assets_agg["period_month"] == latest_closed_month
-    ].reset_index(drop=True)
-
-    # Category totals (for the new column)
-    cat_tot = (
-        exp_asset_lst.groupby("category")["amount"]
-        .sum()
-        .reset_index()
-        .rename(columns={"amount": "category_total"})
-    )
-
-    # Merge category totals into the breakdown
-    exp_asset_lst = exp_asset_lst.merge(cat_tot, on="category", how="left")
-
-    # Build total row (overall total)
-    overall_total = exp_asset_lst["amount"].sum()
-
-    total_row = pd.DataFrame({
-        "period_month": [latest_closed_month],
-        "period_quarter": [latest_closed_month.asfreq("Q")],
-        "period_year": [latest_closed_month.asfreq("Y")],
-        "category": ["TOTAL"],
-        "related_account": ["ALL ACCOUNTS"],
-        "amount": [overall_total],
-        "category_total": [overall_total]
-    })
-
-    # Append total row
-    exp_asset_lst_final = pd.concat(
-        [exp_asset_lst, total_row], ignore_index=True)
-
-    print("\n==============================")
-    print(
-        f" Operational Expenses + Assets - Excluding Payroll ({latest_closed_month})")
-    print("===============================")
-    print(exp_asset_lst_final)
-
-    return xero_df, final
+    return grand_total

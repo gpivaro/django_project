@@ -47,7 +47,7 @@ def build_unified_financials(
     if "billed_amount" in jane_rev.columns:
         jane_rev["revenue_accrual"] = jane_rev["billed_amount"]
     else:
-        jane_rev["revenue_accrual"] = jane_rev["amount_paid_to_clinic"]
+        jane_rev["revenue_accrual"] = jane_rev["Actual Collected"]
 
     jane_rev = jane_rev.groupby("period_month")[
         "revenue_accrual"].sum().reset_index()
@@ -66,10 +66,6 @@ def build_unified_financials(
     # 3. Prepare Xero Operational Costs (monthly)
     # ---------------------------------------------------------
     xero_ops = monthly_operational.copy()
-
-    # Remove YTD + All-Time rows
-    if len(xero_ops) >= 2:
-        xero_ops = xero_ops.iloc[:-2]
 
     # Normalize period_month type
     xero_ops["period_month"] = xero_ops["period_month"].astype("period[M]")

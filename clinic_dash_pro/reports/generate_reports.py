@@ -65,4 +65,9 @@ class GenerateReport:
             monthly_operational=monthly_operational
         )
 
+        # FIX: Convert pandas Period → string
+        for col in ["period_month", "period_year", "period_quarter"]:
+            if col in unified_financials.columns:
+                unified_financials[col] = unified_financials[col].astype(str)
+
         return unified_financials.to_dict(orient="records")

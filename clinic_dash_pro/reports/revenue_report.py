@@ -26,6 +26,13 @@ def merge_claims_sessions(claims_processed_df, sessions_df):
     claims_processed_df = claims_processed_df.copy()
     sessions_df = sessions_df.copy()
 
+    # Drop Unecessary columns
+    claims_processed_df = claims_processed_df.drop(
+        columns=["id", "hash_key", "insert_date"])
+
+    sessions_df = sessions_df.drop(
+        columns=["id", "hash_key", "insert_date", "payer"])
+
     # ---------------------------------------------------------
     # Step 3: Merge transactions with sales (attach therapist)
     # ---------------------------------------------------------
@@ -83,6 +90,9 @@ def attach_therapist_to_transactions(claims_processed_df, sessions_df):
     # --- Step 3: Explode multi-claim rows ---
     exploded = claims_processed_df.explode('applied_to')
 
+    exploded['applied_to'] = exploded['applied_to'].apply(
+        lambda x: x.replace("[", "").replace("]", "").replace("'", ""))
+
     # --- Step 4: Merge with therapist data from sales report ---
     merged = exploded.merge(
         sessions_df,
@@ -113,6 +123,8 @@ def attach_therapist_to_transactions(claims_processed_df, sessions_df):
         if col in merged.columns:
             merged[col] = pd.to_datetime(merged[col], errors="coerce").dt.date
 
+    merged["purchase_date"] = pd.to_datetime(
+        merged["purchase_date"], errors="coerce")
     merged["period_month"] = merged["purchase_date"].dt.to_period("M")
     merged["period_quarter"] = merged["purchase_date"].dt.to_period("Q")
     merged["period_year"] = merged["purchase_date"].dt.to_period("Y")

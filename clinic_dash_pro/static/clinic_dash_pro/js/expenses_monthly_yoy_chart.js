@@ -1,3 +1,6 @@
+// clinic_dash_pro\static\clinic_dash_pro\js\expenses_monthly_yoy_chart.js
+
+
 document.addEventListener("DOMContentLoaded", function () {
 
     console.log("📊 YOY Chart JS Loaded");

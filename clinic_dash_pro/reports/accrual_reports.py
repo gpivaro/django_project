@@ -43,6 +43,7 @@ def build_accrual_payroll(gusto_df: pd.DataFrame, jane_df: pd.DataFrame) -> pd.D
 
     for idx, row in gusto.iterrows():
         staff = row["staff_member"]
+        employee_initials = row["employee_initials"]
         # default to Therapist if missing
         role = row.get("department", "Therapy")
         start = row["payroll_period_start"]
@@ -65,6 +66,7 @@ def build_accrual_payroll(gusto_df: pd.DataFrame, jane_df: pd.DataFrame) -> pd.D
                 "idx": idx,
                 "purchase_date": day,
                 "staff_member": staff,
+                "employee_initials": employee_initials,
                 "role": role,
                 "daily_cost_base": daily_cost,
                 "payroll_period": payroll_period
@@ -139,7 +141,8 @@ def build_accrual_payroll(gusto_df: pd.DataFrame, jane_df: pd.DataFrame) -> pd.D
     # 7. Aggregate to monthly payroll per staff_member
     # -----------------------------
     monthly_payroll_by_staff = (
-        daily.groupby(["period_month", "staff_member"])["daily_cost"]
+        daily.groupby(["period_month", "staff_member", "employee_initials"])[
+            "daily_cost"]
         .sum()
         .reset_index()
         .rename(columns={"daily_cost": "payroll_accrual"})

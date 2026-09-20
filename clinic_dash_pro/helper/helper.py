@@ -1,5 +1,6 @@
 # helper.py
 
+import numpy as np
 from datetime import date, timedelta
 import math
 from dateutil import parser
@@ -933,9 +934,10 @@ def build_staff_short_name(first=None, last=None, full_name=None):
     """
     Builds a short staff name in the format:
         First L
-    Works whether the caller provides:
-        - first + last
-        - full_name only
+    Priority:
+        1. full_name is authoritative
+        2. first+last only used if full_name is missing
+    Handles multi-part last names (Rocha Garcia → G)
     """
 
     def clean(s):
@@ -943,28 +945,39 @@ def build_staff_short_name(first=None, last=None, full_name=None):
             return ""
         return str(s).strip().title()
 
+    def normalize_last_name(name):
+        """
+        Fix multi-part last names like 'Rocha Garcia'.
+        Always return the LAST token (Garcia).
+        """
+        if not name:
+            return ""
+        parts = str(name).strip().split()
+        return parts[-1]  # Garcia
+
     def get_last_initial(name):
         if not name:
             return ""
-        name = name.strip()
-        return name[0].upper()
+        return name.strip()[0].upper()
 
-    # If full_name is provided, split it
+    # -----------------------------------------
+    # 1. FULL NAME PROVIDED → authoritative
+    # -----------------------------------------
     if full_name:
         full_name = clean(full_name)
-
         parts = full_name.split()
 
-        if len(parts) == 1:
-            # Only one name provided → treat as first name only
-            first = parts[0]
-            last = ""
-        else:
-            first = parts[0]
-            last = parts[-1]  # last token is last name (handles middle names)
+        first_name = parts[0]
+        last_name = normalize_last_name(parts[-1])  # handles Rocha Garcia
+        last_initial = get_last_initial(last_name)
 
-    # If first/last provided directly
+        return f"{first_name} {last_initial}".strip()
+
+    # -----------------------------------------
+    # 2. FALLBACK: first + last
+    # -----------------------------------------
     first = clean(first)
+    last = normalize_last_name(last)
     last_initial = get_last_initial(last)
 
     return f"{first} {last_initial}".strip()
@@ -1064,3 +1077,48 @@ def get_periods():
         "current_year": current_year,
         "latest_closed_year": latest_closed_year,
     }
+
+
+def convert_df_to_dict(df):
+
+    # If None → return empty list
+    if df is None:
+        return []
+
+    # Replace NaN with None so JSON is valid
+    df = df.replace({np.nan: None})
+
+    # If DataFrame → normalize + convert
+    if isinstance(df, pd.DataFrame):
+
+        if df.empty:
+            return []
+
+        # Convert Period, Timestamp, numpy types → strings or Python primitives
+        df = df.copy()
+
+        for col in df.columns:
+            if isinstance(df[col].dtype, pd.PeriodDtype):
+                df[col] = df[col].astype(str)
+
+            elif np.issubdtype(df[col].dtype, np.datetime64):
+                df[col] = df[col].astype(str)
+
+            elif df[col].dtype == "object":
+                # Convert numpy types inside object columns
+                df[col] = df[col].apply(
+                    lambda x: x.item() if isinstance(x, (np.integer, np.floating)) else x
+                )
+
+        return df.to_dict(orient="records")
+
+    # If Series → convert to dict
+    if isinstance(df, pd.Series):
+        return df.to_dict()
+
+    # If list or dict → return as-is
+    if isinstance(df, (list, dict)):
+        return df
+
+    # Fallback
+    return []

@@ -140,6 +140,7 @@ def gusto_ingest(uploaded_file):
     # ---------------------------------------------------------
     # Step 4a: Build short staff member name (First + Last Initial)
     # ---------------------------------------------------------
+
     payroll_df["Staff Member"] = payroll_df.apply(
         lambda row: build_staff_short_name(
             row["First Name"], row["Last Name"]),

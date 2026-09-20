@@ -39,16 +39,6 @@ def build_unified_financials(
     jane_rev["purchase_date"] = pd.to_datetime(
         jane_rev["purchase_date"], errors="coerce")
 
-    # ---------------------------------------------------------
-    # 2. Choose the revenue measure
-    # ---------------------------------------------------------
-    # If Jane provides billed_amount or charge_amount, use that.
-    # Otherwise fall back to actual_collected (cash proxy).
-    if "billed_amount" in jane_rev.columns:
-        jane_rev["revenue_accrual"] = jane_rev["billed_amount"]
-    else:
-        jane_rev["revenue_accrual"] = jane_rev["Actual Collected"]
-
     jane_rev = jane_rev.groupby("period_month")[
         "revenue_accrual"].sum().reset_index()
     jane_rev = jane_rev.rename(columns={"revenue_accrual": "revenue"})

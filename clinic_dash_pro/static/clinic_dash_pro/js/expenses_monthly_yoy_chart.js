@@ -81,6 +81,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 y: {
                     ticks: {
                         callback: value => '$' + value.toLocaleString()
+                    },
+                    grid: {
+                        color: (ctx) => ctx.tick.value === 0 ? "#000" : "#ddd",
+                        lineWidth: (ctx) => ctx.tick.value === 0 ? 2 : 1
                     }
                 }
             },

@@ -212,9 +212,44 @@
 
     </div>
 
+    <hr style="margin:40px 0;">
+    <h2 style="text-align:center; margin-bottom:20px;">Therapist Profitability</h2>
 
 
+    <div class="layout">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Therapist</th>
+                        <th>Revenue</th>
+                        <th>Payroll</th>
+                        <th>Profit</th>
+                        <th>Margin</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in therapist_profitability %}
+                    <tr>
+                        <td style="text-align:center;">{{ row.period_month }}</td>
+                        <td>{{ row.employee_initials }}</td>
+                        <td>${{ row.therapist_revenue|floatformat:2 }}</td>
+                        <td>${{ row.therapist_payroll|floatformat:2 }}</td>
+                        <td>${{ row.therapist_profit|floatformat:2 }}</td>
+                        <td>{{ row.therapist_margin|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
+
+        <div class="chart-area">
+            <canvas id="therapist_profit_chart"></canvas>
+        </div>
+
+    </div>
 
 
 
@@ -226,9 +261,14 @@
 
     {{ monthly_operational_expenses_assets|json_script:"report-data-json" }}
     {{ unified_financials|json_script:"unified-financials-json" }}
+    {{ therapist_profitability|json_script:"therapist-profitability-json" }}
+
 
     <script src="{% static 'clinic_dash_pro/js/expenses_monthly_yoy_chart.js' %}"></script>
     <script src="{% static 'clinic_dash_pro/js/unified_financials_chart.js' %}"></script>
+    <script src="{% static 'clinic_dash_pro/js/therapist_profit_chart.js' %}"></script>
+
+
 
 
 </body>

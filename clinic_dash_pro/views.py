@@ -11,6 +11,7 @@ from clinic_dash_pro.ingestion.xero import xero_ingest
 from clinic_dash_pro.ingestion.jane import jane_sessions_ingest, jane_processed_claims_ingest
 from datetime import date, timedelta
 from clinic_dash_pro.reports.generate_reports import GenerateReport
+from clinic_dash_pro.helper.helper import convert_df_to_dict
 
 
 @login_required
@@ -400,10 +401,16 @@ def reports_home(request):
     # Call the Reporting Section
     reports = GenerateReport(
         gusto_data, jane_sessions_data, jane_claims_data, xero_data)
+
+    # Call specific reports data
     monthly_operational_expenses_assets = reports.get_operational_report()
     unified_financials = reports.get_unified_financials()
+    therapist_profitability = reports.get_analyze_unified_financials()
 
-    context = {"monthly_operational_expenses_assets": monthly_operational_expenses_assets,
-               "unified_financials": unified_financials}
+    context = {
+        "monthly_operational_expenses_assets": convert_df_to_dict(monthly_operational_expenses_assets),
+        "unified_financials": convert_df_to_dict(unified_financials),
+        "therapist_profitability": convert_df_to_dict(therapist_profitability)
+    }
 
     return render(request, "clinic_dash_pro/report_home.html", context)

@@ -45,6 +45,16 @@ def merge_claims_sessions(claims_processed_df, sessions_df):
         (jane_merged_df["purchase_date"].astype(str).str.strip() != "")
     ]
 
+    # ---------------------------------------------------------
+    # 2. Choose the revenue measure
+    # ---------------------------------------------------------
+    # If Jane provides billed_amount or charge_amount, use that.
+    # Otherwise fall back to actual_collected (cash proxy).
+    if "billed_amount" in jane_merged_df.columns:
+        jane_merged_df["revenue_accrual"] = jane_merged_df["billed_amount"]
+    else:
+        jane_merged_df["revenue_accrual"] = jane_merged_df["Actual Collected"]
+
     # Sort by payment_date
     jane_merged_df.sort_values(by='payment_date', inplace=True)
     jane_merged_df = jane_merged_df.reset_index(drop=True)

@@ -16,13 +16,7 @@ latest_closed_year = periods["latest_closed_year"]
 # ---------------------------------------------------------
 
 
-def report_operational_expenses(xero_df):
-    """
-    Build operational expense report using:
-        - Xero Expenses (6000–6999)
-        - Xero Assets (1000–1999)
-    """
-
+def expenses_asset_data(xero_df):
     # Convert date → datetime
     xero_df["date"] = pd.to_datetime(xero_df["date"], errors="coerce")
     xero_df["period_month"] = xero_df["date"].dt.to_period("M")
@@ -35,14 +29,29 @@ def report_operational_expenses(xero_df):
     # Convert amount → positive
     xero_df["amount"] = xero_df["gross"].abs()
 
+    columns = ["hash_key", "insert_date", "account_type", "id"]
+    xero_df = xero_df.drop(columns=columns)
+
     # Separate expenses and assets
     category_dfs = {
         category: xero_df[xero_df["category"] == category].copy()
         for category in xero_df["category"].unique()
     }
 
-    expenses = category_dfs["Expense"]
-    assets = category_dfs["Asset"]
+    expenses = category_dfs["Expense"].reset_index(drop=True)
+    assets = category_dfs["Asset"].reset_index(drop=True)
+
+    return expenses, assets
+
+
+def report_operational_expenses(xero_df):
+    """
+    Build operational expense report using:
+        - Xero Expenses (6000–6999)
+        - Xero Assets (1000–1999)
+    """
+
+    expenses, assets = expenses_asset_data(xero_df)
 
     # -----------------------------
     # Monthly Expenses (cash-based)
@@ -112,3 +121,29 @@ def report_operational_expenses_lifetime(monthly, monthly_expenses_assets):
     grand_total["ty_ly_py"] = 'All Time'
 
     return grand_total
+
+
+def operating_expenses_breakdown(xero_df):
+
+    expenses, assets = expenses_asset_data(xero_df)
+
+    group_cols = [
+        'period_year', 'ty_ly_py', 'period_quarter',
+        'period_month', 'category', 'related_account'
+    ]
+
+    expenses_df = (
+        expenses[group_cols + ['amount']]
+        .groupby(group_cols)['amount']
+        .sum()
+        .reset_index()
+    )
+
+    assets_df = (
+        assets[group_cols + ['amount']]
+        .groupby(group_cols)['amount']
+        .sum()
+        .reset_index()
+    )
+
+    return expenses_df, assets_df

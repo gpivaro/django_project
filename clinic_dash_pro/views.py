@@ -314,11 +314,17 @@ def gusto_list(request):
 
 @login_required
 def xero_list(request):
+
+    REMOVE_FIELDS = [
+        "account_type",
+    ]
+
     return generic_list_view(
         request,
         XeroTransaction,
         "Xero Transactions",
-        "date"
+        "date",
+        remove_fields=REMOVE_FIELDS
     )
 
 
@@ -406,11 +412,15 @@ def reports_home(request):
     monthly_operational_expenses_assets = reports.get_operational_report()
     unified_financials = reports.get_unified_financials()
     therapist_profitability = reports.get_analyze_unified_financials()
+    operating_expenses_breakdown, _ = reports.get_operating_expenses_breakdown()
+    income_statement = reports.get_income_statement()
 
     context = {
         "monthly_operational_expenses_assets": convert_df_to_dict(monthly_operational_expenses_assets),
         "unified_financials": convert_df_to_dict(unified_financials),
-        "therapist_profitability": convert_df_to_dict(therapist_profitability)
+        "therapist_profitability": convert_df_to_dict(therapist_profitability),
+        "operating_expenses_breakdown": convert_df_to_dict(operating_expenses_breakdown),
+        "income_statement": convert_df_to_dict(income_statement)
     }
 
     return render(request, "clinic_dash_pro/report_home.html", context)

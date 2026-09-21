@@ -26,7 +26,7 @@
         /* Top bar: back button */
         .top-bar {
             display: flex;
-            justify-content: flex-end;
+            justify-content: flex-start;
             margin-bottom: 25px;
         }
 
@@ -48,7 +48,7 @@
             text-align: center;
             font-size: 14px;
             color: #555;
-            margin-bottom: 20px;
+            margin-bottom: 5px;
         }
 
         /* Layout: table + chart */
@@ -56,13 +56,13 @@
             display: flex;
             gap: 40px;
             align-items: flex-start;
-            max-width: 1400px;
+            max-width: 1600px;
             margin: auto;
         }
 
         /* Table container */
         .table-container {
-            width: 600px;
+            width: 800px;
             max-height: 450px;
             overflow-y: auto;
         }
@@ -117,6 +117,37 @@
             color: #666;
             font-size: 14px;
         }
+
+        .income-table td,
+        .income-table th {
+            text-align: left;
+            /* padding: 8px 10px; */
+            /* white-space: normal !important;     allow wrapping */
+            /* word-break: break-word !important;  break long words */
+            max-width: 400px;
+            /* prevents infinite stretching */
+        }
+
+
+        /* Sticky total row */
+        #income-statement-table tfoot {
+            position: sticky;
+            bottom: 0;
+            background: #eef6ff;
+            z-index: 5;
+        }
+
+        #income-statement-table tfoot th {
+            padding: 10px;
+            border-top: 2px solid #0078D4;
+        }
+
+        /* Prevent wrapping ONLY for Month column */
+        .income-table td.month-col,
+        .income-table th.month-col {
+            white-space: nowrap !important;
+            word-break: normal !important;
+        }
     </style>
 </head>
 
@@ -126,12 +157,111 @@
     <div class="hint">
         Review monthly operational totals and visualize year-over-year trends.
     </div>
-    <hr>
     <div class="top-bar">
-        <a href="{% url 'clinicdashpro_home' %}">
-            <button class="back-btn">Back to Home</button>
-        </a>
+
+        <!-- RIGHT: Back button -->
+        <div>
+            <a href="{% url 'clinicdashpro_home' %}">
+                <button class="back-btn">Back to Home</button>
+            </a>
+        </div>
+
+
+
     </div>
+
+    <hr>
+
+    <h2 style="text-align:center; margin-bottom:20px;">Income Statement</h2>
+
+
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar"
+        style="margin-bottom:20px; display:flex; gap:20px; align-items:center; justify-content:center;">
+
+        <!-- Date Range -->
+        <div>
+            <label><strong>Date range:</strong></label><br>
+            <select id="filter-date-range">
+                <option value="all">All</option>
+                <option value="this_month">This month</option>
+                <option value="this_quarter">This quarter</option>
+                <option value="this_year">This fiscal year</option>
+                <option value="last_month">Last month</option>
+                <option value="last_quarter">Last quarter</option>
+                <option value="last_year">Last fiscal year</option>
+                <option value="mtd">Month to date</option>
+                <option value="qtd">Quarter to date</option>
+                <option value="ytd">Year to date</option>
+            </select>
+        </div>
+
+        <!-- Category Filter -->
+        <div>
+            <label><strong>Category:</strong></label><br>
+            <select id="filter-category">
+                <option value="all">All</option>
+            </select>
+        </div>
+
+        <!-- Account Filter -->
+        <div>
+            <label><strong>Account:</strong></label><br>
+            <select id="filter-account">
+                <option value="all">All</option>
+            </select>
+        </div>
+
+        <button id="apply-filters" class="back-btn">Apply</button>
+        <button id="clear-filters" class="back-btn" style="background:#999;">Clear</button>
+    </div>
+
+    <div class="layout">
+        <!-- TABLE (aligned left, text wraps) -->
+        <div class="table-container">
+            <table id="income-statement-table" class="income-table">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Quarter</th>
+                        <th class="month-col">Month</th>
+                        <th>Category</th>
+                        <th>Account</th>
+                        <th style="text-align:right;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="5" style="text-align:right;">TOTAL</th>
+                        <th id="income-total" style="text-align:right;">$0.00</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- BAR CHART (smaller width, same style as other charts) -->
+        <div class="chart-area" style="width:800px;">
+            <canvas id="income_bar_chart"></canvas>
+        </div>
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+    <hr style="margin:40px 0;">
+
 
     <h2 style="text-align:center; margin-bottom:20px;">
         Unified Financials — Revenue • Payroll • Operational
@@ -171,7 +301,10 @@
         </div>
 
     </div>
+
+
     <hr style="margin:40px 0;">
+
 
     <h2 style="text-align:center; margin-bottom:20px;">
         Monthly Operational Expenses & Assets
@@ -253,20 +386,30 @@
 
 
 
+
+
+
+
     <div class="footer">
         Generated by Clinic Dash Pro Reporting Engine
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
 
     {{ monthly_operational_expenses_assets|json_script:"report-data-json" }}
     {{ unified_financials|json_script:"unified-financials-json" }}
     {{ therapist_profitability|json_script:"therapist-profitability-json" }}
+    {{ income_statement|json_script:"income-statement-json" }}
+
 
 
     <script src="{% static 'clinic_dash_pro/js/expenses_monthly_yoy_chart.js' %}"></script>
     <script src="{% static 'clinic_dash_pro/js/unified_financials_chart.js' %}"></script>
     <script src="{% static 'clinic_dash_pro/js/therapist_profit_chart.js' %}"></script>
+    <script src="{% static 'clinic_dash_pro/js/income_statement.js' %}"></script>
+
 
 
 

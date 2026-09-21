@@ -2,10 +2,33 @@
 
 
 <style>
+    .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        /* Top bar: back button */
+        .top-bar {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 25px;
+        }
+
+        .hint {
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
     .status-wrapper {
         display: flex;
         justify-content: center;
         width: 100%;
+        margin-bottom: 20px;
     }
 
     .status-container {
@@ -77,9 +100,10 @@
 
 </style>
 
-
-<h1>Clinic Dash Pro</h1>
-<p>Welcome to your financial dashboard.</p>
+<h1 class="page-title">Clinic Dash Pro</h1>
+    <div class="hint">
+        Welcome to your financial dashboard.
+    </div>
 
 <hr>
 
@@ -177,6 +201,12 @@
 
     </div>
 </div>
+
+
+
+<hr>
+
+<h2 class="section-title">Explore Financial Reports</h2>
 
 <div class="status-wrapper">
     <div class="status-container">

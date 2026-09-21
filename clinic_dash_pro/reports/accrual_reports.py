@@ -152,6 +152,9 @@ def build_accrual_payroll(gusto_df: pd.DataFrame, jane_df: pd.DataFrame) -> pd.D
     monthly_payroll_by_staff["period_month"] = monthly_payroll_by_staff["period_month"].astype(
         "period[M]")
 
+    monthly_payroll_by_staff['payroll_accrual'] = monthly_payroll_by_staff['payroll_accrual'].apply(
+        lambda x: round(x, 2))
+
     # -----------------------------
     # 8. Aggregate to monthly payroll
     # -----------------------------
@@ -161,6 +164,9 @@ def build_accrual_payroll(gusto_df: pd.DataFrame, jane_df: pd.DataFrame) -> pd.D
         .reset_index()
         .rename(columns={"daily_cost": "payroll_accrual"})
     )
+
+    monthly_payroll['payroll_accrual'] = monthly_payroll['payroll_accrual'].apply(
+        lambda x: round(x, 2))
 
     # Ensure period_month is Period[M]
     monthly_payroll["period_month"] = monthly_payroll["period_month"].astype(

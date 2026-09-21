@@ -305,9 +305,9 @@ def gusto_list(request):
 
     return generic_list_view(
         request,
-        GustoPayroll,
-        "Gusto Payroll Records",
-        "payroll_period_start",
+        model=GustoPayroll,
+        title="Gusto Payroll Records",
+        date_field="payroll_period_start",
         remove_fields=REMOVE_FIELDS
     )
 
@@ -321,9 +321,9 @@ def xero_list(request):
 
     return generic_list_view(
         request,
-        XeroTransaction,
-        "Xero Transactions",
-        "date",
+        model=XeroTransaction,
+        title="Xero Transactions",
+        date_field="date",
         remove_fields=REMOVE_FIELDS
     )
 
@@ -332,9 +332,9 @@ def xero_list(request):
 def jane_sessions_list(request):
     return generic_list_view(
         request,
-        JaneSessions,
-        "Jane Sessions Records",
-        "purchase_date"
+        model=JaneSessions,
+        title="Jane Sessions Records",
+        date_field="purchase_date"
     )
 
 
@@ -342,9 +342,9 @@ def jane_sessions_list(request):
 def jane_claims_list(request):
     return generic_list_view(
         request,
-        JaneProcessedClaim,
-        "Jane Processed Claims",
-        "payment_date"
+        model=JaneProcessedClaim,
+        title="Jane Processed Claims",
+        date_field="payment_date"
     )
 
 

@@ -84,13 +84,15 @@
             text-align: center;
             font-weight: 600;
             color: #005a9e;
-            z-index: 10;
+            z-index: 10;        
         }
 
         tbody td {
             padding: 8px 10px;
             border-bottom: 1px solid #ddd;
             text-align: right;
+            /* Light vertical column divider */
+            border-right: 1px solid #d0d0d0;
         }
 
         tbody tr:nth-child(even) {
@@ -121,11 +123,6 @@
         .income-table td,
         .income-table th {
             text-align: left;
-            /* padding: 8px 10px; */
-            /* white-space: normal !important;     allow wrapping */
-            /* word-break: break-word !important;  break long words */
-            max-width: 400px;
-            /* prevents infinite stretching */
         }
 
 
@@ -142,12 +139,7 @@
             border-top: 2px solid #0078D4;
         }
 
-        /* Prevent wrapping ONLY for Month column */
-        .income-table td.month-col,
-        .income-table th.month-col {
-            white-space: nowrap !important;
-            word-break: normal !important;
-        }
+
     </style>
 </head>
 
@@ -217,15 +209,15 @@
         <button id="clear-filters" class="back-btn" style="background:#999;">Clear</button>
     </div>
 
-    <div class="layout">
+    <div class="layout" style="width: 1800;">
         <!-- TABLE (aligned left, text wraps) -->
-        <div class="table-container">
+        <div class="table-container" style="width: 1600px">
             <table id="income-statement-table" class="income-table">
                 <thead>
                     <tr>
-                        <th>Year</th>
+                        <th >Year</th>
                         <th>Quarter</th>
-                        <th class="month-col">Month</th>
+                        <th>Month</th>
                         <th>Category</th>
                         <th>Account</th>
                         <th style="text-align:right;">Amount</th>
@@ -355,7 +347,7 @@
                 <thead>
                     <tr>
                         <th>Month</th>
-                        <th>Therapist</th>
+                        <th >Therapist</th>
                         <th>Revenue</th>
                         <th>Payroll</th>
                         <th>Profit</th>
@@ -366,7 +358,7 @@
                     {% for row in therapist_profitability %}
                     <tr>
                         <td style="text-align:center;">{{ row.period_month }}</td>
-                        <td>{{ row.employee_initials }}</td>
+                        <td style="text-align:center;">{{ row.employee_initials }}</td>
                         <td>${{ row.therapist_revenue|floatformat:2 }}</td>
                         <td>${{ row.therapist_payroll|floatformat:2 }}</td>
                         <td>${{ row.therapist_profit|floatformat:2 }}</td>

@@ -349,42 +349,80 @@ def jane_claims_list(request):
 
 
 @login_required
-def generic_list_view(request, model, title, date_field, remove_fields=None):
+def revenue_details_view(request):
 
-    # Filtering
+    # Pull data for all sources to process
+    xero_data = XeroTransaction.objects.all().values()
+    gusto_data = GustoPayroll.objects.all().values()
+    jane_sessions_data = JaneSessions.objects.all().values()
+    jane_claims_data = JaneProcessedClaim.objects.all().values()
+
+    # Call the Reporting Section
+    reports = GenerateReport(
+        gusto_data, jane_sessions_data, jane_claims_data, xero_data)
+
+    df = reports.get_revenue_details()
+    return generic_list_view(
+        request,
+        df=df,
+        title="Revenue Details",
+        date_field="purchase_date",
+        remove_fields=[""]
+    )
+
+
+@login_required
+def generic_list_view(request, model=None, df=None, title="", date_field="", remove_fields=None):
+
     q = request.GET.get("q", "").strip()
-
-    queryset = model.objects.all()
-
-    # Fields
-    EXCLUDE_DEFAULT = ("id", "hash_key", "insert_date")
-
-    if remove_fields:
-        EXCLUDE_FIELDS = set(EXCLUDE_DEFAULT) | set(remove_fields)
-    else:
-        EXCLUDE_FIELDS = EXCLUDE_DEFAULT
-
-    fields = [
-        f.name for f in model._meta.get_fields()
-        if f.concrete and f.name not in EXCLUDE_FIELDS
-    ]
-
-    if q:
-        search_filters = Q()
-        for f in fields:
-            search_filters |= Q(**{f"{f}__icontains": q})
-        queryset = queryset.filter(search_filters)
-
-    # Sorting
     sort = request.GET.get("sort", date_field)
+
+    EXCLUDE_DEFAULT = ("id", "hash_key", "insert_date")
+    EXCLUDE_FIELDS = set(EXCLUDE_DEFAULT) | set(remove_fields or [])
+
+    is_df = df is not None
+
+    # --- Fields ---
+    if is_df:
+        fields = [c for c in df.columns if c not in EXCLUDE_FIELDS]
+    else:
+        fields = [
+            f.name for f in model._meta.get_fields()
+            if f.concrete and f.name not in EXCLUDE_FIELDS
+        ]
+
+    # --- Filtering ---
+    if is_df:
+        if q:
+            mask = False
+            for f in fields:
+                mask |= df[f].astype(str).str.contains(q, case=False, na=False)
+            df = df[mask]
+    else:
+        queryset = model.objects.all()
+        if q:
+            search_filters = Q()
+            for f in fields:
+                search_filters |= Q(**{f"{f}__icontains": q})
+            queryset = queryset.filter(search_filters)
+
+    # --- Sorting ---
     if sort.lstrip("-") not in fields:
         sort = date_field
-    queryset = queryset.order_by(sort)
 
-    # Pagination
-    paginator = Paginator(queryset, 50)
-    page = request.GET.get("page")
-    items = paginator.get_page(page)
+    if is_df:
+        sort_field = sort.lstrip("-")
+        ascending = not sort.startswith("-")
+        df = df.sort_values(sort_field, ascending=ascending)
+    else:
+        queryset = queryset.order_by(sort)
+
+    # --- Pagination ---
+    if is_df:
+        items = Paginator(df.to_dict("records"), 50).get_page(
+            request.GET.get("page"))
+    else:
+        items = Paginator(queryset, 50).get_page(request.GET.get("page"))
 
     return render(request, "clinic_dash_pro/list_view.html", {
         "title": title,
@@ -414,13 +452,15 @@ def reports_home(request):
     therapist_profitability = reports.get_analyze_unified_financials()
     operating_expenses_breakdown, _ = reports.get_operating_expenses_breakdown()
     income_statement = reports.get_income_statement()
+    revenue_details = reports.get_revenue_details()
 
     context = {
         "monthly_operational_expenses_assets": convert_df_to_dict(monthly_operational_expenses_assets),
         "unified_financials": convert_df_to_dict(unified_financials),
         "therapist_profitability": convert_df_to_dict(therapist_profitability),
         "operating_expenses_breakdown": convert_df_to_dict(operating_expenses_breakdown),
-        "income_statement": convert_df_to_dict(income_statement)
+        "income_statement": convert_df_to_dict(income_statement),
+        "revenue_details": convert_df_to_dict(revenue_details)
     }
 
     return render(request, "clinic_dash_pro/report_home.html", context)

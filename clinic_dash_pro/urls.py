@@ -32,6 +32,10 @@ urlpatterns = [
     path("list/jane/sessions/", views.jane_sessions_list,
          name="jane_sessions_list"),
     path("list/jane/claims/", views.jane_claims_list, name="jane_claims_list"),
+    path("list/revenue_details_view/",
+         views.revenue_details_view, name="revenue_details_view"),
+
+
 
     # Additional Reports
     path("reports/", views.reports_home,         name="reports_home"),

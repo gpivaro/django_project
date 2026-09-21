@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from clinic_dash_pro.helper.helper import ty_ly_py
 
 # ---------------------------------------------------------
@@ -114,8 +115,10 @@ def attach_therapist_to_transactions(claims_processed_df, sessions_df):
     # Recompute Actual Collected per claim
     merged['Actual Collected'] = round(
         merged['collected'] + merged['processing_fee'] /
-        merged['claim_count'], 2
+        merged['claim_count'].replace(0, np.nan), 2
     )
+    merged['Actual Collected'] = merged['Actual Collected'].fillna(0)
+    merged.loc[merged['status'] == 'no_charge', 'Actual Collected'] = 0
 
     # --- Step 5: Re-convert dates after merge ---
     merged["payment_date"] = pd.to_datetime(
@@ -156,3 +159,20 @@ def attach_therapist_to_transactions(claims_processed_df, sessions_df):
         print("\n✅ Financial validation passed — merged totals match original.\n")
 
     return merged
+
+
+def revenue_details(jane_claims_merged):
+
+    columns = ['period_year', 'ty_ly_py', 'period_quarter', 'period_month',
+               'purchase_date', 'payment_date', 'Days Between invoice and Payment',
+               'payer', 'reference_number', 'employee_initials', 'item',
+               'invoice_number',  'applied_to', 'claim_count', 'amount',
+               'processing_fee', 'amount_paid_to_clinic', 'status', 'subtotal',
+               'total', 'balance', 'revenue_accrual', 'Actual Collected']
+
+    revenue_details = jane_claims_merged[columns]
+
+    revenue_details['purchase_date'] = revenue_details['purchase_date'].dt.strftime(
+        "%b. %d, %Y")
+
+    return revenue_details

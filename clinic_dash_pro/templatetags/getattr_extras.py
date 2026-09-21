@@ -1,9 +1,16 @@
 # getattr_extras.py
 
+
 from django import template
+
 register = template.Library()
 
 
-@register.filter(name="get_field")
+@register.filter
 def get_field(obj, attr):
-    return getattr(obj, attr)
+    # Support dict rows (DataFrame)
+    if isinstance(obj, dict):
+        return obj.get(attr, "")
+
+    # Support Django model instances
+    return getattr(obj, attr, "")

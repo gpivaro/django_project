@@ -2,7 +2,7 @@
 import pandas as pd
 from .expenses_reports import report_operational_expenses, operating_expenses_breakdown
 from .accrual_reports import build_accrual_payroll
-from .revenue_report import merge_claims_sessions
+from .revenue_report import merge_claims_sessions, revenue_details
 from .unified_reports import build_unified_financials
 from .analyze_financias import analyze_unified_financials
 
@@ -135,8 +135,6 @@ class GenerateReport:
         monthly_revenue = monthly_revenue.rename(
             columns={"amount": "tot_amount", "revenue_accrual": "amount"})
 
-        print(monthly_revenue.iloc[0])
-
         # ---------------------------------------------------------
         # 3. Get monthly payroll (Gusto accrual)
         # ---------------------------------------------------------
@@ -186,7 +184,15 @@ class GenerateReport:
              'category', 'related_account'])['amount'].sum().reset_index()
 
         income_statement = income_statement.sort_values(
-            ["period_year", "period_month", "category"]
+            ["period_month", "category"]
         ).reset_index(drop=True)
 
         return income_statement
+
+    def get_revenue_details(self):
+
+        monthly_revenue = self.get_accrual_revenue()
+
+        revenue_details_df = revenue_details(monthly_revenue)
+
+        return revenue_details_df

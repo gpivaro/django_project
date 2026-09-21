@@ -1,8 +1,15 @@
 <!-- home.html -->
+{% load static %}
+<body>
+
+    <head>
+        
+        <link rel="icon" type="image/png" href="{% static 'clinic_dash_pro/images/favicon.png' %}">
+    </head>
 
 
-<style>
-    .page-title {
+    <style>
+        .page-title {
             font-size: 32px;
             font-weight: 600;
             color: #333;
@@ -24,202 +31,206 @@
             margin-bottom: 5px;
         }
 
-    .status-wrapper {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        margin-bottom: 20px;
-    }
+        .status-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
 
-    .status-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-top: 20px;
-        justify-content: center; /* ensures children are centered too */
-    }
+        .status-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+            /* ensures children are centered too */
+        }
 
-    .status-box {
-        flex: 1;
-        min-width: 220px;
-        max-width: 260px;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-    }
+        .status-box {
+            flex: 1;
+            min-width: 220px;
+            max-width: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
 
-    .status-card {
-        padding: 12px 15px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        background: #fafafa;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        margin-bottom: 10px;
-    }
+        .status-card {
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #fafafa;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
 
-    .status-card h3 {
-        margin-top: 0;
-        font-size: 1rem;
-        margin-bottom: 8px;
-    }
+        .status-card h3 {
+            margin-top: 0;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
 
-    .status-card p {
-        margin: 4px 0;
-        font-size: 0.85rem;
-    }
+        .status-card p {
+            margin: 4px 0;
+            font-size: 0.85rem;
+        }
 
-    .upload-btn {
-        padding: 8px 12px;
-        font-size: 0.85rem;
-        border-radius: 6px;
-        border: none;
-        background: #99a0a7;
-        color: white;
-        cursor: pointer;
-        width: 100%;
-        margin-bottom: 5px;
-    }
+        .upload-btn {
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            border: none;
+            background: #99a0a7;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 5px;
+        }
 
-    .upload-btn:hover {
-        background: #0056b3;
-    }
+        .upload-btn:hover {
+            background: #0056b3;
+        }
 
-    .fresh {
-        color: green;
-        font-weight: bold;
-    }
+        .fresh {
+            color: green;
+            font-weight: bold;
+        }
 
-    .stale {
-        color: red;
-        font-weight: bold;
-    }
-    
-    .section-title {
-    text-align: center;
-    }
+        .stale {
+            color: red;
+            font-weight: bold;
+        }
 
-</style>
+        .section-title {
+            text-align: center;
+        }
+    </style>
 
-<h1 class="page-title">Clinic Dash Pro</h1>
+    <h1 class="page-title">Clinic Dash Pro</h1>
     <div class="hint">
         Welcome to your financial dashboard.
     </div>
 
-<hr>
+    <hr>
 
-<h2 class="section-title">Applications Data Overview</h2>
+    <h2 class="section-title">Applications Data Overview</h2>
 
-<div class="status-wrapper">
-    <div class="status-container">
+    <div class="status-wrapper">
+        <div class="status-container">
 
-        <!-- Gusto -->
-        <div class="status-box">
-            <div class="status-card">
-                <h3>Gusto Payroll</h3>
-                <p>Total records: {{ gusto.count }}</p>
-                <p>Date range: {{ gusto.start }} → {{ gusto.end }}</p>
-                <p>Latest: {{ gusto.latest }}</p>
-                {% if gusto.stale %}
+            <!-- Gusto -->
+            <div class="status-box">
+                <div class="status-card">
+                    <h3>Gusto Payroll</h3>
+                    <p>Total records: {{ gusto.count }}</p>
+                    <p>Date range: {{ gusto.start }} → {{ gusto.end }}</p>
+                    <p>Latest: {{ gusto.latest }}</p>
+                    {% if gusto.stale %}
                     <p class="stale">⚠ Over 15 days old</p>
-                {% else %}
+                    {% else %}
                     <p class="fresh">✔ Fresh</p>
-                {% endif %}
-            </div>
-            <a href="{% url 'upload_gusto' %}">
-                <button class="upload-btn">Upload Gusto Payroll</button>
-            </a>
-            
-            <a href="{% url 'gusto_list' %}">
-                <button class="upload-btn">View Gusto Data</button>
-            </a>
-        </div>
+                    {% endif %}
+                </div>
+                <a href="{% url 'upload_gusto' %}">
+                    <button class="upload-btn">Upload Gusto Payroll</button>
+                </a>
 
-        <!-- Xero -->
-        <div class="status-box">
-            <div class="status-card">
-                <h3>Xero Transactions</h3>
-                <p>Total records: {{ xero.count }}</p>
-                <p>Date range: {{ xero.start }} → {{ xero.end }}</p>
-                <p>Latest: {{ xero.latest }}</p>
-                {% if xero.stale %}
+                <a href="{% url 'gusto_list' %}">
+                    <button class="upload-btn">View Gusto Data</button>
+                </a>
+            </div>
+
+            <!-- Xero -->
+            <div class="status-box">
+                <div class="status-card">
+                    <h3>Xero Transactions</h3>
+                    <p>Total records: {{ xero.count }}</p>
+                    <p>Date range: {{ xero.start }} → {{ xero.end }}</p>
+                    <p>Latest: {{ xero.latest }}</p>
+                    {% if xero.stale %}
                     <p class="stale">⚠ Over 15 days old</p>
-                {% else %}
+                    {% else %}
                     <p class="fresh">✔ Fresh</p>
-                {% endif %}
-            </div>
-            <a href="{% url 'upload_xero' %}">
-                <button class="upload-btn">Upload Xero Transactions</button>
-            </a>
-            
-            <a href="{% url 'xero_list' %}">
-                <button class="upload-btn">View Xero Data</button>
-            </a>
-        </div>
+                    {% endif %}
+                </div>
+                <a href="{% url 'upload_xero' %}">
+                    <button class="upload-btn">Upload Xero Transactions</button>
+                </a>
 
-        <!-- Jane Sales -->
-        <div class="status-box">
-            <div class="status-card">
-                <h3>Jane Staff Sessions</h3>
-                <p>Total records: {{ jane_sessions.count }}</p>
-                <p>Date range: {{ jane_sessions.start }} → {{ jane_sessions.end }}</p>
-                <p>Latest: {{ jane_sessions.latest }}</p>
-                {% if jane_sessions.stale %}
+                <a href="{% url 'xero_list' %}">
+                    <button class="upload-btn">View Xero Data</button>
+                </a>
+            </div>
+
+            <!-- Jane Sales -->
+            <div class="status-box">
+                <div class="status-card">
+                    <h3>Jane Staff Sessions</h3>
+                    <p>Total records: {{ jane_sessions.count }}</p>
+                    <p>Date range: {{ jane_sessions.start }} → {{ jane_sessions.end }}</p>
+                    <p>Latest: {{ jane_sessions.latest }}</p>
+                    {% if jane_sessions.stale %}
                     <p class="stale">⚠ Over 15 days old</p>
-                {% else %}
+                    {% else %}
                     <p class="fresh">✔ Fresh</p>
-                {% endif %}
-            </div>
-            <a href="{% url 'upload_jane_sessions' %}">
-                <button class="upload-btn">Upload Jane Staff Sessions</button>
-            </a>
-            
-            <a href="{% url 'jane_sessions_list' %}">
-                <button class="upload-btn">View Jane Data</button>
-            </a>
-        </div>
+                    {% endif %}
+                </div>
+                <a href="{% url 'upload_jane_sessions' %}">
+                    <button class="upload-btn">Upload Jane Staff Sessions</button>
+                </a>
 
-        <!-- Jane Claims -->
-        <div class="status-box">
-            <div class="status-card">
-                <h3>Jane Claims</h3>
-                <p>Total records: {{ jane_claims.count }}</p>
-                <p>Date range: {{ jane_claims.start }} → {{ jane_claims.end }}</p>
-                <p>Latest: {{ jane_claims.latest }}</p>
-                {% if jane_claims.stale %}
+                <a href="{% url 'jane_sessions_list' %}">
+                    <button class="upload-btn">View Jane Data</button>
+                </a>
+            </div>
+
+            <!-- Jane Claims -->
+            <div class="status-box">
+                <div class="status-card">
+                    <h3>Jane Claims</h3>
+                    <p>Total records: {{ jane_claims.count }}</p>
+                    <p>Date range: {{ jane_claims.start }} → {{ jane_claims.end }}</p>
+                    <p>Latest: {{ jane_claims.latest }}</p>
+                    {% if jane_claims.stale %}
                     <p class="stale">⚠ Over 15 days old</p>
-                {% else %}
+                    {% else %}
                     <p class="fresh">✔ Fresh</p>
-                {% endif %}
+                    {% endif %}
+                </div>
+                <a href="{% url 'upload_jane_processed_claims' %}">
+                    <button class="upload-btn">Upload Jane Claims</button>
+                </a>
+                <a href="{% url 'jane_claims_list' %}">
+                    <button class="upload-btn">View Jane Claims Data</button>
+                </a>
             </div>
-            <a href="{% url 'upload_jane_processed_claims' %}">
-                <button class="upload-btn">Upload Jane Claims</button>
-            </a>
-            <a href="{% url 'jane_claims_list' %}">
-                <button class="upload-btn">View Jane Claims Data</button>
-            </a>
-        </div>
 
-    </div>
-</div>
-
-
-
-<hr>
-
-<h2 class="section-title">Explore Financial Reports</h2>
-
-<div class="status-wrapper">
-    <div class="status-container">
-        <!-- Report -->
-        <div class="status-box">
-            <a href="{% url 'reports_home' %}">
-                <button class="upload-btn">Go to Reports</button>
-            </a>
         </div>
     </div>
-</div>
 
 
 
+    <hr>
+
+    <h2 class="section-title">Explore Financial Reports</h2>
+
+    <div class="status-wrapper">
+        <div class="status-container">
+            <!-- Report -->
+            <div class="status-box">
+                <a href="{% url 'reports_home' %}">
+                    <button class="upload-btn">Go to Reports</button>
+                </a>
+                    <a href="{% url 'revenue_details_view' %}">
+                    <button class="upload-btn">Revenue Details</button>
+                </a>
 
 
+                
+            </div>
+        </div>
+    </div>
+
+
+</body>

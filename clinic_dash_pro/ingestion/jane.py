@@ -85,23 +85,17 @@ def make_jane_sessions_hash(row):
         return v
 
     key_fields = [
-        norm(row.get("purchase_date")),
-        norm(row.get("invoice_date")),
-        norm(row.get("item")),
-        norm(row.get("staff_member")),
-        norm(row.get("employee_initials")),
-        norm(row.get("payer")),
-        norm(row.get("invoice_number")),
-        norm(row.get("status")),
-        norm(row.get("subtotal")),
-        norm(row.get("total")),
-        norm(row.get("collected")),
-        norm(row.get("balance")),
-        # synthetic row ID for uniqueness inside file
-        norm(row.get("_row_id")),
+        row.get("staff_member"),
+        row.get("employee_initials"),
+        row.get("purchase_date"),
+        row.get("invoice_date"),
+        row.get("invoice_number"),
+        row.get("item"),
+        row.get("payer"),
     ]
 
-    key = "|".join(key_fields)
+    # Convert all fields to strings safely
+    key = "|".join(str(v) for v in key_fields)
     return hashlib.sha256(key.encode("utf-8")).hexdigest()
 
 
@@ -156,7 +150,7 @@ def jane_sessions_ingest(uploaded_file):
     jane_df["hash_key"] = jane_df.apply(make_jane_sessions_hash, axis=1)
 
     # Load into DB
-    inserted, skipped = load_jane_sessions_to_db(jane_df)
+    inserted, skipped, _ = load_jane_sessions_to_db(jane_df)
 
     return inserted, skipped
 

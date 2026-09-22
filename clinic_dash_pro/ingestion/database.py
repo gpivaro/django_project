@@ -164,44 +164,67 @@ def load_xero_to_db(xero_df):
 
 def load_jane_sessions_to_db(jane_df):
     inserted = 0
+    updated = 0
     skipped = 0
 
     for idx, row in jane_df.iterrows():
         row_dict = row.to_dict()
+        hash_key = row_dict["hash_key"]
 
         if idx % 500 == 0:
             print(
-                f"[Jane Staff Sales] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(jane_df):,}")
+                f"[Jane Staff Sales] Row {idx:,} — Inserted: {inserted:,}, Updated: {updated:,}, Skipped: {skipped:,}, Total: {len(jane_df):,}"
+            )
 
-        # Deduplication
-        if JaneSessions.objects.filter(hash_key=row_dict["hash_key"]).exists():
-            skipped += 1
-            continue
+        try:
+            obj = JaneSessions.objects.get(hash_key=hash_key)
+            # Existing record → check for changes
+            changed = False
 
-        JaneSessions.objects.create(
-            staff_member=row_dict.get("staff_member"),
-            employee_initials=row_dict.get("employee_initials"),
-            purchase_date=row_dict.get("purchase_date"),
-            invoice_date=row_dict.get("invoice_date"),
-            invoice_number=row_dict.get("invoice"),
-            item=row_dict.get("item"),
-            payer=row_dict.get("payer"),
-            status=row_dict.get("status"),
-            subtotal=row_dict.get("subtotal"),
-            total=row_dict.get("total"),
-            collected=row_dict.get("collected"),
-            balance=row_dict.get("balance"),
-            hash_key=row_dict.get("hash_key"),
-        )
+            # Fields that may change over time
+            mutable_fields = ["status", "subtotal",
+                              "total", "collected", "balance"]
 
-        inserted += 1
+            for field in mutable_fields:
+                new_val = row_dict.get(field)
+                old_val = getattr(obj, field)
+
+                if new_val != old_val:
+                    setattr(obj, field, new_val)
+                    changed = True
+
+            if changed:
+                obj.save()  # auto-updates updated_date
+                updated += 1
+            else:
+                skipped += 1
+
+        except JaneSessions.DoesNotExist:
+            # New record → insert
+            JaneSessions.objects.create(
+                staff_member=row_dict.get("staff_member"),
+                employee_initials=row_dict.get("employee_initials"),
+                purchase_date=row_dict.get("purchase_date"),
+                invoice_date=row_dict.get("invoice_date"),
+                invoice_number=row_dict.get("invoice"),
+                item=row_dict.get("item"),
+                payer=row_dict.get("payer"),
+                status=row_dict.get("status"),
+                subtotal=row_dict.get("subtotal"),
+                total=row_dict.get("total"),
+                collected=row_dict.get("collected"),
+                balance=row_dict.get("balance"),
+                hash_key=hash_key,
+            )
+            inserted += 1
 
     print("\n=== JANE STAFF SALES LOAD REPORT ===")
     print(f"Inserted new rows: {inserted}")
-    print(f"Skipped duplicates: {skipped}")
+    print(f"Updated existing rows: {updated}")
+    print(f"Skipped (no changes): {skipped}")
     print("==============================\n")
 
-    return inserted, skipped
+    return inserted, updated, skipped
 
 
 def load_jane_processed_claims_to_db(jane_df):

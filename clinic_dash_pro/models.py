@@ -143,11 +143,6 @@ class XeroTransaction(models.Model):
 
 
 class JaneSessions(models.Model):
-    """
-    Represents a single billing item from Jane's 'Sessions by Staff Member' export.
-    Each row corresponds to one billed service.
-    """
-
     staff_member = models.CharField(max_length=255, null=True, blank=True)
     employee_initials = models.CharField(max_length=50, null=True, blank=True)
 
@@ -163,9 +158,9 @@ class JaneSessions(models.Model):
     collected = models.FloatField(null=True, blank=True)
     balance = models.FloatField(null=True, blank=True)
 
-    # Deduplication + audit
     hash_key = models.CharField(max_length=64, unique=True)
     insert_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)  # NEW
 
     def __str__(self):
         return f"{self.purchase_date} — {self.staff_member} — {self.item}"

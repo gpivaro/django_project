@@ -2,8 +2,10 @@
 
 from django.urls import path
 from . import views
+from . import exports
 
 urlpatterns = [
+    # Home
     path('', views.clinicdashpro_home, name='clinicdashpro_home'),
 
     # Upload pages
@@ -13,8 +15,6 @@ urlpatterns = [
          name='upload_jane_sessions'),
     path("upload/jane/claims/", views.upload_jane_processed_claims,
          name="upload_jane_processed_claims"),
-
-
 
     # Success pages
     path('upload/gusto/success/', views.gusto_upload_success,
@@ -36,8 +36,15 @@ urlpatterns = [
          views.revenue_details_view, name="revenue_details_view"),
 
 
-
     # Additional Reports
     path("reports/", views.reports_home,         name="reports_home"),
+
+    # Export Routes
+    path("export/csv/<str:model_name>/", exports.export_csv, name="export_csv"),
+    path("export/excel/<str:model_name>/",
+         exports.export_excel, name="export_excel"),
+    path("export/df/csv/", exports.export_df_csv, name="export_df_csv"),
+    path("export/df/excel/", exports.export_df_excel, name="export_df_excel"),
+
 
 ]

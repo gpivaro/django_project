@@ -1,15 +1,18 @@
 # views.py
 
+import pandas as pd
+from datetime import date, timedelta
+import datetime
 
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+
 from clinic_dash_pro.models import GustoPayroll, XeroTransaction, JaneSessions, JaneProcessedClaim
 from clinic_dash_pro.ingestion.gusto import gusto_ingest
 from clinic_dash_pro.ingestion.xero import xero_ingest
 from clinic_dash_pro.ingestion.jane import jane_sessions_ingest, jane_processed_claims_ingest
-from datetime import date, timedelta
 from clinic_dash_pro.reports.generate_reports import GenerateReport
 from clinic_dash_pro.helper.helper import convert_df_to_dict
 
@@ -308,7 +311,8 @@ def gusto_list(request):
         model=GustoPayroll,
         title="Gusto Payroll Records",
         date_field="payroll_period_start",
-        remove_fields=REMOVE_FIELDS
+        remove_fields=REMOVE_FIELDS,
+        model_name="GustoPayroll"
     )
 
 
@@ -324,7 +328,8 @@ def xero_list(request):
         model=XeroTransaction,
         title="Xero Transactions",
         date_field="date",
-        remove_fields=REMOVE_FIELDS
+        remove_fields=REMOVE_FIELDS,
+        model_name="XeroTransaction"
     )
 
 
@@ -334,7 +339,8 @@ def jane_sessions_list(request):
         request,
         model=JaneSessions,
         title="Jane Sessions Records",
-        date_field="purchase_date"
+        date_field="purchase_date",
+        model_name="JaneSessions"
     )
 
 
@@ -344,35 +350,51 @@ def jane_claims_list(request):
         request,
         model=JaneProcessedClaim,
         title="Jane Processed Claims",
-        date_field="payment_date"
+        date_field="payment_date",
+        model_name="JaneProcessedClaim"
     )
 
 
 @login_required
 def revenue_details_view(request):
 
-    # Pull data for all sources to process
     xero_data = XeroTransaction.objects.all().values()
     gusto_data = GustoPayroll.objects.all().values()
     jane_sessions_data = JaneSessions.objects.all().values()
     jane_claims_data = JaneProcessedClaim.objects.all().values()
 
-    # Call the Reporting Section
     reports = GenerateReport(
-        gusto_data, jane_sessions_data, jane_claims_data, xero_data)
+        gusto_data, jane_sessions_data, jane_claims_data, xero_data
+    )
 
     df = reports.get_revenue_details()
+
+    df = reports.get_revenue_details()
+
+    # Convert Period columns → string
+    for col in df.columns:
+        if isinstance(df[col].dtype, pd.PeriodDtype):
+            df[col] = df[col].astype(str)
+
+    # Convert Python date/datetime → string
+    for col in df.columns:
+        if df[col].dtype == "object":
+            df[col] = df[col].apply(
+                lambda x: x.isoformat() if isinstance(
+                    x, (datetime.date, datetime.datetime)) else x
+            )
+
     return generic_list_view(
         request,
         df=df,
         title="Revenue Details",
         date_field="purchase_date",
-        remove_fields=[""]
+        remove_fields=[],
     )
 
 
 @login_required
-def generic_list_view(request, model=None, df=None, title="", date_field="", remove_fields=None):
+def generic_list_view(request, model=None, df=None, title="", date_field="", remove_fields=None, model_name=None):
 
     q = request.GET.get("q", "").strip()
     sort = request.GET.get("sort", date_field)
@@ -390,6 +412,11 @@ def generic_list_view(request, model=None, df=None, title="", date_field="", rem
             f.name for f in model._meta.get_fields()
             if f.concrete and f.name not in EXCLUDE_FIELDS
         ]
+
+    # Save DF export data AFTER fields exists
+    if is_df:
+        request.session["df_export"] = df.to_dict("records")
+        request.session["df_fields"] = fields
 
     # --- Filtering ---
     if is_df:
@@ -430,6 +457,7 @@ def generic_list_view(request, model=None, df=None, title="", date_field="", rem
         "fields": fields,
         "sort": sort,
         "q": q,
+        "model_name": model_name,
     })
 
 

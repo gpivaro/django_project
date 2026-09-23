@@ -188,6 +188,8 @@ def load_jane_sessions_to_db(jane_df):
             for field in mutable_fields:
                 new_val = row_dict.get(field)
                 old_val = getattr(obj, field)
+                print(new_val)
+                print(old_val)
 
                 if new_val != old_val:
                     setattr(obj, field, new_val)

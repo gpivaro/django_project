@@ -89,7 +89,7 @@ def make_jane_sessions_hash(row):
         row.get("employee_initials"),
         row.get("purchase_date"),
         row.get("invoice_date"),
-        row.get("invoice_number"),
+        row.get("invoice"),
         row.get("item"),
         row.get("payer"),
     ]

@@ -126,9 +126,9 @@ def attach_therapist_to_transactions(claims_processed_df, sessions_df):
     merged["invoice_date"] = pd.to_datetime(
         merged["invoice_date"], errors="coerce")
 
-    merged["Days Between invoice and Payment"] = (
+    merged["Days Until Paid"] = (
         merged["payment_date"] - merged["invoice_date"]
-    ).apply(lambda x: x.days if pd.notnull(x) else None)
+    ).apply(lambda x: x.days if pd.notnull(x) else None).fillna(0).astype("int")
 
     # Convert date columns to datetime.date
     date_cols = ["payment_date", "invoice_date", "purchase_date"]
@@ -164,7 +164,7 @@ def attach_therapist_to_transactions(claims_processed_df, sessions_df):
 def revenue_details(jane_claims_merged):
 
     columns = ['period_year', 'ty_ly_py', 'period_quarter', 'period_month',
-               'purchase_date', 'payment_date', 'Days Between invoice and Payment',
+               'purchase_date', 'payment_date', 'Days Until Paid',
                'payer', 'reference_number', 'employee_initials', 'item',
                'invoice_number',  'applied_to', 'claim_count', 'amount',
                'processing_fee', 'amount_paid_to_clinic', 'status', 'subtotal',

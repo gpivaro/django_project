@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const rawJson = document.getElementById("report-data-json")?.textContent;
 
-    console.log("Raw JSON from template:", rawJson);
+    
 
     let reportData = null;
 

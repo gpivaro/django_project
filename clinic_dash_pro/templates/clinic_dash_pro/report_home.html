@@ -6,10 +6,10 @@
 
 <head>
 
-    
-        
-        <link rel="icon" type="image/png" href="{% static 'clinic_dash_pro/images/favicon.png' %}">
-    
+
+
+    <link rel="icon" type="image/png" href="{% static 'clinic_dash_pro/images/favicon.png' %}">
+
 
     <meta charset="UTF-8">
     <title>Operational Report</title>
@@ -60,7 +60,7 @@
         /* Layout: table + chart */
         .layout {
             display: flex;
-            gap: 40px;
+            gap: 20px;
             align-items: flex-start;
             max-width: 1600px;
             margin: auto;
@@ -90,7 +90,7 @@
             text-align: center;
             font-weight: 600;
             color: #005a9e;
-            z-index: 10;        
+            z-index: 10;
         }
 
         tbody td {
@@ -148,12 +148,10 @@
         tfoot tr th {
             border-top: 2px solid #0078D4;
         }
-
-
     </style>
 
-    
-<link rel="icon" type="image/png" href="{% static 'clinic_dash_pro/images/favicon.png' %}">
+
+    <link rel="icon" type="image/png" href="{% static 'clinic_dash_pro/images/favicon.png' %}">
 
 </head>
 
@@ -225,11 +223,11 @@
 
     <div class="layout" style="width: 1800;">
         <!-- TABLE (aligned left, text wraps) -->
-        <div class="table-container" style="width: 1600px">
+        <div class="table-container" style="width: 1200px">
             <table id="income-statement-table" class="income-table">
                 <thead>
                     <tr>
-                        <th >Year</th>
+                        <th>Year</th>
                         <th>Quarter</th>
                         <th>Month</th>
                         <th>Category</th>
@@ -257,13 +255,15 @@
 
 
 
+    <div style="margin-top:40px; text-align:center;">
+        <h2 style="margin-bottom:10px;">Monthly Amount by Account</h2>
+    </div>
 
-
-
-
-
-
-
+    <div class="layout" style="margin-top:1px;">
+        <div class="chart-area" style="width:100%; margin:auto;">
+            <canvas id="monthly_account_chart"></canvas>
+        </div>
+    </div>
 
 
     <hr style="margin:40px 0;">
@@ -361,7 +361,7 @@
                 <thead>
                     <tr>
                         <th>Month</th>
-                        <th >Therapist</th>
+                        <th>Therapist</th>
                         <th>Revenue</th>
                         <th>Payroll</th>
                         <th>Profit</th>

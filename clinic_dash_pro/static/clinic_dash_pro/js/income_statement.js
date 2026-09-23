@@ -1,3 +1,5 @@
+// clinic_dash_pro\static\clinic_dash_pro\js\income_statement.js
+
 document.addEventListener("DOMContentLoaded", function () {
 
     const rawJson = document.getElementById("income-statement-json")?.textContent;
@@ -149,6 +151,89 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 }
 
+/// ============================
+// Render Monthly Chart (Amount vs Account)
+// ============================
+let monthlyChart = null;
+
+function renderMonthlyChart(rows) {
+    const ctx = document.getElementById("monthly_account_chart").getContext("2d");
+
+    // Group by month → account → total
+    const grouped = {};
+
+    rows.forEach(r => {
+        const raw = r.amount;
+        const original = typeof raw === "string"
+            ? Number(raw.replace(/[^0-9.-]/g, ""))
+            : Number(raw || 0);
+
+        const amount = Math.abs(original);   // ⭐ always positive
+
+        const month = r.period_month;        // "2026-09"
+        const account = r.related_account;
+
+        if (!grouped[month]) grouped[month] = {};
+        grouped[month][account] = (grouped[month][account] || 0) + amount;
+    });
+
+    // Sorted months
+    const months = Object.keys(grouped).sort();
+
+    // All accounts
+    const accounts = [...new Set(rows.map(r => r.related_account))].sort();
+
+    // Build datasets
+    const datasets = accounts.map(acc => {
+        const data = months.map(m => grouped[m][acc] || 0);
+
+        return {
+            label: acc,
+            data,
+            borderWidth: 2,
+            fill: false,
+            tension: 0.2,
+            borderColor: "#" + Math.floor(Math.random()*16777215).toString(16),
+        };
+    });
+
+    if (monthlyChart) monthlyChart.destroy();
+
+    monthlyChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: months,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    align: "start",     // ⭐ justify left-to-right instead of centered
+                },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => {
+                            const acc = ctx.dataset.label;
+                            const val = ctx.raw;
+                            return `${acc}: $${val.toLocaleString()}`;   // ⭐ account + amount
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: {
+                        callback: v => "$" + v.toLocaleString()
+                    }
+                }
+            }
+        }
+    });
+}
+
 
 
 
@@ -248,6 +333,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         renderTable(filtered);
         renderBarChart(filtered);
+        renderMonthlyChart(filtered);
+
     }
 
     document.getElementById("apply-filters").addEventListener("click", applyFilters);
@@ -262,9 +349,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         renderTable(data);
         renderBarChart(data);
+        renderMonthlyChart(data);
     });
 
     // Initial render
     renderTable(data);
     renderBarChart(data);
+    renderMonthlyChart(data);
+
 });

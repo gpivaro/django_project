@@ -1085,9 +1085,6 @@ def convert_df_to_dict(df):
     if df is None:
         return []
 
-    # Replace NaN with None so JSON is valid
-    df = df.replace({np.nan: None})
-
     # If DataFrame → normalize + convert
     if isinstance(df, pd.DataFrame):
 
@@ -1096,6 +1093,9 @@ def convert_df_to_dict(df):
 
         # Convert Period, Timestamp, numpy types → strings or Python primitives
         df = df.copy()
+
+        # Replace NaN with None so JSON is valid
+        df = df.replace({np.nan: None})
 
         for col in df.columns:
             if isinstance(df[col].dtype, pd.PeriodDtype):
@@ -1122,3 +1122,26 @@ def convert_df_to_dict(df):
 
     # Fallback
     return []
+
+
+def safe_report_call(func, *args, **kwargs):
+    try:
+        return func(*args, **kwargs)
+    except Exception:
+        # Return something safe depending on the report type
+        return pd.DataFrame()
+
+
+def make_json_safe(value):
+    try:
+        if isinstance(value, (np.integer, np.floating)):
+            return float(value)
+        if isinstance(value, (datetime.date, datetime.datetime)):
+            return value.isoformat()
+        if isinstance(value, pd.Period):
+            return str(value)
+        if isinstance(value, (list, tuple)):
+            return [make_json_safe(v) for v in value]
+        return value
+    except Exception:
+        return str(value)

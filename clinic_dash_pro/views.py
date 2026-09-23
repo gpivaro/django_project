@@ -14,7 +14,15 @@ from clinic_dash_pro.ingestion.gusto import gusto_ingest
 from clinic_dash_pro.ingestion.xero import xero_ingest
 from clinic_dash_pro.ingestion.jane import jane_sessions_ingest, jane_processed_claims_ingest
 from clinic_dash_pro.reports.generate_reports import GenerateReport
-from clinic_dash_pro.helper.helper import convert_df_to_dict
+from clinic_dash_pro.helper.helper import convert_df_to_dict, safe_report_call, make_json_safe
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.http import HttpResponse
+
+
+@staff_member_required
+def admin_only_view(request):
+    return HttpResponse("Staff only")
 
 
 @login_required
@@ -362,32 +370,48 @@ def jane_claims_list(request):
 @login_required
 def revenue_details_view(request):
 
+    # Pull data for all sources to process
     xero_data = XeroTransaction.objects.all().values()
     gusto_data = GustoPayroll.objects.all().values()
     jane_sessions_data = JaneSessions.objects.all().values()
     jane_claims_data = JaneProcessedClaim.objects.all().values()
 
+    # Reporting engine
     reports = GenerateReport(
         gusto_data, jane_sessions_data, jane_claims_data, xero_data
     )
 
-    df = reports.get_revenue_details()
+    # SAFETY WRAPPER — prevents crashes when DB is empty
+    try:
+        df = reports.get_revenue_details()
+    except Exception:
+        df = pd.DataFrame()  # safe fallback
 
-    df = reports.get_revenue_details()
+    # SAFETY — if df is None or not a DataFrame
+    if df is None or not isinstance(df, pd.DataFrame):
+        df = pd.DataFrame()
 
-    # Convert Period columns → string
+    # SAFETY — convert Period columns → string
     for col in df.columns:
-        if isinstance(df[col].dtype, pd.PeriodDtype):
-            df[col] = df[col].astype(str)
+        try:
+            if isinstance(df[col].dtype, pd.PeriodDtype):
+                df[col] = df[col].astype(str)
+        except Exception:
+            pass
 
-    # Convert Python date/datetime → string
+    # SAFETY — convert Python date/datetime → string
     for col in df.columns:
-        if df[col].dtype == "object":
-            df[col] = df[col].apply(
-                lambda x: x.isoformat() if isinstance(
-                    x, (datetime.date, datetime.datetime)) else x
-            )
+        try:
+            if df[col].dtype == "object":
+                df[col] = df[col].apply(
+                    lambda x: x.isoformat()
+                    if isinstance(x, (datetime.date, datetime.datetime))
+                    else x
+                )
+        except Exception:
+            pass
 
+    # SAFETY — generic_list_view will handle empty df gracefully
     return generic_list_view(
         request,
         df=df,
@@ -411,25 +435,32 @@ def generic_list_view(request, model=None, df=None, title="", date_field="", rem
 
     # --- Fields ---
     if is_df:
-        fields = [c for c in df.columns if c not in EXCLUDE_FIELDS]
+        try:
+            fields = [c for c in df.columns if c not in EXCLUDE_FIELDS]
+        except Exception:
+            fields = []
     else:
         fields = [
             f.name for f in model._meta.get_fields()
             if f.concrete and f.name not in EXCLUDE_FIELDS
         ]
 
-    # Save DF export data AFTER fields exists
-    if is_df:
-        request.session["df_export"] = df.to_dict("records")
-        request.session["df_fields"] = fields
-
     # --- Filtering ---
     if is_df:
-        if q:
-            mask = False
-            for f in fields:
-                mask |= df[f].astype(str).str.contains(q, case=False, na=False)
-            df = df[mask]
+        if q and fields:
+            try:
+                mask = False
+                for f in fields:
+                    if f in df.columns:
+                        mask |= df[f].astype(str).str.contains(
+                            q, case=False, na=False)
+                df = df[mask]
+            except Exception:
+                pass
+
+        # Clear ORM filter state
+        request.session["filtered_ids"] = []
+
     else:
         queryset = model.objects.all()
         if q:
@@ -438,23 +469,52 @@ def generic_list_view(request, model=None, df=None, title="", date_field="", rem
                 search_filters |= Q(**{f"{f}__icontains": q})
             queryset = queryset.filter(search_filters)
 
+        # Save filtered IDs for export
+        request.session["filtered_ids"] = list(
+            queryset.values_list("id", flat=True))
+
     # --- Sorting ---
-    if sort.lstrip("-") not in fields:
-        sort = date_field
+    sort_field = sort.lstrip("-")
+    ascending = not sort.startswith("-")
 
     if is_df:
-        sort_field = sort.lstrip("-")
-        ascending = not sort.startswith("-")
-        df = df.sort_values(sort_field, ascending=ascending)
+        if sort_field in df.columns:
+            try:
+                df = df.sort_values(sort_field, ascending=ascending)
+            except Exception:
+                pass
     else:
         queryset = queryset.order_by(sort)
 
+    # --- Save DF export data (JSON-safe) AFTER filtering + sorting ---
+    if is_df:
+        try:
+            safe_records = []
+            for row in df.to_dict("records"):
+                safe_row = {k: make_json_safe(v) for k, v in row.items()}
+                safe_records.append(safe_row)
+
+            request.session["df_export"] = safe_records
+            request.session["df_fields"] = fields
+
+        except Exception:
+            request.session["df_export"] = []
+            request.session["df_fields"] = []
+
     # --- Pagination ---
     if is_df:
-        items = Paginator(df.to_dict("records"), 50).get_page(
-            request.GET.get("page"))
+        try:
+            items = Paginator(df.to_dict("records"), 50).get_page(
+                request.GET.get("page"))
+        except Exception:
+            items = Paginator([], 50).get_page(request.GET.get("page"))
     else:
         items = Paginator(queryset, 50).get_page(request.GET.get("page"))
+
+    # --- Override ORM export to match visible page (Option 2) ---
+    if not is_df:
+        visible_ids = [obj.id for obj in items.object_list]
+        request.session["filtered_ids"] = visible_ids
 
     return render(request, "clinic_dash_pro/list_view.html", {
         "title": title,
@@ -475,17 +535,35 @@ def reports_home(request):
     jane_sessions_data = JaneSessions.objects.all().values()
     jane_claims_data = JaneProcessedClaim.objects.all().values()
 
-    # Call the Reporting Section
+    # Reporting engine
     reports = GenerateReport(
-        gusto_data, jane_sessions_data, jane_claims_data, xero_data)
+        gusto_data, jane_sessions_data, jane_claims_data, xero_data
+    )
 
-    # Call specific reports data
-    monthly_operational_expenses_assets = reports.get_operational_report()
-    unified_financials = reports.get_unified_financials()
-    therapist_profitability = reports.get_analyze_unified_financials()
-    operating_expenses_breakdown, _ = reports.get_operating_expenses_breakdown()
-    income_statement = reports.get_income_statement()
-    revenue_details = reports.get_revenue_details()
+    # Safe report calls
+    monthly_operational_expenses_assets = safe_report_call(
+        reports.get_operational_report
+    )
+
+    unified_financials = safe_report_call(
+        reports.get_unified_financials
+    )
+
+    therapist_profitability = safe_report_call(
+        reports.get_analyze_unified_financials
+    )
+
+    operating_expenses_breakdown = safe_report_call(
+        reports.get_operating_expenses_breakdown
+    )
+
+    income_statement = safe_report_call(
+        reports.get_income_statement
+    )
+
+    revenue_details = safe_report_call(
+        reports.get_revenue_details
+    )
 
     context = {
         "monthly_operational_expenses_assets": convert_df_to_dict(monthly_operational_expenses_assets),
@@ -493,7 +571,7 @@ def reports_home(request):
         "therapist_profitability": convert_df_to_dict(therapist_profitability),
         "operating_expenses_breakdown": convert_df_to_dict(operating_expenses_breakdown),
         "income_statement": convert_df_to_dict(income_statement),
-        "revenue_details": convert_df_to_dict(revenue_details)
+        "revenue_details": convert_df_to_dict(revenue_details),
     }
 
     return render(request, "clinic_dash_pro/report_home.html", context)

@@ -172,7 +172,17 @@ def revenue_details(jane_claims_merged):
 
     revenue_details = jane_claims_merged[columns]
 
-    revenue_details['purchase_date'] = revenue_details['purchase_date'].dt.strftime(
-        "%b. %d, %Y")
+    # Break view → make independent DataFrame
+    revenue_details = revenue_details.copy()
+
+    # Break dtype
+    revenue_details['purchase_date'] = revenue_details['purchase_date'].astype(
+        'object')
+
+    # Assign formatted strings
+    revenue_details['purchase_date'] = (
+        revenue_details['purchase_date']
+        .apply(lambda x: x.strftime('%Y-%m-%d') if hasattr(x, 'strftime') else x)
+    )
 
     return revenue_details

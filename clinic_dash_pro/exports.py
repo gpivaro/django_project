@@ -1,10 +1,10 @@
 # exports.py
-import pandas as pd
-from django.http import HttpResponse
-from django.apps import apps
-from datetime import datetime
 
 import pandas as pd
+from datetime import datetime
+from django.http import HttpResponse
+from django.apps import apps
+from django.contrib.auth.decorators import login_required
 
 
 def sanitize_dataframe(df):
@@ -35,9 +35,16 @@ def build_filename(name, ext):
     return f"{safe_name}_{timestamp}.{ext}"
 
 
+@login_required
 def export_csv(request, model_name):
     Model = apps.get_model("clinic_dash_pro", model_name)
-    qs = Model.objects.all().values()
+
+    filtered_ids = request.session.get("filtered_ids", [])
+    if filtered_ids:
+        qs = Model.objects.filter(id__in=filtered_ids).values()
+    else:
+        qs = Model.objects.all().values()
+
     df = pd.DataFrame(list(qs))
 
     filename = build_filename(model_name, "csv")
@@ -48,9 +55,16 @@ def export_csv(request, model_name):
     return response
 
 
+@login_required
 def export_excel(request, model_name):
     Model = apps.get_model("clinic_dash_pro", model_name)
-    qs = Model.objects.all().values()
+
+    filtered_ids = request.session.get("filtered_ids", [])
+    if filtered_ids:
+        qs = Model.objects.filter(id__in=filtered_ids).values()
+    else:
+        qs = Model.objects.all().values()
+
     df = pd.DataFrame(list(qs))
 
     df = sanitize_dataframe(df)
@@ -68,6 +82,7 @@ def export_excel(request, model_name):
     return response
 
 
+@login_required
 def export_df_csv(request):
     rows = request.session.get("df_export", [])
     fields = request.session.get("df_fields", [])
@@ -83,6 +98,7 @@ def export_df_csv(request):
     return response
 
 
+@login_required
 def export_df_excel(request):
     rows = request.session.get("df_export", [])
     fields = request.session.get("df_fields", [])

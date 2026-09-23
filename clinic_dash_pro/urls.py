@@ -5,6 +5,9 @@ from . import views
 from . import exports
 
 urlpatterns = [
+    # admin only
+    path("admin-only/", views.admin_only_view, name="admin_only_view"),
+
     # Home
     path('', views.clinicdashpro_home, name='clinicdashpro_home'),
 

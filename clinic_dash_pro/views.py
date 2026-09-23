@@ -335,11 +335,15 @@ def xero_list(request):
 
 @login_required
 def jane_sessions_list(request):
+
+    REMOVE_FIELDS = ["updated_date",]
+
     return generic_list_view(
         request,
         model=JaneSessions,
         title="Jane Sessions Records",
         date_field="purchase_date",
+        remove_fields=REMOVE_FIELDS,
         model_name="JaneSessions"
     )
 

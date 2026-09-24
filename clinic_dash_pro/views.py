@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from django.urls import reverse
 
 from clinic_dash_pro.models import GustoPayroll, XeroTransaction, JaneSessions, JaneProcessedClaim
 from clinic_dash_pro.ingestion.gusto import gusto_ingest
@@ -102,12 +103,31 @@ def upload_gusto(request):
                 "errors": ["Gusto file must be a CSV"]
             })
 
-        # Run ingestion pipeline
-        inserted, skipped = gusto_ingest(gusto_file)
+        request.session["upload_error"] = None
+        try:
+            inserted, skipped, updated = gusto_ingest(
+                gusto_file)
 
-        # Store ingestion results in session
-        request.session["gusto_inserted"] = inserted
-        request.session["gusto_skipped"] = skipped
+            return redirect("gusto_upload_success")
+
+        except Exception as err:
+            # Capture the actual error message
+            if isinstance(err, KeyError):
+                error_message = f"Missing required column: {err}"
+            else:
+                error_message = f"Upload failed: {str(err)}"
+
+            # Store error in session so success page can show it
+            request.session["upload_error"] = error_message
+
+            inserted = 0
+            skipped = 0
+            updated = 0
+
+        # Success → store counts
+        request.session["inserted_rows"] = inserted
+        request.session["skipped_rows"] = skipped
+        request.session["updated_rows"] = updated
 
         # Redirect to success page
         return redirect("gusto_upload_success")
@@ -130,8 +150,10 @@ def gusto_upload_success(request):
     Counts are retrieved from Django session, set in upload_gusto().
     """
     # Retrieve counts from session (default to 0)
-    inserted = request.session.get("gusto_inserted", 0)
-    skipped = request.session.get("gusto_skipped", 0)
+    inserted = request.session.get("inserted_rows", 0)
+    skipped = request.session.get("skipped_rows", 0)
+    updated = request.session.get("updated_rows", 0)
+    upload_error = request.session.get("upload_error")
 
     # Total rows in DB
     count = GustoPayroll.objects.count()
@@ -149,12 +171,18 @@ def gusto_upload_success(request):
         start = end = None
 
     # Render success page
-    return render(request, "clinic_dash_pro/gusto_upload_success.html", {
+    return render(request, "clinic_dash_pro/upload_success.html", {
+        "title": "Gusto Upload Completed",
+        "subtitle": "Your Gusto Payroll File Was Processed",
+        "data_description": "payroll",
         "count": count,
         "start": start,
         "end": end,
         "inserted": inserted,
         "skipped": skipped,
+        "updated": updated,
+        "upload_additional_records_url": reverse("upload_gusto"),
+        "upload_error": upload_error
     })
 
 
@@ -169,10 +197,31 @@ def upload_xero(request):
                 "errors": ["Xero file must be an Excel .xlsx file"]
             })
 
-        inserted, skipped = xero_ingest(xero_file)
+        request.session["upload_error"] = None
+        try:
+            inserted, skipped, updated = xero_ingest(
+                xero_file)
 
-        request.session["xero_inserted"] = inserted
-        request.session["xero_skipped"] = skipped
+            return redirect("xero_upload_success")
+
+        except Exception as err:
+            # Capture the actual error message
+            if isinstance(err, KeyError):
+                error_message = f"Missing required column: {err}"
+            else:
+                error_message = f"Upload failed: {str(err)}"
+
+            # Store error in session so success page can show it
+            request.session["upload_error"] = error_message
+
+            inserted = 0
+            skipped = 0
+            updated = 0
+
+        # Success → store counts
+        request.session["inserted_rows"] = inserted
+        request.session["skipped_rows"] = skipped
+        request.session["updated_rows"] = updated
 
         return redirect("xero_upload_success")
 
@@ -181,8 +230,10 @@ def upload_xero(request):
 
 @login_required
 def xero_upload_success(request):
-    inserted = request.session.get("xero_inserted", 0)
-    skipped = request.session.get("xero_skipped", 0)
+    inserted = request.session.get("inserted_rows", 0)
+    skipped = request.session.get("skipped_rows", 0)
+    updated = request.session.get("updated_rows", 0)
+    upload_error = request.session.get("upload_error")
 
     count = XeroTransaction.objects.count()
 
@@ -192,12 +243,19 @@ def xero_upload_success(request):
     else:
         start = end = None
 
-    return render(request, "clinic_dash_pro/xero_upload_success.html", {
+    return render(request, "clinic_dash_pro/upload_success.html", {
+        "title": "Xero Upload Completed",
+        "subtitle": "Your Xero Transactions File Was Processed",
+        "data_description": "categorized transactions",
         "count": count,
         "start": start,
         "end": end,
         "inserted": inserted,
         "skipped": skipped,
+        "updated": "",
+        "upload_additional_records_url": reverse("upload_xero"),
+        "upload_error": upload_error
+
     })
 
 
@@ -212,10 +270,31 @@ def upload_jane_sessions(request):
                 "errors": ["Jane Sessions file must be a CSV file"]
             })
 
-        inserted, skipped = jane_sessions_ingest(jane_file)
+        request.session["upload_error"] = None
+        try:
+            inserted, skipped, updated = jane_sessions_ingest(
+                jane_file)
 
-        request.session["jane_sessions_inserted"] = inserted
-        request.session["jane_sessions_skipped"] = skipped
+            return redirect("jane_sessions_upload_success")
+
+        except Exception as err:
+            # Capture the actual error message
+            if isinstance(err, KeyError):
+                error_message = f"Missing required column: {err}"
+            else:
+                error_message = f"Upload failed: {str(err)}"
+
+            # Store error in session so success page can show it
+            request.session["upload_error"] = error_message
+
+            inserted = 0
+            skipped = 0
+            updated = 0
+
+        # Success → store counts
+        request.session["inserted_rows"] = inserted
+        request.session["skipped_rows"] = skipped
+        request.session["updated_rows"] = updated
 
         return redirect("jane_sessions_upload_success")
 
@@ -224,8 +303,10 @@ def upload_jane_sessions(request):
 
 @login_required
 def jane_sessions_upload_success(request):
-    inserted = request.session.get("jane_sessions_inserted", 0)
-    skipped = request.session.get("jane_sessions_skipped", 0)
+    inserted = request.session.get("inserted_rows", 0)
+    skipped = request.session.get("skipped_rows", 0)
+    updated = request.session.get("updated_rows", 0)
+    upload_error = request.session.get("upload_error")
 
     count = JaneSessions.objects.count()
 
@@ -235,12 +316,18 @@ def jane_sessions_upload_success(request):
     else:
         start = end = None
 
-    return render(request, "clinic_dash_pro/jane_sessions_upload_success.html", {
+    return render(request, "clinic_dash_pro/upload_success.html", {
+        "title": "Jane Sessions Upload Completed",
+        "subtitle": "Your Jane Sessions File Was Processed",
+        "data_description": "staff session",
         "count": count,
         "start": start,
         "end": end,
         "inserted": inserted,
         "skipped": skipped,
+        "updated": updated,
+        "upload_additional_records_url": reverse("upload_jane_sessions"),
+        "upload_error": upload_error
     })
 
 
@@ -255,20 +342,43 @@ def upload_jane_processed_claims(request):
                 "errors": ["Jane Processed Claims file must be a CSV file"]
             })
 
-        inserted, skipped = jane_processed_claims_ingest(jane_file)
+        request.session["upload_error"] = None
+        try:
+            inserted, skipped, updated = jane_processed_claims_ingest(
+                jane_file)
 
-        request.session["jane_claims_inserted"] = inserted
-        request.session["jane_claims_skipped"] = skipped
+        except Exception as err:
+            # Capture the actual error message
+            if isinstance(err, KeyError):
+                error_message = f"Missing required column: {err}"
+            else:
+                error_message = f"Upload failed: {str(err)}"
 
+            # Store error in session so success page can show it
+            request.session["upload_error"] = error_message
+
+            inserted = 0
+            skipped = 0
+            updated = 0
+
+        # Success → store counts
+        request.session["inserted_rows"] = inserted
+        request.session["skipped_rows"] = skipped
+        request.session["updated_rows"] = updated
+
+        # Also show error immediately on upload page
         return redirect("jane_processed_claims_upload_success")
 
+    # GET request → show upload page
     return render(request, "clinic_dash_pro/upload_jane_processed_claims.html")
 
 
 @login_required
 def jane_processed_claims_upload_success(request):
-    inserted = request.session.get("jane_claims_inserted", 0)
-    skipped = request.session.get("jane_claims_skipped", 0)
+    inserted = request.session.get("inserted_rows", 0)
+    skipped = request.session.get("skipped_rows", 0)
+    updated = request.session.get("updated_rows", 0)
+    upload_error = request.session.get("upload_error")
 
     count = JaneProcessedClaim.objects.count()
 
@@ -279,12 +389,19 @@ def jane_processed_claims_upload_success(request):
     else:
         start = end = None
 
-    return render(request, "clinic_dash_pro/jane_processed_claims_upload_success.html", {
+    return render(request, "clinic_dash_pro/upload_success.html", {
+        "title": "Jane Claims Upload Completed",
+        "subtitle": "Your Jane Claims File Was Processed",
+        "data_description": "insurance claim",
         "count": count,
         "start": start,
         "end": end,
         "inserted": inserted,
         "skipped": skipped,
+        "updated": updated,
+        "upload_additional_records_url": reverse("upload_jane_processed_claims"),
+        "upload_error": upload_error
+
     })
 
 
@@ -457,9 +574,6 @@ def generic_list_view(request, model=None, df=None, title="", date_field="", rem
                 df = df[mask]
             except Exception:
                 pass
-
-        # Clear ORM filter state
-        request.session["filtered_ids"] = []
 
     else:
         queryset = model.objects.all()

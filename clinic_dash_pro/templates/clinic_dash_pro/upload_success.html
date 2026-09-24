@@ -2,9 +2,10 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Gusto Upload Completed</title>
+    <title>{{title}}</title>
 
     <style>
         body {
@@ -53,7 +54,7 @@
             background: #fff;
             padding: 30px;
             border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
             flex: 1;
             max-width: 450px;
             text-align: left;
@@ -87,7 +88,7 @@
         .upload-btn {
             background-color: #0078D4;
             color: white;
-            
+
         }
 
         .upload-btn:hover {
@@ -108,39 +109,48 @@
 
 <body>
 
-<h1 class="page-title">Gusto Upload Completed</h1>
+    <h1 class="page-title">{{title}}</h1>
 
-<div class="layout">
+    {% if upload_error %}
+    <h2 style="color:red;text-align: center;">{{ upload_error }}</h2>
+    {% endif %}
 
-    <!-- LEFT: Summary -->
-    <div class="summary-box">
-        <h2>Your Gusto Payroll File Was Processed</h2>
-        <p>Clinic Dash Pro analyzed your payroll CSV and updated your payroll records.</p>
-        <p>New rows were imported, and duplicates were safely skipped.</p>
-        <p>This ensures your payroll data remains clean and accurate.</p>
-    </div>
+    <div class="layout">
 
-    <!-- RIGHT: Metrics -->
-    <div class="metrics-box">
-        <p><strong>Inserted Rows:</strong> {{ inserted }}</p>
-        <p><strong>Skipped Duplicates:</strong> {{ skipped }}</p>
-        <p><strong>Total Rows in Database:</strong> {{ count }}</p>
-        <p><strong>Payroll Period Range:</strong> {{ start }} → {{ end }}</p>
+        <!-- LEFT: Summary -->
+        <div class="summary-box">
+            <h2>{{subtitle}}</h2>
+            <p>Clinic Dash Pro analyzed your {{data_description}} CSV and updated your {{data_description}} records.</p>
+            <p>New rows were imported, and duplicates were safely skipped.</p>
+            <p>This ensures your {{data_description}} data remains clean and accurate.</p>
+        </div>
 
-        <!-- Center-aligned buttons -->
-        <div class="button-row">
-            <a href="{% url 'upload_gusto' %}">
-                <button class="upload-btn">Upload Another Gusto File</button>
-            </a>
+
+
+
+        <!-- RIGHT: Metrics -->
+        <div class="metrics-box">
+            <p><strong>Inserted Rows:</strong> {{ inserted }}</p>
+            <p><strong>Updated Rows:</strong> {{ updated }}</p>
+            <p><strong>Skipped Duplicates:</strong> {{ skipped }}</p>
+            <p><strong>Total Rows in Database:</strong> {{ count }}</p>
+            <p><strong>{{data_description}} Period Range:</strong> {{ start }} → {{ end }}</p>
+
+            <!-- Center-aligned buttons -->
+            <div class="button-row">
+                <a href="{{ upload_additional_records_url }}">
+                    <button class="upload-btn">Upload Another {{data_description}}</button>
+                </a>
             </div>
             <div class="button-row">
-            <a href="{% url 'clinicdashpro_home' %}">
-                <button class="back-btn">Back to Home</button>
-            </a>
+                <a href="{% url 'clinicdashpro_home' %}">
+                    <button class="back-btn">Back to Home</button>
+                </a>
+            </div>
         </div>
+
     </div>
 
-</div>
-
 </body>
+
 </html>

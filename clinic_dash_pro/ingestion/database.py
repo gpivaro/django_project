@@ -224,43 +224,65 @@ def load_jane_sessions_to_db(jane_df):
     print(f"Skipped (no changes): {skipped}")
     print("==============================\n")
 
-    return inserted, updated, skipped
+    return inserted, skipped, updated
 
 
 def load_jane_processed_claims_to_db(jane_df):
     inserted = 0
     skipped = 0
+    updated = 0
 
     for idx, row in jane_df.iterrows():
         row_dict = row.to_dict()
+        hash_key = row_dict["hash_key"]
 
         if idx % 500 == 0:
             print(
                 f"[Jane Claims] Row {idx:,} — Inserted: {inserted:,}, Skipped: {skipped:,}, Total: {len(jane_df):,}")
 
-        # Deduplication
-        if JaneProcessedClaim.objects.filter(hash_key=row_dict["hash_key"]).exists():
-            skipped += 1
-            continue
+        try:
+            obj = JaneProcessedClaim.objects.get(hash_key=hash_key)
+            # Existing record → check for changes
+            changed = False
 
-        JaneProcessedClaim.objects.create(
-            payment_date=row_dict.get("payment_date"),
-            payer=row_dict.get("payer"),
-            payment_method=row_dict.get("payment_method"),
-            reference_number=row_dict.get("reference_number"),
-            applied_to=row_dict.get("applied_to"),
-            claim_count=row_dict.get("claim_count"),
-            amount=row_dict.get("amount"),
-            processing_fee=row_dict.get("processing_fee"),
-            amount_paid_to_clinic=row_dict.get("amount_paid_to_clinic"),
-            hash_key=row_dict.get("hash_key"),
-        )
+            # Fields that may change over time
+            mutable_fields = ['amount', 'processing_fee',
+                              'amount_paid_to_clinic']
 
-        inserted += 1
+            for field in mutable_fields:
+                new_val = row_dict.get(field)
+                old_val = getattr(obj, field)
+
+                if new_val != old_val:
+                    setattr(obj, field, new_val)
+                    changed = True
+
+            if changed:
+                obj.save()  # auto-updates updated_date
+                updated += 1
+            else:
+                skipped += 1
+        except JaneProcessedClaim.DoesNotExist:
+
+            JaneProcessedClaim.objects.create(
+                payment_date=row_dict.get("payment_date"),
+                payer=row_dict.get("payer"),
+                payment_method=row_dict.get("payment_method"),
+                reference_number=row_dict.get("reference_number"),
+                applied_to=row_dict.get("applied_to"),
+                claim_count=row_dict.get("claim_count"),
+                amount=row_dict.get("amount"),
+                processing_fee=row_dict.get("processing_fee"),
+                amount_paid_to_clinic=row_dict.get("amount_paid_to_clinic"),
+                hash_key=row_dict.get("hash_key"),
+            )
+
+            inserted += 1
 
     print("\n=== JANE PROCESSED CLAIMS LOAD REPORT ===")
     print(f"Inserted new rows: {inserted}")
+    print(f"Updated existing rows: {updated}")
     print(f"Skipped duplicates: {skipped}")
     print("=========================================\n")
 
-    return inserted, skipped
+    return inserted, skipped, updated

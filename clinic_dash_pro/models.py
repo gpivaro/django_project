@@ -100,6 +100,7 @@ class GustoPayroll(models.Model):
     # ---------------------------------------------------------
     hash_key = models.CharField(max_length=64, unique=True)
     insert_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)  # NEW
 
     def __str__(self):
         """
@@ -137,6 +138,7 @@ class XeroTransaction(models.Model):
     # Deduplication + audit
     hash_key = models.CharField(max_length=64, unique=True)
     insert_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)  # NEW
 
     def __str__(self):
         return f"{self.date} — {self.contact} — {self.description}"
@@ -185,6 +187,7 @@ class JaneProcessedClaim(models.Model):
     # Deduplication + audit
     hash_key = models.CharField(max_length=64, unique=True)
     insert_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)  # NEW
 
     def __str__(self):
         return f"{self.payment_date} — {self.payer} — {self.amount}"

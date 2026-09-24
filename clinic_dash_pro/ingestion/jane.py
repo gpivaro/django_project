@@ -150,9 +150,9 @@ def jane_sessions_ingest(uploaded_file):
     jane_df["hash_key"] = jane_df.apply(make_jane_sessions_hash, axis=1)
 
     # Load into DB
-    inserted, skipped, _ = load_jane_sessions_to_db(jane_df)
+    inserted, skipped, updated = load_jane_sessions_to_db(jane_df)
 
-    return inserted, skipped
+    return inserted, skipped, updated
 
 
 def make_jane_processed_claim_hash(row):
@@ -273,6 +273,6 @@ def jane_processed_claims_ingest(uploaded_file):
     jane_df["hash_key"] = jane_df.apply(make_jane_processed_claim_hash, axis=1)
 
     # Load into DB
-    inserted, skipped = load_jane_processed_claims_to_db(jane_df)
+    inserted, skipped, updated = load_jane_processed_claims_to_db(jane_df)
 
-    return inserted, skipped
+    return inserted, skipped, updated

@@ -511,11 +511,6 @@ def generic_list_view(request, model=None, df=None, title="", date_field="", rem
     else:
         items = Paginator(queryset, 50).get_page(request.GET.get("page"))
 
-    # --- Override ORM export to match visible page (Option 2) ---
-    if not is_df:
-        visible_ids = [obj.id for obj in items.object_list]
-        request.session["filtered_ids"] = visible_ids
-
     return render(request, "clinic_dash_pro/list_view.html", {
         "title": title,
         "items": items,

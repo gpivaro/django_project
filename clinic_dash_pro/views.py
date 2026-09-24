@@ -103,14 +103,17 @@ def upload_gusto(request):
                 "errors": ["Gusto file must be a CSV"]
             })
 
-        request.session["upload_error"] = None
         try:
-            inserted, skipped, updated = gusto_ingest(
+            inserted, skipped = gusto_ingest(
                 gusto_file)
+            updated = 0
 
-            return redirect("gusto_upload_success")
+            # Clear error on successful ingestion
+            print("DEBUG: Ingestion succeeded:", inserted, skipped, updated)
+            request.session.pop("upload_error", None)
 
         except Exception as err:
+            print("DEBUG: Ingestion failed:", err)
             # Capture the actual error message
             if isinstance(err, KeyError):
                 error_message = f"Missing required column: {err}"
@@ -153,7 +156,7 @@ def gusto_upload_success(request):
     inserted = request.session.get("inserted_rows", 0)
     skipped = request.session.get("skipped_rows", 0)
     updated = request.session.get("updated_rows", 0)
-    upload_error = request.session.get("upload_error")
+    upload_error = request.session.pop("upload_error", "")
 
     # Total rows in DB
     count = GustoPayroll.objects.count()
@@ -197,14 +200,17 @@ def upload_xero(request):
                 "errors": ["Xero file must be an Excel .xlsx file"]
             })
 
-        request.session["upload_error"] = None
         try:
-            inserted, skipped, updated = xero_ingest(
+            inserted, skipped = xero_ingest(
                 xero_file)
+            updated = 0
 
-            return redirect("xero_upload_success")
+            # Clear error on successful ingestion
+            print("DEBUG: Ingestion succeeded:", inserted, skipped, updated)
+            request.session.pop("upload_error", None)
 
         except Exception as err:
+            print("DEBUG: Ingestion failed:", err)
             # Capture the actual error message
             if isinstance(err, KeyError):
                 error_message = f"Missing required column: {err}"
@@ -233,7 +239,7 @@ def xero_upload_success(request):
     inserted = request.session.get("inserted_rows", 0)
     skipped = request.session.get("skipped_rows", 0)
     updated = request.session.get("updated_rows", 0)
-    upload_error = request.session.get("upload_error")
+    upload_error = request.session.pop("upload_error", "")
 
     count = XeroTransaction.objects.count()
 
@@ -252,7 +258,7 @@ def xero_upload_success(request):
         "end": end,
         "inserted": inserted,
         "skipped": skipped,
-        "updated": "",
+        "updated": updated,
         "upload_additional_records_url": reverse("upload_xero"),
         "upload_error": upload_error
 
@@ -270,14 +276,16 @@ def upload_jane_sessions(request):
                 "errors": ["Jane Sessions file must be a CSV file"]
             })
 
-        request.session["upload_error"] = None
         try:
             inserted, skipped, updated = jane_sessions_ingest(
                 jane_file)
 
-            return redirect("jane_sessions_upload_success")
+            # Clear error on successful ingestion
+            print("DEBUG: Ingestion succeeded:", inserted, skipped, updated)
+            request.session.pop("upload_error", None)
 
         except Exception as err:
+            print("DEBUG: Ingestion failed:", err)
             # Capture the actual error message
             if isinstance(err, KeyError):
                 error_message = f"Missing required column: {err}"
@@ -306,7 +314,7 @@ def jane_sessions_upload_success(request):
     inserted = request.session.get("inserted_rows", 0)
     skipped = request.session.get("skipped_rows", 0)
     updated = request.session.get("updated_rows", 0)
-    upload_error = request.session.get("upload_error")
+    upload_error = request.session.pop("upload_error", "")
 
     count = JaneSessions.objects.count()
 
@@ -342,12 +350,16 @@ def upload_jane_processed_claims(request):
                 "errors": ["Jane Processed Claims file must be a CSV file"]
             })
 
-        request.session["upload_error"] = None
         try:
             inserted, skipped, updated = jane_processed_claims_ingest(
                 jane_file)
 
+            # Clear error on successful ingestion
+            print("DEBUG: Ingestion succeeded:", inserted, skipped, updated)
+            request.session.pop("upload_error", None)
+
         except Exception as err:
+            print("DEBUG: Ingestion failed:", err)
             # Capture the actual error message
             if isinstance(err, KeyError):
                 error_message = f"Missing required column: {err}"
@@ -378,7 +390,7 @@ def jane_processed_claims_upload_success(request):
     inserted = request.session.get("inserted_rows", 0)
     skipped = request.session.get("skipped_rows", 0)
     updated = request.session.get("updated_rows", 0)
-    upload_error = request.session.get("upload_error")
+    upload_error = request.session.pop("upload_error", "")
 
     count = JaneProcessedClaim.objects.count()
 

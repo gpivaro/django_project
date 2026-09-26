@@ -441,6 +441,7 @@ def gusto_list(request):
         "insert_date",
         "hash_key",
         "id",
+        "updated_date"
     ]
 
     return generic_list_view(
@@ -458,6 +459,7 @@ def xero_list(request):
 
     REMOVE_FIELDS = [
         "account_type",
+        "updated_date"
     ]
 
     return generic_list_view(

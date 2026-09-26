@@ -1,3 +1,5 @@
+from decimal import Decimal
+import datetime
 import pandas as pd
 import hashlib
 
@@ -86,7 +88,6 @@ def make_jane_sessions_hash(row):
 
     key_fields = [
         row.get("staff_member"),
-        row.get("employee_initials"),
         row.get("purchase_date"),
         row.get("invoice_date"),
         row.get("invoice"),
@@ -96,7 +97,9 @@ def make_jane_sessions_hash(row):
 
     # Convert all fields to strings safely
     key = "|".join(str(v) for v in key_fields)
-    return hashlib.sha256(key.encode("utf-8")).hexdigest()
+
+    # --- Shorter hash (128-bit) to save DB space ---
+    return hashlib.md5(key.encode("utf-8")).hexdigest()
 
 
 def jane_sessions_ingest(uploaded_file):
@@ -143,9 +146,6 @@ def jane_sessions_ingest(uploaded_file):
     jane_df["employee_initials"] = jane_df["staff_member"].apply(
         to_initials)
 
-    # Add synthetic row ID
-    jane_df["_row_id"] = jane_df.index
-
     # Generate hash keys
     jane_df["hash_key"] = jane_df.apply(make_jane_sessions_hash, axis=1)
 
@@ -157,19 +157,64 @@ def jane_sessions_ingest(uploaded_file):
 
 def make_jane_processed_claim_hash(row):
     """
-    Stable hash for Jane Processed Claims rows.
-    Identical rows inside the same file are treated as distinct.
-    Identical rows across uploads are deduped.
+    Generate a stable, deterministic hash for Jane Processed Claims.
+
+    Goals:
+    - Identical rows → identical hashes.
+    - Robust against:
+        * float formatting differences (19.8 vs 19.80 vs 19.80000000001)
+        * date formatting differences (Timestamp vs datetime vs string)
+        * whitespace / unicode inconsistencies
+        * type inconsistencies (float, Decimal, numpy types)
+        * hidden unicode (non-breaking spaces, zero-width spaces)
+    - Hash length reduced (128-bit) to save DB space.
     """
 
     def norm(v):
+        """
+        Normalize a value into a canonical string representation.
+        This ensures that semantically identical values hash identically.
+        """
+
+        # Treat None / NaN as empty string
         if v is None or pd.isna(v):
             return ""
-        v = str(v).strip().lower()
+
+        # --- Normalize dates ---
+        # Handles: datetime.date, datetime.datetime, pandas.Timestamp
+        if isinstance(v, (datetime.date, datetime.datetime, pd.Timestamp)):
+            return v.strftime("%Y-%m-%d")
+
+        # --- Normalize numeric values ---
+        # Convert floats / Decimals / numpy floats to a fixed 2-decimal format
+        try:
+            # Convert to Decimal for stable rounding
+            dec = Decimal(str(v))
+            return format(dec.quantize(Decimal("0.01")), "f")  # e.g. "19.80"
+        except Exception:
+            pass
+
+        # --- Normalize strings ---
+        v = str(v)
+
+        # Lowercase for case-insensitivity
+        v = v.lower()
+
+        # Replace non-breaking spaces with normal spaces
         v = v.replace("\xa0", " ")
+
+        # Remove zero-width spaces
+        v = v.replace("\u200b", "")
+
+        # Collapse multiple spaces → single space
         v = " ".join(v.split())
+
+        # Strip leading/trailing whitespace
+        v = v.strip()
+
         return v
 
+    # Fields used for hashing — must be stable and deterministic
     key_fields = [
         norm(row.get("payment_date")),
         norm(row.get("payer")),
@@ -178,12 +223,18 @@ def make_jane_processed_claim_hash(row):
         norm(row.get("amount")),
         norm(row.get("processing_fee")),
         norm(row.get("amount_paid_to_clinic")),
-        # synthetic row ID for uniqueness inside file
-        norm(row.get("_row_id")),
     ]
 
+    # Join fields into a single canonical string
     key = "|".join(key_fields)
-    return hashlib.sha256(key.encode("utf-8")).hexdigest()
+
+    # --- Shorter hash (128-bit) to save DB space ---
+    # SHA-256 → 64 hex chars
+    # SHA-1 → 40 hex chars
+    # MD5 → 32 hex chars (128-bit)
+    #
+    # MD5 is perfectly fine for dedupe keys (not used for security).
+    return hashlib.md5(key.encode("utf-8")).hexdigest()
 
 
 def jane_processed_claims_ingest(uploaded_file):
@@ -203,11 +254,13 @@ def jane_processed_claims_ingest(uploaded_file):
     jane_df = normalize_columns(jane_df)
 
     # --- Step 2: Normalize applied_to column ---
-    jane_df['applied_to'] = jane_df['applied_to'].fillna('')
+    jane_df['applied_to'] = jane_df['applied_to'].fillna('N/A')
 
     jane_df['applied_to'] = jane_df['applied_to'].apply(
         lambda x: [item.strip() for item in str(x).split(',') if item.strip()]
     )
+
+    jane_df['reference_number'] = jane_df['reference_number'].fillna('N/A')
 
     # ---------------------------------------------------------
     # Step 1: Normalize payer based on patient_guid

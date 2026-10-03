@@ -441,7 +441,8 @@ def gusto_list(request):
         "insert_date",
         "hash_key",
         "id",
-        "updated_date"
+        "updated_date",
+        "staff_member"
     ]
 
     return generic_list_view(
@@ -475,7 +476,10 @@ def xero_list(request):
 @login_required
 def jane_sessions_list(request):
 
-    REMOVE_FIELDS = ["updated_date",]
+    REMOVE_FIELDS = [
+        "updated_date",
+        "staff_member"
+    ]
 
     return generic_list_view(
         request,
@@ -489,11 +493,15 @@ def jane_sessions_list(request):
 
 @login_required
 def jane_claims_list(request):
+
+    REMOVE_FIELDS = ["updated_date",]
+
     return generic_list_view(
         request,
         model=JaneProcessedClaim,
         title="Jane Processed Claims",
         date_field="payment_date",
+        remove_fields=REMOVE_FIELDS,
         model_name="JaneProcessedClaim"
     )
 

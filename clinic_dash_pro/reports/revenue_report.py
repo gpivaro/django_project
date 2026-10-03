@@ -27,12 +27,23 @@ def merge_claims_sessions(claims_processed_df, sessions_df):
     claims_processed_df = claims_processed_df.copy()
     sessions_df = sessions_df.copy()
 
-    # Drop Unecessary columns
-    claims_processed_df = claims_processed_df.drop(
-        columns=["id", "hash_key", "insert_date"])
+    columns_to_drop = [
+        "id",
+        "hash_key",
+        "insert_date",
+        "updated_date",
+        "period_month",
+        "period_quarter",
+        "period_year",
+        "ty_ly_py",
+    ]
 
+    claims_processed_df = claims_processed_df.drop(
+        columns=columns_to_drop, errors="ignore")
     sessions_df = sessions_df.drop(
-        columns=["id", "hash_key", "insert_date", "payer"])
+        columns=columns_to_drop, errors="ignore")
+
+    sessions_df = sessions_df.drop(columns="payer", errors="ignore")
 
     # ---------------------------------------------------------
     # Step 3: Merge transactions with sales (attach therapist)
@@ -166,7 +177,7 @@ def revenue_details(jane_claims_merged):
     columns = ['period_year', 'ty_ly_py', 'period_quarter', 'period_month',
                'purchase_date', 'payment_date', 'Days Until Paid',
                'payer', 'reference_number', 'employee_initials', 'item',
-               'invoice_number',  'applied_to', 'claim_count', 'amount',
+               'invoice_number',  'applied_to', 'refund', 'claim_count', 'amount',
                'processing_fee', 'amount_paid_to_clinic', 'status', 'subtotal',
                'total', 'balance', 'revenue_accrual', 'Actual Collected']
 

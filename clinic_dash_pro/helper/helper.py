@@ -1,10 +1,11 @@
 # helper.py
 
+from decimal import Decimal
 import numpy as np
+import datetime
 from datetime import date, timedelta
 import math
 from dateutil import parser
-from datetime import datetime
 from rapidfuzz import process, fuzz
 import re
 import os
@@ -745,64 +746,6 @@ def to_initials(name: str) -> str:
     return initials
 
 
-def ty_ly_py(df, column):
-    """
-    Classify each row based on the year difference between df[column] and today:
-        TY = This Year
-        LY = Last Year
-        PY = Prior Year (2 years ago)
-        OY = Older Year (3+ years ago)
-
-    Supports:
-        - datetime64 columns
-        - period dtype columns (e.g., period[Y-DEC])
-    """
-
-    current_year = datetime.now().year
-
-    col = df[column]
-
-    # ---------------------------------------------------------
-    # Handle Period dtype (e.g., period[Y-DEC])
-    # ---------------------------------------------------------
-    if isinstance(col.dtype, pd.PeriodDtype):
-        df["year_diff"] = current_year - col.dt.year
-
-    # ---------------------------------------------------------
-    # Handle datetime dtype
-    # ---------------------------------------------------------
-    elif pd.api.types.is_datetime64_any_dtype(col):
-        df["year_diff"] = current_year - col.dt.year
-
-    # ---------------------------------------------------------
-    # Handle object/string dates
-    # ---------------------------------------------------------
-    else:
-        # Convert to datetime safely
-        col_dt = pd.to_datetime(col, errors="coerce")
-        df["year_diff"] = current_year - col_dt.dt.year
-
-    # ---------------------------------------------------------
-    # Classification
-    # ---------------------------------------------------------
-    def classify(diff):
-        if pd.isna(diff):
-            return "OY"
-        if diff == 0:
-            return "TY"
-        if diff == 1:
-            return "LY"
-        if diff == 2:
-            return "PY"
-        return "OY"
-
-    df["ty_ly_py"] = df["year_diff"].apply(classify)
-
-    df.drop(columns=["year_diff"], inplace=True)
-
-    return df
-
-
 def get_periods():
     """
     Returns:
@@ -1002,33 +945,25 @@ def ty_ly_py(df, column):
         - period dtype columns (e.g., period[Y-DEC])
     """
 
-    current_year = datetime.now().year
+    # FIX: use datetime.datetime.now()
+    current_year = datetime.datetime.now().year
 
     col = df[column]
 
-    # ---------------------------------------------------------
-    # Handle Period dtype (e.g., period[Y-DEC])
-    # ---------------------------------------------------------
+    # Handle Period dtype
     if isinstance(col.dtype, pd.PeriodDtype):
         df["year_diff"] = current_year - col.dt.year
 
-    # ---------------------------------------------------------
     # Handle datetime dtype
-    # ---------------------------------------------------------
     elif pd.api.types.is_datetime64_any_dtype(col):
         df["year_diff"] = current_year - col.dt.year
 
-    # ---------------------------------------------------------
     # Handle object/string dates
-    # ---------------------------------------------------------
     else:
-        # Convert to datetime safely
         col_dt = pd.to_datetime(col, errors="coerce")
         df["year_diff"] = current_year - col_dt.dt.year
 
-    # ---------------------------------------------------------
     # Classification
-    # ---------------------------------------------------------
     def classify(diff):
         if pd.isna(diff):
             return "OY"
@@ -1041,7 +976,6 @@ def ty_ly_py(df, column):
         return "OY"
 
     df["ty_ly_py"] = df["year_diff"].apply(classify)
-
     df.drop(columns=["year_diff"], inplace=True)
 
     return df
@@ -1145,3 +1079,52 @@ def make_json_safe(value):
         return value
     except Exception:
         return str(value)
+
+
+def norm(v):
+    """
+    Normalize a value into a canonical string representation.
+    Ensures semantically identical values hash identically.
+    Supports:
+        - None / NaN
+        - strings
+        - floats / Decimals / numpy floats
+        - datetime.date / datetime.datetime / pandas.Timestamp
+    """
+
+    # Treat None / NaN as empty string
+    if v is None or pd.isna(v):
+        return ""
+
+    # --- Normalize dates ---
+    # Handles: datetime.date, datetime.datetime, pandas.Timestamp
+    if isinstance(v, (datetime.date, datetime.datetime, pd.Timestamp)):
+        return v.strftime("%Y-%m-%d")
+
+    # --- Normalize numeric values ---
+    # Convert floats / Decimals / numpy floats to a fixed 2-decimal format
+    try:
+        dec = Decimal(str(v))
+        return format(dec.quantize(Decimal("0.01")), "f")  # e.g. "19.80"
+    except Exception:
+        pass
+
+    # --- Normalize strings ---
+    v = str(v)
+
+    # Lowercase for case-insensitivity
+    v = v.lower()
+
+    # Replace non-breaking spaces with normal spaces
+    v = v.replace("\xa0", " ")
+
+    # Remove zero-width spaces
+    v = v.replace("\u200b", "")
+
+    # Collapse multiple spaces → single space
+    v = " ".join(v.split())
+
+    # Strip leading/trailing whitespace
+    v = v.strip()
+
+    return v

@@ -166,7 +166,7 @@
             <!-- Jane Sales -->
             <div class="status-box">
                 <div class="status-card">
-                    <h3>Jane Staff Sessions</h3>
+                    <h3>Jane Sessions</h3>
                     <p>Total records: {{ jane_sessions.count }}</p>
                     <p>Date range: {{ jane_sessions.start }} → {{ jane_sessions.end }}</p>
                     <p>Latest: {{ jane_sessions.latest }}</p>
@@ -177,11 +177,11 @@
                     {% endif %}
                 </div>
                 <a href="{% url 'upload_jane_sessions' %}">
-                    <button class="upload-btn">Upload Jane Staff Sessions</button>
+                    <button class="upload-btn">Upload Jane Sessions</button>
                 </a>
 
                 <a href="{% url 'jane_sessions_list' %}">
-                    <button class="upload-btn">View Jane Data</button>
+                    <button class="upload-btn">View Jane Sessions Data</button>
                 </a>
             </div>
 

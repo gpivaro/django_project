@@ -1,9 +1,8 @@
-from decimal import Decimal
-import datetime
+
 import pandas as pd
 import hashlib
 
-from clinic_dash_pro.helper.helper import normalize_columns, auto_numeric_columns, to_initials, build_staff_short_name
+from clinic_dash_pro.helper.helper import normalize_columns, auto_numeric_columns, to_initials, build_staff_short_name, norm
 from clinic_dash_pro.ingestion.database import load_jane_sessions_to_db, load_jane_processed_claims_to_db
 
 # ---------------------------------------------------------
@@ -78,21 +77,13 @@ def make_jane_sessions_hash(row):
     Identical rows across uploads are deduped.
     """
 
-    def norm(v):
-        if v is None or pd.isna(v):
-            return ""
-        v = str(v).strip().lower()
-        v = v.replace("\xa0", " ")
-        v = " ".join(v.split())
-        return v
-
     key_fields = [
-        row.get("staff_member"),
-        row.get("purchase_date"),
-        row.get("invoice_date"),
-        row.get("invoice"),
-        row.get("item"),
-        row.get("payer"),
+        norm(row.get("staff_member")),
+        norm(row.get("purchase_date")),
+        norm(row.get("invoice_date")),
+        norm(row.get("invoice")),
+        norm(row.get("item")),
+        norm(row.get("payer")),
     ]
 
     # Convert all fields to strings safely
@@ -127,6 +118,24 @@ def jane_sessions_ingest(uploaded_file):
         jane_df["purchase_date"], errors="coerce").dt.date
     jane_df["invoice_date"] = pd.to_datetime(
         jane_df["invoice_date"], errors="coerce").dt.date
+
+    # ---------------------------------------------------------
+    # Add period fields based on purchase_date
+    # ---------------------------------------------------------
+
+    # Convert to datetime64 for period operations
+    pdate = pd.to_datetime(jane_df["purchase_date"], errors="coerce")
+
+    jane_df["period_month"] = pdate.dt.to_period("M").astype(str)
+    jane_df["period_quarter"] = pdate.dt.to_period("Q").astype(str)
+    jane_df["period_year"] = pdate.dt.to_period("Y").astype(str)
+
+    # TY / LY / PY / OY classification
+    from clinic_dash_pro.helper.helper import ty_ly_py
+    jane_df = ty_ly_py(jane_df, "period_year")
+
+    # Convert back to Python date for DB
+    jane_df["purchase_date"] = pdate.dt.date
 
     # Drop empty rows
     jane_df = jane_df.dropna(how="all").reset_index(drop=True)
@@ -169,50 +178,6 @@ def make_jane_processed_claim_hash(row):
         * hidden unicode (non-breaking spaces, zero-width spaces)
     - Hash length reduced (128-bit) to save DB space.
     """
-
-    def norm(v):
-        """
-        Normalize a value into a canonical string representation.
-        This ensures that semantically identical values hash identically.
-        """
-
-        # Treat None / NaN as empty string
-        if v is None or pd.isna(v):
-            return ""
-
-        # --- Normalize dates ---
-        # Handles: datetime.date, datetime.datetime, pandas.Timestamp
-        if isinstance(v, (datetime.date, datetime.datetime, pd.Timestamp)):
-            return v.strftime("%Y-%m-%d")
-
-        # --- Normalize numeric values ---
-        # Convert floats / Decimals / numpy floats to a fixed 2-decimal format
-        try:
-            # Convert to Decimal for stable rounding
-            dec = Decimal(str(v))
-            return format(dec.quantize(Decimal("0.01")), "f")  # e.g. "19.80"
-        except Exception:
-            pass
-
-        # --- Normalize strings ---
-        v = str(v)
-
-        # Lowercase for case-insensitivity
-        v = v.lower()
-
-        # Replace non-breaking spaces with normal spaces
-        v = v.replace("\xa0", " ")
-
-        # Remove zero-width spaces
-        v = v.replace("\u200b", "")
-
-        # Collapse multiple spaces → single space
-        v = " ".join(v.split())
-
-        # Strip leading/trailing whitespace
-        v = v.strip()
-
-        return v
 
     # Fields used for hashing — must be stable and deterministic
     key_fields = [
@@ -293,6 +258,24 @@ def jane_processed_claims_ingest(uploaded_file):
         errors="coerce"
     ).dt.date
 
+    # ---------------------------------------------------------
+    # Add period fields based on payment_date
+    # ---------------------------------------------------------
+
+    # Convert to datetime64 for period operations
+    pdate = pd.to_datetime(jane_df["payment_date"], errors="coerce")
+
+    jane_df["period_month"] = pdate.dt.to_period("M").astype(str)
+    jane_df["period_quarter"] = pdate.dt.to_period("Q").astype(str)
+    jane_df["period_year"] = pdate.dt.to_period("Y").astype(str)
+
+    # TY / LY / PY / OY classification
+    from clinic_dash_pro.helper.helper import ty_ly_py
+    jane_df = ty_ly_py(jane_df, "period_year")
+
+    # Convert back to Python date for DB
+    jane_df["payment_date"] = pdate.dt.date
+
     # Normalize Jane Payments naming
     jane_df = replace_with_regex(
         jane_df, 'payment_method', r'^Jane Payments.*', 'Jane Payments'
@@ -318,9 +301,6 @@ def jane_processed_claims_ingest(uploaded_file):
     # ---------------------------------------------------------
     jane_df["claim_count"] = jane_df["applied_to"].apply(
         count_claims)
-
-    # Add synthetic row ID
-    jane_df["_row_id"] = jane_df.index
 
     # Generate hash keys
     jane_df["hash_key"] = jane_df.apply(make_jane_processed_claim_hash, axis=1)

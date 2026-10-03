@@ -4,9 +4,12 @@ import pandas as pd
 import hashlib
 from io import BytesIO
 
+
 from clinic_dash_pro.helper.helper import (
     normalize_columns,
     auto_numeric_columns,
+    norm,
+    ty_ly_py
 )
 from clinic_dash_pro.ingestion.database import load_xero_to_db
 
@@ -18,26 +21,22 @@ def make_xero_hash(row):
     Identical rows across different uploads are deduped.
     """
 
-    def norm(v):
-        if v is None or pd.isna(v):
-            return ""
-        v = str(v).strip().lower()
-        v = v.replace("\xa0", " ")
-        v = " ".join(v.split())
-        return v
-
     key_fields = [
         norm(row.get("date")),
         norm(row.get("account_type")),
         norm(row.get("related_account")),
         norm(row.get("contact")),
         norm(row.get("description")),
+        norm(row.get("debit")),
+        norm(row.get("credit")),
         norm(row.get("gross")),
-        norm(row.get("_row_id")),   # synthetic unique row ID
+        norm(row.get("category")),
     ]
 
-    key = "|".join(key_fields)
-    return hashlib.sha256(key.encode("utf-8")).hexdigest()
+    # Convert all fields to strings safely
+    key = "|".join(str(v) for v in key_fields)
+
+    return hashlib.md5(key.encode("utf-8")).hexdigest()
 
 
 # ---------------------------------------------------------
@@ -100,7 +99,15 @@ def xero_ingest(uploaded_file):
     xero_df = normalize_columns(xero_df)
 
     # Convert date column
-    xero_df["date"] = pd.to_datetime(xero_df["date"], errors="coerce").dt.date
+    xero_df["date"] = pd.to_datetime(xero_df["date"], errors="coerce")
+
+    xero_df["period_month"] = xero_df["date"].dt.to_period("M").astype(str)
+    xero_df["period_quarter"] = xero_df["date"].dt.to_period("Q").astype(str)
+    xero_df["period_year"] = xero_df["date"].dt.to_period("Y").astype(str)
+
+    xero_df = ty_ly_py(xero_df, "period_year")
+
+    xero_df["date"] = xero_df["date"].dt.date
 
     xero_df = xero_df[xero_df["date"].notna()]
 
@@ -115,8 +122,6 @@ def xero_ingest(uploaded_file):
 
     # Classify Xero categories (Revenue, Expense, Asset, Payroll, etc.)
     xero_df["category"] = xero_df.apply(classify_xero_category, axis=1)
-
-    xero_df["_row_id"] = xero_df.index
 
     # Generate hash keys
     xero_df["hash_key"] = xero_df.apply(make_xero_hash, axis=1)

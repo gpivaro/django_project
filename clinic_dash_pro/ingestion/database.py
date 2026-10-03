@@ -61,11 +61,20 @@ def load_gusto_to_db(gusto_df):
         # Insert new payroll row
         # ---------------------------------------------------------
         GustoPayroll.objects.create(
+
+
+            period_year=row_dict.get("period_year"),
+            ty_ly_py=row_dict.get("ty_ly_py"),
+            period_quarter=row_dict.get("period_quarter"),
+            period_month=row_dict.get("period_month"),
+            payroll_period=row_dict.get("Payroll Period"),
+            payroll_period_start=row_dict.get("Payroll Period Start"),
+            payroll_period_end=row_dict.get("Payroll Period End"),
+
             staff_member=row_dict.get("Staff Member"),
             employee_initials=row_dict.get("employee_initials"),
-
-            payroll_period=row_dict.get("Payroll Period"),
             department=row_dict.get("Department"),
+            employee_type=row_dict.get("Employee Type"),
 
             regular_hours=row_dict.get("Regular (Hours)"),
             regular_amount=row_dict.get("Regular (Amount)"),
@@ -100,12 +109,7 @@ def load_gusto_to_db(gusto_df):
             check_amount=row_dict.get("Check Amount"),
 
             employer_cost=row_dict.get("Employer Cost"),
-
-            employee_type=row_dict.get("Employee Type"),
             payment=row_dict.get("Payment"),
-
-            payroll_period_start=row_dict.get("Payroll Period Start"),
-            payroll_period_end=row_dict.get("Payroll Period End"),
 
             hash_key=row_dict.get("hash_key"),
         )
@@ -140,15 +144,22 @@ def load_xero_to_db(xero_df):
             continue
 
         XeroTransaction.objects.create(
+            period_year=row_dict.get("period_year"),
+            ty_ly_py=row_dict.get("ty_ly_py"),
+            period_quarter=row_dict.get("period_quarter"),
+            period_month=row_dict.get("period_month"),
             date=row_dict.get("date"),
+
+            category=row_dict.get("category"),
             account_type=row_dict.get("account_type"),
             related_account=row_dict.get("related_account"),
             contact=row_dict.get("contact"),
             description=row_dict.get("description"),
+
             debit=row_dict.get("debit"),
             credit=row_dict.get("credit"),
             gross=row_dict.get("gross"),
-            category=row_dict.get("category"),
+
             hash_key=row_dict.get("hash_key"),
         )
 
@@ -202,18 +213,28 @@ def load_jane_sessions_to_db(jane_df):
         except JaneSessions.DoesNotExist:
             # New record → insert
             JaneSessions.objects.create(
-                staff_member=row_dict.get("staff_member"),
-                employee_initials=row_dict.get("employee_initials"),
+
+                period_year=row_dict.get("period_year"),
+                ty_ly_py=row_dict.get("ty_ly_py"),
+                period_quarter=row_dict.get("period_quarter"),
+                period_month=row_dict.get("period_month"),
                 purchase_date=row_dict.get("purchase_date"),
                 invoice_date=row_dict.get("invoice_date"),
+
+                staff_member=row_dict.get("staff_member"),
+                employee_initials=row_dict.get("employee_initials"),
+
+
                 invoice_number=row_dict.get("invoice"),
                 item=row_dict.get("item"),
                 payer=row_dict.get("payer"),
                 status=row_dict.get("status"),
+
                 subtotal=row_dict.get("subtotal"),
                 total=row_dict.get("total"),
                 collected=row_dict.get("collected"),
                 balance=row_dict.get("balance"),
+
                 hash_key=hash_key,
             )
             inserted += 1
@@ -265,15 +286,22 @@ def load_jane_processed_claims_to_db(jane_df):
         except JaneProcessedClaim.DoesNotExist:
 
             JaneProcessedClaim.objects.create(
+                period_year=row_dict.get("period_year"),
+                ty_ly_py=row_dict.get("ty_ly_py"),
+                period_quarter=row_dict.get("period_quarter"),
+                period_month=row_dict.get("period_month"),
                 payment_date=row_dict.get("payment_date"),
+
                 payer=row_dict.get("payer"),
                 payment_method=row_dict.get("payment_method"),
                 reference_number=row_dict.get("reference_number"),
                 applied_to=row_dict.get("applied_to"),
                 claim_count=row_dict.get("claim_count"),
+
                 amount=row_dict.get("amount"),
                 processing_fee=row_dict.get("processing_fee"),
                 amount_paid_to_clinic=row_dict.get("amount_paid_to_clinic"),
+
                 hash_key=row_dict.get("hash_key"),
             )
 

@@ -170,10 +170,20 @@ def gusto_ingest(uploaded_file):
         pd.to_numeric, errors="coerce"
     )
 
-    # Convert payroll period dates to datetime.date
-    payroll_df["Payroll Period Start"] = pd.to_datetime(
-        payroll_df["Payroll Period Start"], errors="coerce"
-    ).dt.date
+    # Convert to datetime64 first
+    pps = pd.to_datetime(payroll_df["Payroll Period Start"], errors="coerce")
+
+    # Add period fields
+    payroll_df["period_month"] = pps.dt.to_period("M").astype(str)
+    payroll_df["period_quarter"] = pps.dt.to_period("Q").astype(str)
+    payroll_df["period_year"] = pps.dt.to_period("Y").astype(str)
+
+    # Add TY / LY / PY / OY classification
+    from clinic_dash_pro.helper.helper import ty_ly_py
+    payroll_df = ty_ly_py(payroll_df, "period_year")
+
+    # Convert back to Python date for DB
+    payroll_df["Payroll Period Start"] = pps.dt.date
 
     payroll_df["Payroll Period End"] = pd.to_datetime(
         payroll_df["Payroll Period End"], errors="coerce"

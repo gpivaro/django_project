@@ -47,6 +47,7 @@ class GenerateReport:
 
         claims_sessions_merged = merge_claims_sessions(
             self.jane_claims_df, self.jane_sessions_df)
+
         return claims_sessions_merged
 
     def get_unified_financials(self):

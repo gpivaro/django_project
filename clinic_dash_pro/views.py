@@ -513,7 +513,7 @@ def revenue_details_view(request):
     xero_data = XeroTransaction.objects.all().values()
     gusto_data = GustoPayroll.objects.all().values()
     jane_sessions_data = JaneSessions.objects.all().values()
-    jane_claims_data = JaneProcessedClaim.objects.all().values()
+    jane_claims_data = JaneProcessedClaim.objects.exclude(refund="Y").values()
 
     # Reporting engine
     reports = GenerateReport(
@@ -664,7 +664,7 @@ def reports_home(request):
     xero_data = XeroTransaction.objects.all().values()
     gusto_data = GustoPayroll.objects.all().values()
     jane_sessions_data = JaneSessions.objects.all().values()
-    jane_claims_data = JaneProcessedClaim.objects.all().values()
+    jane_claims_data = JaneProcessedClaim.objects.exclude(refund="Y").values()
 
     # Reporting engine
     reports = GenerateReport(

@@ -67,7 +67,7 @@ def load_gusto_to_db(gusto_df):
             ty_ly_py=row_dict.get("ty_ly_py"),
             period_quarter=row_dict.get("period_quarter"),
             period_month=row_dict.get("period_month"),
-            payroll_period=row_dict.get("Payroll Period"),
+            payroll_period=row_dict.get("Period"),
             payroll_period_start=row_dict.get("Payroll Period Start"),
             payroll_period_end=row_dict.get("Payroll Period End"),
 

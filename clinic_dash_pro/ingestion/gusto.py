@@ -60,7 +60,7 @@ def gusto_ingest(uploaded_file):
     # ---------------------------------------------------------
     period_indices = []
     for i, line in enumerate(lines):
-        if "Payroll period" in line:
+        if "period" in line:
             period_indices.append(i)
 
     if not period_indices:
@@ -105,10 +105,10 @@ def gusto_ingest(uploaded_file):
         # Extract payroll period from first line of block
         payroll_period_raw = block[0].strip().replace('"', '')
         payroll_period_clean = payroll_period_raw.replace(
-            "Payroll period,", "").strip()
+            "Pay period,", "").strip()
 
         # Add payroll period as a new column
-        header.append("Payroll Period")
+        header.append("Period")
 
         # Parse all rows
         rows = []
@@ -151,17 +151,17 @@ def gusto_ingest(uploaded_file):
     payroll_df = payroll_df.drop(columns=["First Name", "Last Name"])
 
     # Reorder columns: Staff Member, Payroll Period, then everything else
-    cols = ["Staff Member", "Payroll Period"] + [
-        c for c in payroll_df.columns if c not in ["Staff Member", "Payroll Period"]
+    cols = ["Staff Member", "Period"] + [
+        c for c in payroll_df.columns if c not in ["Staff Member", "Period"]
     ]
     payroll_df = payroll_df[cols]
 
     # ---------------------------------------------------------
     # Step 4b: Split payroll period into start and end dates
     # ---------------------------------------------------------
-    payroll_df['Payroll Period Start'] = payroll_df['Payroll Period'].apply(
+    payroll_df['Payroll Period Start'] = payroll_df['Period'].apply(
         lambda x: x.split('-')[0])
-    payroll_df['Payroll Period End'] = payroll_df['Payroll Period'].apply(
+    payroll_df['Payroll Period End'] = payroll_df['Period'].apply(
         lambda x: x.split('-')[1])
 
     # Convert numeric columns
@@ -208,7 +208,7 @@ def gusto_ingest(uploaded_file):
     # ---------------------------------------------------------
     KEY_COLUMNS = [
         "Staff Member",
-        "Payroll Period",
+        "Period",
         "Department"
     ]
 

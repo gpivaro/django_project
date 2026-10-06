@@ -175,7 +175,7 @@ def revenue_details(jane_claims_merged):
     columns = ['period_year', 'ty_ly_py', 'period_quarter', 'period_month',
                'purchase_date', 'payment_date', 'Days Until Paid',
                'payer', 'reference_number', 'employee_initials', 'item',
-               'invoice_number',  'applied_to', 'refund', 'claim_count', 'amount',
+               'invoice_number', 'invoice_group', 'applied_to', 'refund', 'claim_count', 'amount',
                'processing_fee', 'amount_paid_to_clinic', 'status', 'subtotal',
                'total', 'balance', 'processing_fee_invoice', 'revenue_accrual']
 

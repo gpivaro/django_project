@@ -226,6 +226,7 @@ def load_jane_sessions_to_db(jane_df):
 
 
                 invoice_number=row_dict.get("invoice"),
+                invoice_group=row_dict.get("invoice_group"),
                 item=row_dict.get("item"),
                 payer=row_dict.get("payer"),
                 status=row_dict.get("status"),

@@ -140,6 +140,10 @@ def jane_sessions_ingest(uploaded_file):
     # Drop empty rows
     jane_df = jane_df.dropna(how="all").reset_index(drop=True)
 
+    # Link Invoices by Prefix
+    jane_df["invoice_group"] = jane_df["invoice_number"].apply(
+        lambda x: x.split("-")[0])
+
     # Convert numeric columns
     numeric_cols = auto_numeric_columns(jane_df)
     jane_df[numeric_cols] = jane_df[numeric_cols].apply(

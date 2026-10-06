@@ -141,7 +141,7 @@ def jane_sessions_ingest(uploaded_file):
     jane_df = jane_df.dropna(how="all").reset_index(drop=True)
 
     # Link Invoices by Prefix
-    jane_df["invoice_group"] = jane_df["invoice_number"].apply(
+    jane_df["invoice_group"] = jane_df["invoice"].apply(
         lambda x: x.split("-")[0])
 
     # Convert numeric columns

@@ -556,8 +556,7 @@ def revenue_details_view(request):
         df=df,
         title="Revenue Details",
         date_field="purchase_date",
-        remove_fields=["balance", "subtotal",
-                       "Actual Collected", "applied_to"],
+        remove_fields=["balance", "subtotal", "applied_to"],
     )
 
 

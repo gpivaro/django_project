@@ -57,16 +57,6 @@ def merge_claims_sessions(claims_processed_df, sessions_df):
         (jane_merged_df["purchase_date"].astype(str).str.strip() != "")
     ]
 
-    # ---------------------------------------------------------
-    # 2. Choose the revenue measure
-    # ---------------------------------------------------------
-    # If Jane provides billed_amount or charge_amount, use that.
-    # Otherwise fall back to actual_collected (cash proxy).
-    if "billed_amount" in jane_merged_df.columns:
-        jane_merged_df["revenue_accrual"] = jane_merged_df["billed_amount"]
-    else:
-        jane_merged_df["revenue_accrual"] = jane_merged_df["Actual Collected"]
-
     # Sort by payment_date
     jane_merged_df.sort_values(by='payment_date', inplace=True)
     jane_merged_df = jane_merged_df.reset_index(drop=True)
@@ -123,13 +113,21 @@ def attach_therapist_to_transactions(claims_processed_df, sessions_df):
         how='left'
     )
 
-    # Recompute Actual Collected per claim
-    merged['Actual Collected'] = round(
+    # Recompute Actual Collected/revenue accrual per claim
+    merged['revenue_accrual'] = round(
         merged['collected'] + merged['processing_fee'] /
         merged['claim_count'].replace(0, np.nan), 2
     )
-    merged['Actual Collected'] = merged['Actual Collected'].fillna(0)
-    merged.loc[merged['status'] == 'no_charge', 'Actual Collected'] = 0
+    merged['revenue_accrual'] = merged['revenue_accrual'].fillna(0)
+    merged.loc[merged['status'] == 'no_charge', 'revenue_accrual'] = 0
+
+    # Calculate the processing fee per claim
+    merged['processing_fee_invoice'] = round(
+        merged['processing_fee'] /
+        merged['claim_count'].replace(0, np.nan), 2
+    )
+    merged['processing_fee_invoice'] = merged['processing_fee_invoice'].fillna(
+        0)
 
     # --- Step 5: Re-convert dates after merge ---
     merged["payment_date"] = pd.to_datetime(
@@ -179,7 +177,7 @@ def revenue_details(jane_claims_merged):
                'payer', 'reference_number', 'employee_initials', 'item',
                'invoice_number',  'applied_to', 'refund', 'claim_count', 'amount',
                'processing_fee', 'amount_paid_to_clinic', 'status', 'subtotal',
-               'total', 'balance', 'revenue_accrual', 'Actual Collected']
+               'total', 'balance', 'processing_fee_invoice', 'revenue_accrual']
 
     revenue_details = jane_claims_merged[columns]
 

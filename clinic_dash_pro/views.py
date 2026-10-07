@@ -670,6 +670,9 @@ def reports_home(request):
         gusto_data, jane_sessions_data, jane_claims_data, xero_data
     )
 
+    # Overview of completed sessions and paid/unpaid %
+    sessions_overview = safe_report_call(reports.get_sessions_overview)
+
     # Safe report calls
     monthly_operational_expenses_assets = safe_report_call(
         reports.get_operational_report
@@ -696,6 +699,7 @@ def reports_home(request):
     )
 
     context = {
+        'sessions_overview': convert_df_to_dict(sessions_overview),
         "monthly_operational_expenses_assets": convert_df_to_dict(monthly_operational_expenses_assets),
         "unified_financials": convert_df_to_dict(unified_financials),
         "therapist_profitability": convert_df_to_dict(therapist_profitability),

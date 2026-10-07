@@ -2,7 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    console.log("📊 Unified Financials Chart Loaded");
+    
 
     const rawJson = document.getElementById("unified-financials-json")?.textContent;
 

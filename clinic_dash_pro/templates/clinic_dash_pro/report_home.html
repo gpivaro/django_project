@@ -1,3 +1,4 @@
+<!-- clinic_dash_pro\templates\clinic_dash_pro\report_home.html  -->
 {% load static %}
 {% load format_extras %}
 
@@ -174,12 +175,6 @@
 
     </div>
 
-    <hr>
-
-    <h2 style="text-align:center; margin-bottom:20px;">Income Statement</h2>
-
-
-
     <!-- FILTER BAR -->
     <div class="filter-bar"
         style="margin-bottom:20px; display:flex; gap:20px; align-items:center; justify-content:center;">
@@ -220,6 +215,45 @@
         <button id="apply-filters" class="back-btn">Apply</button>
         <button id="clear-filters" class="back-btn" style="background:#999;">Clear</button>
     </div>
+
+    <hr>
+
+    <h2 style="text-align:center; margin-bottom:20px;">Sessions Overview</h2>
+    
+    <!-- SESSIONS OVERVIEW CHARTS -->
+    <div style="display:flex; justify-content:center; gap:40px; margin-bottom:40px;">
+
+        <!-- Chart 1: Paid vs Unpaid with Total in Center -->
+        <div style="flex:0 0 300px;">
+            <h3 style="text-align:center;">Paid vs Unpaid</h3>
+            <canvas id="sessions_paid_unpaid_chart" width="300" height="300"></canvas>
+        </div>
+
+        <!-- Chart 2: Sessions by Payer -->
+        <div style="flex:0 0 300px;">
+            <h3 style="text-align:center;">Sessions by Type</h3>
+            <canvas id="sessions_type_chart" width="300" height="300"></canvas>
+        </div>
+
+        <!-- Chart 3: Sessions by Employee -->
+        <div style="flex:0 0 300px;">
+            <h3 style="text-align:center;">Sessions by Employee</h3>
+            <canvas id="sessions_employee_chart" width="300" height="300"></canvas>
+        </div>
+
+    </div>
+
+
+
+
+
+    <hr>
+
+    <h2 style="text-align:center; margin-bottom:20px;">Income Statement</h2>
+
+
+
+    
 
     <div class="layout" style="width: 1800;">
         <!-- TABLE (aligned left, text wraps) -->
@@ -404,6 +438,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
 
+    {{sessions_overview|json_script:"sessions_overview-data-json"}}
     {{ monthly_operational_expenses_assets|json_script:"report-data-json" }}
     {{ unified_financials|json_script:"unified-financials-json" }}
     {{ therapist_profitability|json_script:"therapist-profitability-json" }}
@@ -411,6 +446,8 @@
 
 
 
+    <script src="{% static 'clinic_dash_pro/js/report_filters.js' %}"></script>
+    <script src="{% static 'clinic_dash_pro/js/sessions_overview_charts.js' %}"></script>
     <script src="{% static 'clinic_dash_pro/js/expenses_monthly_yoy_chart.js' %}"></script>
     <script src="{% static 'clinic_dash_pro/js/unified_financials_chart.js' %}"></script>
     <script src="{% static 'clinic_dash_pro/js/therapist_profit_chart.js' %}"></script>

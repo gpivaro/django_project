@@ -1,11 +1,29 @@
-// clinic_dash_pro\static\clinic_dash_pro\js\income_statement.js
+// ============================================================================
+// income_statement.js
+// Renders:
+//   1. Income Statement Table
+//   2. Bar Chart (Amount by Account)
+//   3. Monthly Trend Chart (Amount vs Account)
+//
+// Responds to:
+//   - Date Range filter (period_year, period_quarter, period_month)
+//   - Category filter
+//   - Account filter
+//
+// Uses shared filtering logic from report_filters.js
+// ============================================================================
 
 document.addEventListener("DOMContentLoaded", function () {
 
+    // ------------------------------------------------------------------------
+    // Load dataset from Django JSON script tag
+    // ------------------------------------------------------------------------
     const rawJson = document.getElementById("income-statement-json")?.textContent;
     let data = JSON.parse(rawJson);
 
-    // Populate filters
+    // ------------------------------------------------------------------------
+    // Populate Category and Account dropdowns dynamically
+    // ------------------------------------------------------------------------
     const categories = [...new Set(data.map(r => r.category))].sort();
     const accounts = [...new Set(data.map(r => r.related_account))].sort();
 
@@ -26,9 +44,14 @@ document.addEventListener("DOMContentLoaded", function () {
         accSelect.appendChild(opt);
     });
 
-    // ============================
-    // Render Table
-    // ============================
+    // ========================================================================
+    // TABLE RENDERING
+    // ========================================================================
+
+    /**
+     * Render the income statement table.
+     * @param {Array} rows - Filtered dataset.
+     */
     function renderTable(rows) {
         const tbody = document.querySelector("#income-statement-table tbody");
         tbody.innerHTML = "";
@@ -37,6 +60,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         rows.forEach(r => {
             const raw = r.amount;
+
+            // Convert "$1,234.56" or numeric into a number
             const amount = typeof raw === "string"
                 ? Number(raw.replace(/[^0-9.-]/g, ""))
                 : Number(raw || 0);
@@ -55,306 +80,234 @@ document.addEventListener("DOMContentLoaded", function () {
             tbody.appendChild(tr);
         });
 
+        // Update total at bottom of table
         document.getElementById("income-total").textContent =
             "$" + total.toLocaleString(undefined, { minimumFractionDigits: 2 });
     }
 
-    // ============================
-    // Render Bar Chart (Amount by Account)
-    // ============================
+    // ========================================================================
+    // BAR CHART — Amount by Account
+    // ========================================================================
+
     let barChart = null;
 
+    /**
+     * Render bar chart showing total amount per account.
+     * @param {Array} rows - Filtered dataset.
+     */
     function renderBarChart(rows) {
-    const ctx = document.getElementById("income_bar_chart").getContext("2d");
 
-    const grouped = {};
+        const ctx = document.getElementById("income_bar_chart").getContext("2d");
 
-    rows.forEach(r => {
-        const raw = r.amount;
-        const amount = typeof raw === "string"
-            ? Number(raw.replace(/[^0-9.-]/g, ""))
-            : Number(raw || 0);
+        const grouped = {};
 
-        grouped[r.related_account] = (grouped[r.related_account] || 0) + amount;
-    });
+        // Group totals by account
+        rows.forEach(r => {
+            const raw = r.amount;
+            const amount = typeof raw === "string"
+                ? Number(raw.replace(/[^0-9.-]/g, ""))
+                : Number(raw || 0);
 
-    const labels = Object.keys(grouped);
-    const originalValues = Object.values(grouped);
+            grouped[r.related_account] = (grouped[r.related_account] || 0) + amount;
+        });
 
-    // Compute total BEFORE removing negatives
-    const totalOriginal = originalValues.reduce((acc, v) => acc + v, 0);
+        const labels = Object.keys(grouped);
+        const originalValues = Object.values(grouped);
 
-    // Add TOTAL as an extra account
-    labels.push("TOTAL");
-    originalValues.push(totalOriginal);
+        // Compute total BEFORE converting negatives
+        const totalOriginal = originalValues.reduce((acc, v) => acc + v, 0);
 
-    // Convert all values to positive for plotting
-    const plottedValues = originalValues.map(v => Math.abs(v));
+        // Add TOTAL as final bar
+        labels.push("TOTAL");
+        originalValues.push(totalOriginal);
 
-    // Color based on original sign
-    const barColors = originalValues.map(v => v >= 0 ? "#2ecc71" : "#e74c3c");
+        // Convert values to positive for chart display
+        const plottedValues = originalValues.map(v => Math.abs(v));
 
-    if (barChart) barChart.destroy();
+        // Green for positive, red for negative
+        const barColors = originalValues.map(v => v >= 0 ? "#2ecc71" : "#e74c3c");
 
-    barChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels,
-            datasets: [{
-                data: plottedValues,
-                backgroundColor: barColors,
-                borderColor: barColors,
-                borderWidth: 1
-            }]
-        },
-        options: {
-            indexAxis: "y",              // horizontal bars
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: ctx => {
+        if (barChart) barChart.destroy();
+
+        barChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels,
+                datasets: [{
+                    data: plottedValues,
+                    backgroundColor: barColors,
+                    borderColor: barColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: "y", // horizontal bars
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => {
+                                const original = originalValues[ctx.dataIndex];
+                                return "$" + original.toLocaleString();
+                            }
+                        }
+                    },
+                    datalabels: {
+                        anchor: "end",
+                        align: "right",
+                        formatter: (v, ctx) => {
                             const original = originalValues[ctx.dataIndex];
                             return "$" + original.toLocaleString();
-                        }
+                        },
+                        color: "#000",
+                        font: { weight: "bold" }
                     }
                 },
-                datalabels: {
-                    anchor: "end",
-                    align: "right",
-                    formatter: (v, ctx) => {
-                        const original = originalValues[ctx.dataIndex];
-                        return "$" + original.toLocaleString();
+                scales: {
+                    x: {
+                        ticks: {
+                            callback: v => "$" + v.toLocaleString()
+                        }
                     },
-                    color: "#000",
-                    font: { weight: "bold" }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: {
-                        callback: v => "$" + v.toLocaleString()
-                    }
-                },
-                y: {
-                    ticks: {
-                        autoSkip: false,
-                        maxRotation: 0,
-                        minRotation: 0
-                    }
-                }
-            }
-        },
-        plugins: [ChartDataLabels]
-    });
-}
-
-/// ============================
-// Render Monthly Chart (Amount vs Account)
-// ============================
-let monthlyChart = null;
-
-function renderMonthlyChart(rows) {
-    const ctx = document.getElementById("monthly_account_chart").getContext("2d");
-
-    // Group by month → account → total
-    const grouped = {};
-
-    rows.forEach(r => {
-        const raw = r.amount;
-        const original = typeof raw === "string"
-            ? Number(raw.replace(/[^0-9.-]/g, ""))
-            : Number(raw || 0);
-
-        const amount = Math.abs(original);   // ⭐ always positive
-
-        const month = r.period_month;        // "2026-09"
-        const account = r.related_account;
-
-        if (!grouped[month]) grouped[month] = {};
-        grouped[month][account] = (grouped[month][account] || 0) + amount;
-    });
-
-    // Sorted months
-    const months = Object.keys(grouped).sort();
-
-    // All accounts
-    const accounts = [...new Set(rows.map(r => r.related_account))].sort();
-
-    // Build datasets
-    const datasets = accounts.map(acc => {
-        const data = months.map(m => grouped[m][acc] || 0);
-
-        return {
-            label: acc,
-            data,
-            borderWidth: 2,
-            fill: false,
-            tension: 0.2,
-            borderColor: "#" + Math.floor(Math.random()*16777215).toString(16),
-        };
-    });
-
-    if (monthlyChart) monthlyChart.destroy();
-
-    monthlyChart = new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: months,
-            datasets: datasets
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: "bottom",
-                    align: "start",     // ⭐ justify left-to-right instead of centered
-                },
-                tooltip: {
-                    callbacks: {
-                        label: ctx => {
-                            const acc = ctx.dataset.label;
-                            const val = ctx.raw;
-                            return `${acc}: $${val.toLocaleString()}`;   // ⭐ account + amount
+                    y: {
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 0,
+                            minRotation: 0
                         }
                     }
                 }
             },
-            scales: {
-                y: {
-                    ticks: {
-                        callback: v => "$" + v.toLocaleString()
-                    }
-                }
-            }
-        }
-    });
-}
-
-
-
-
-    // ============================
-    // Date Range Filtering
-    // ============================
-    function toDate(periodMonth) {
-        const [y, m] = periodMonth.split("-");
-        return new Date(Number(y), Number(m) - 1);
+            plugins: [ChartDataLabels]
+        });
     }
 
-    function getQuarter(m) {
-        return Math.floor((m - 1) / 3) + 1;
-    }
+    // ========================================================================
+    // MONTHLY TREND CHART — Amount vs Account
+    // ========================================================================
 
-    function filterByDate(rows, range) {
-        if (range === "all") return rows;
+    let monthlyChart = null;
 
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth() + 1;
-        const currentQuarter = getQuarter(month);
+    /**
+     * Render monthly trend chart showing each account over time.
+     * @param {Array} rows - Filtered dataset.
+     */
+    function renderMonthlyChart(rows) {
 
-        return rows.filter(r => {
-            const [rowYearStr, rowMonthStr] = r.period_month.split("-");
-            const rowYear = Number(rowYearStr);
-            const rowMonth = Number(rowMonthStr);
-            const rowDate = toDate(r.period_month);
-            const rowQuarter = getQuarter(rowMonth);
+        const ctx = document.getElementById("monthly_account_chart").getContext("2d");
 
-            switch (range) {
-                case "this_month":
-                    return rowYear === year && rowMonth === month;
+        const grouped = {};
 
-                case "last_month": {
-                    const lastMonthDate = new Date(year, month - 2);
-                    const lmYear = lastMonthDate.getFullYear();
-                    const lmMonth = lastMonthDate.getMonth() + 1;
-                    return rowYear === lmYear && rowMonth === lmMonth;
-                }
+        // Group by month → account → total
+        rows.forEach(r => {
+            const raw = r.amount;
+            const original = typeof raw === "string"
+                ? Number(raw.replace(/[^0-9.-]/g, ""))
+                : Number(raw || 0);
 
-                case "this_quarter":
-                    return rowYear === year && rowQuarter === currentQuarter;
+            const amount = Math.abs(original); // always positive for chart
 
-                case "last_quarter": {
-                    let lqYear = year;
-                    let lqQuarter = currentQuarter - 1;
-                    if (lqQuarter === 0) {
-                        lqQuarter = 4;
-                        lqYear = year - 1;
+            const month = r.period_month; // "2026-09"
+            const account = r.related_account;
+
+            if (!grouped[month]) grouped[month] = {};
+            grouped[month][account] = (grouped[month][account] || 0) + amount;
+        });
+
+        const months = Object.keys(grouped).sort();
+        const accounts = [...new Set(rows.map(r => r.related_account))].sort();
+
+        // Build datasets for each account
+        const datasets = accounts.map(acc => {
+            const data = months.map(m => grouped[m][acc] || 0);
+
+            return {
+                label: acc,
+                data,
+                borderWidth: 2,
+                fill: false,
+                tension: 0.2,
+                borderColor: "#" + Math.floor(Math.random() * 16777215).toString(16),
+            };
+        });
+
+        if (monthlyChart) monthlyChart.destroy();
+
+        monthlyChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: months,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        align: "start" // left-to-right alignment
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => {
+                                const acc = ctx.dataset.label;
+                                const val = ctx.raw;
+                                return `${acc}: $${val.toLocaleString()}`;
+                            }
+                        }
                     }
-                    return rowYear === lqYear && rowQuarter === lqQuarter;
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: v => "$" + v.toLocaleString()
+                        }
+                    }
                 }
-
-                case "this_year":
-                    return rowYear === year;
-
-                case "last_year":
-                    return rowYear === year - 1;
-
-                case "mtd":
-                    return rowYear === year && rowMonth === month && rowDate <= today;
-
-                case "qtd":
-                    return rowYear === year && rowQuarter === currentQuarter && rowDate <= today;
-
-                case "ytd":
-                    return rowYear === year && rowDate <= today;
-
-                default:
-                    return true;
             }
         });
     }
 
-    // ============================
-    // Apply Filters
-    // ============================
+    // ========================================================================
+    // APPLY FILTERS
+    // ========================================================================
+
+    /**
+     * Apply all filters using shared report_filters.js
+     * Then re-render table + charts.
+     */
     function applyFilters() {
-        let filtered = [...data];
 
-        const dateRange = document.getElementById("filter-date-range").value;
-        const category = document.getElementById("filter-category").value;
-        const account = document.getElementById("filter-account").value;
+        // Use shared filter module
+        const filtered = applyFiltersToDataset(data);
 
-        filtered = filterByDate(filtered, dateRange);
-
-        if (category !== "all") {
-            filtered = filtered.filter(r => r.category === category);
-        }
-
-        if (account !== "all") {
-            filtered = filtered.filter(r => r.related_account === account);
-        }
-
+        // Sort by account for consistent display
         filtered.sort((a, b) => a.related_account.localeCompare(b.related_account));
 
         renderTable(filtered);
         renderBarChart(filtered);
         renderMonthlyChart(filtered);
-
     }
+
+    // ========================================================================
+    // FILTER BUTTONS
+    // ========================================================================
 
     document.getElementById("apply-filters").addEventListener("click", applyFilters);
 
-    // ============================
-    // Clear Filters
-    // ============================
     document.getElementById("clear-filters").addEventListener("click", () => {
         document.getElementById("filter-date-range").value = "all";
         document.getElementById("filter-category").value = "all";
         document.getElementById("filter-account").value = "all";
 
-        renderTable(data);
-        renderBarChart(data);
-        renderMonthlyChart(data);
+        applyFilters();
     });
 
-    // Initial render
-    renderTable(data);
-    renderBarChart(data);
-    renderMonthlyChart(data);
+    // ========================================================================
+    // INITIAL RENDER
+    // ========================================================================
+    applyFilters();
 
 });

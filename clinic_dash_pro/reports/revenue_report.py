@@ -195,3 +195,69 @@ def revenue_details(jane_claims_merged):
     )
 
     return revenue_details
+
+
+def report_sessions_overview(jane_sessions):
+    """
+    Build a grouped overview of Jane Sessions:
+    - Validates required columns
+    - Cleans column names
+    - Handles missing numeric columns
+    - Groups by key fields
+    - Sums numeric columns
+    - Returns a safe, aggregated DataFrame
+    """
+
+    # --- 1. Clean column names (strip spaces, lower, etc.) ---
+    jane_sessions = jane_sessions.copy()
+    jane_sessions.columns = jane_sessions.columns.str.strip()
+
+    # --- 2. Define grouping + numeric columns ---
+    group_cols = [
+        'period_year', 'ty_ly_py', 'period_quarter', 'period_month',
+        'purchase_date', 'invoice_date', 'invoice_group',
+        'item', 'status', 'employee_initials'
+    ]
+
+    numeric_cols = ['subtotal', 'total', 'collected', 'balance']
+
+    # --- 3. Validate columns exist ---
+    missing_group = [c for c in group_cols if c not in jane_sessions.columns]
+    missing_numeric = [
+        c for c in numeric_cols if c not in jane_sessions.columns]
+
+    if missing_group:
+        print(f"⚠️ Missing group columns: {missing_group}")
+
+    if missing_numeric:
+        print(f"⚠️ Missing numeric columns: {missing_numeric}")
+
+    # Only use columns that exist
+    group_cols = [c for c in group_cols if c in jane_sessions.columns]
+    numeric_cols = [c for c in numeric_cols if c in jane_sessions.columns]
+
+    if not group_cols:
+        raise ValueError("❌ No valid grouping columns found.")
+
+    if not numeric_cols:
+        print("⚠️ No numeric columns found — returning ungrouped data.")
+        return jane_sessions[group_cols].copy()
+
+    # --- 4. Convert numeric columns safely ---
+    for col in numeric_cols:
+        jane_sessions[col] = pd.to_numeric(
+            jane_sessions[col], errors="coerce").fillna(0)
+
+    # --- 5. Group + aggregate ---
+    try:
+        sessions_overview = (
+            jane_sessions[group_cols + numeric_cols]
+            .groupby(group_cols, dropna=False)
+            .agg({col: 'sum' for col in numeric_cols})
+            .reset_index()
+        )
+    except Exception as e:
+        print(f"❌ Error during grouping: {e}")
+        return jane_sessions[group_cols + numeric_cols].copy()
+
+    return sessions_overview

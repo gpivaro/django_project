@@ -3,7 +3,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    console.log("📊 YOY Chart JS Loaded");
+    
 
     const rawJson = document.getElementById("report-data-json")?.textContent;
 
@@ -29,10 +29,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const assets = reportData.map(row => row.asset_amount);
     const combined = reportData.map(row => row.operational_total);
 
-    console.log("Months:", months);
-    console.log("Expenses:", expenses);
-    console.log("Assets:", assets);
-    console.log("Combined:", combined);
 
     const canvas = document.getElementById('expenses_monthly_yoy_chart');
 

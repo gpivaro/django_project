@@ -2,7 +2,7 @@
 import pandas as pd
 from .expenses_reports import report_operational_expenses, operating_expenses_breakdown
 from .accrual_reports import build_accrual_payroll
-from .revenue_report import merge_claims_sessions, revenue_details
+from .revenue_report import merge_claims_sessions, revenue_details, report_sessions_overview
 from .unified_reports import build_unified_financials
 from .analyze_financias import analyze_unified_financials
 
@@ -26,6 +26,11 @@ class GenerateReport:
         self.jane_sessions_df = pd.DataFrame(jane_sessions_df)
         self.jane_claims_df = pd.DataFrame(jane_claims_df)
         self.xero_df = pd.DataFrame(xero_df)
+
+    def get_sessions_overview(self):
+        sessions_overview = report_sessions_overview(self.jane_sessions_df)
+
+        return sessions_overview
 
     def get_operational_report(self):
 

@@ -225,16 +225,25 @@
 
     <hr>
 
-    <h2 style="text-align:center; margin-bottom:20px;">Sessions Overview</h2>
+    <h2 class="page-title" style="text-align:center; margin-bottom:20px;">Sessions Overview</h2>
     
     <!-- SESSIONS OVERVIEW CHARTS -->
     <div style="display:flex; justify-content:center; gap:40px; margin-bottom:40px;">
+
+
 
         <!-- Chart 1: Paid vs Unpaid with Total in Center -->
         <div style="flex:0 0 300px;">
             <h3 style="text-align:center;">Paid vs Unpaid</h3>
             <canvas id="sessions_paid_unpaid_chart" width="300" height="300"></canvas>
         </div>
+
+        <!-- Chart 4: Sessions by Payer -->
+        <div class="chart-container">
+            <h3 style="text-align:center;">Collected vs Balance<br>(Invoiced)</h3>
+            <canvas id="sessions_financial_chart"></canvas>
+        </div>
+
 
         <!-- Chart 2: Sessions by Payer -->
         <div style="flex:0 0 300px;">
@@ -256,7 +265,7 @@
 
     <hr>
 
-    <h2 style="text-align:center; margin-bottom:20px;">Income Statement</h2>
+    <h2 class="page-title" style="text-align:center; margin-bottom:20px;">Income Statement</h2>
 
 
 
@@ -310,7 +319,7 @@
     <hr style="margin:40px 0;">
 
 
-    <h2 style="text-align:center; margin-bottom:20px;">
+    <h2 class="page-title" style="text-align:center; margin-bottom:20px;">
         Unified Financials — Revenue • Payroll • Operational
     </h2>
 
@@ -353,7 +362,7 @@
     <hr style="margin:40px 0;">
 
 
-    <h2 style="text-align:center; margin-bottom:20px;">
+    <h2 class="page-title" style="text-align:center; margin-bottom:20px;">
         Monthly Operational Expenses & Assets
     </h2>
 
@@ -393,7 +402,7 @@
     </div>
 
     <hr style="margin:40px 0;">
-    <h2 style="text-align:center; margin-bottom:20px;">Therapist Profitability</h2>
+    <h2 class="page-title" style="text-align:center; margin-bottom:20px;">Therapist Profitability</h2>
 
 
     <div class="layout">

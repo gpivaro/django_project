@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let paidUnpaidChart = null;
     let payerChart = null;
     let employeeChart = null;
+    let financialChart = null;   // ⭐ add this
 
     // ------------------------------------------------------------------------
     // Main chart rendering function
@@ -78,6 +79,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (paidUnpaidChart) paidUnpaidChart.destroy();
         if (payerChart) payerChart.destroy();
         if (employeeChart) employeeChart.destroy();
+        if (financialChart) financialChart.destroy();
+
 
         // --------------------------------------------------------------------
         // Filter dataset: Only include Paid + Unpaid sessions
@@ -179,6 +182,56 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
         });
+
+
+        // --------------------------------------------------------------------
+        // Chart 4: Financial Breakdown (Collected vs Balance)
+        // --------------------------------------------------------------------
+        const collectedTotal = filteredSessions.reduce((sum, r) => {
+            const val = Number(r.collected || 0);
+            return sum + val;
+        }, 0);
+
+        const balanceTotal = filteredSessions.reduce((sum, r) => {
+            const val = Number(r.balance || 0);
+            return sum + val;
+        }, 0);
+
+        const financialTotal = collectedTotal + balanceTotal;
+
+        financialChart = new Chart(document.getElementById("sessions_financial_chart"), {
+            type: "doughnut",
+            data: {
+                labels: [
+                    `Collected ($${collectedTotal.toLocaleString()})`,
+                    `Balance ($${balanceTotal.toLocaleString()})`
+                ],
+                datasets: [{
+                    data: [collectedTotal, balanceTotal],
+                    backgroundColor: [palette[2], palette[3]] // pick two distinct colors
+                }]
+            },
+            options: {
+                responsive: false,
+                cutout: "70%",
+                plugins: {
+                    legend: { position: "bottom" },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => {
+                                const label = ctx.label;
+                                const val = ctx.raw;
+                                return `${label}: $${val.toLocaleString()}`;
+                            }
+                        }
+                    },
+                    centerTextPlugin: {
+                        text: `$${financialTotal.toLocaleString()}`
+                    }
+                }
+            }
+        });
+
     }
 
     // ------------------------------------------------------------------------

@@ -144,6 +144,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 indexAxis: "y", // horizontal bars
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        right: 50   // adjust as needed (40–80 works great)
+                    }
+                },
                 plugins: {
                     legend: { display: false },
                     tooltip: {

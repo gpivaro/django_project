@@ -1,7 +1,7 @@
 # clinic_dash_pro\reports\generate_reports
 import pandas as pd
 from .expenses_reports import report_operational_expenses, operating_expenses_breakdown
-from .accrual_reports import build_accrual_payroll
+from .payroll_reports import build_accrual_payroll, build_daily_employer_cost
 from .revenue_report import merge_claims_sessions, revenue_details, report_sessions_overview
 from .unified_reports import build_unified_financials
 from .analyze_financias import analyze_unified_financials
@@ -202,3 +202,10 @@ class GenerateReport:
         revenue_details_df = revenue_details(monthly_revenue)
 
         return revenue_details_df
+
+    def get_daily_employer_cost(self):
+
+        daily_employer_cost = build_daily_employer_cost(
+            self.gusto_df, self.jane_sessions_df)
+
+        return daily_employer_cost

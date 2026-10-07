@@ -54,6 +54,7 @@
             display: flex;
             flex-direction: column;
             align-items: stretch;
+            flex-direction: column;   /* ← forces vertical stacking */
         }
 
         .status-card {
@@ -79,6 +80,13 @@
             margin: 4px 0;
             font-size: 0.85rem;
         }
+
+        .status-box.reports-row {
+            flex-direction: row;      /* horizontal */
+            justify-content: center;  /* center them */
+            gap: 5px;                /* spacing between buttons */
+        }
+
 
         .upload-btn {
             padding: 8px 12px;
@@ -221,20 +229,21 @@
 
     <div class="status-wrapper">
         <div class="status-container">
-            <!-- Report -->
-            <div class="status-box">
+            <div class="status-box reports-row">
                 <a href="{% url 'reports_home' %}">
                     <button class="upload-btn">Go to Reports</button>
                 </a>
-                    <a href="{% url 'revenue_details_view' %}">
+                <a href="{% url 'revenue_details_view' %}">
                     <button class="upload-btn">Revenue Details</button>
                 </a>
-
-
-                
+                <a href="{% url 'employer_cost_list_view' %}">
+                    <button class="upload-btn">Employer Cost</button>
+                </a>
             </div>
         </div>
     </div>
+
+
 
 
 </body>

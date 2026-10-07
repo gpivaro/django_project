@@ -507,6 +507,33 @@ def jane_claims_list(request):
 
 
 @login_required
+def employer_cost_list_view(request):
+
+    # Pull data for all sources to process
+    xero_data = XeroTransaction.objects.all().values()
+    gusto_data = GustoPayroll.objects.all().values()
+    jane_sessions_data = JaneSessions.objects.all().values()
+    jane_claims_data = JaneProcessedClaim.objects.exclude(
+        refund="Y").values()
+
+    # Reporting engine
+    reports = GenerateReport(
+        gusto_data, jane_sessions_data, jane_claims_data, xero_data
+    )
+
+    daily_employer_cost = reports.get_daily_employer_cost()
+
+    # SAFETY — generic_list_view will handle empty df gracefully
+    return generic_list_view(
+        request,
+        df=daily_employer_cost,
+        title="Employer Cost Details",
+        date_field="work_date",
+        remove_fields=[],
+    )
+
+
+@login_required
 def revenue_details_view(request):
 
     # Pull data for all sources to process

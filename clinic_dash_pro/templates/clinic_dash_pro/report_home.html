@@ -184,16 +184,23 @@
             <label><strong>Date range:</strong></label><br>
             <select id="filter-date-range">
                 <option value="all">All</option>
-                <option value="this_month">This month</option>
-                <option value="this_quarter">This quarter</option>
-                <option value="this_year">This fiscal year</option>
+
+                <!-- Closed periods -->
                 <option value="last_month">Last month</option>
+                <option value="prior_month">Prior month</option>
+
                 <option value="last_quarter">Last quarter</option>
+                <option value="prior_quarter">Prior quarter</option>
+
                 <option value="last_year">Last fiscal year</option>
+                <option value="prior_year">Prior fiscal year</option>
+
+                <!-- Current partial periods -->
                 <option value="mtd">Month to date</option>
                 <option value="qtd">Quarter to date</option>
                 <option value="ytd">Year to date</option>
             </select>
+
         </div>
 
         <!-- Category Filter -->

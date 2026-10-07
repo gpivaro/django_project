@@ -107,9 +107,9 @@ function filterByDate(rows, range) {
         // --------------------------------------------------------------------
         switch (range) {
 
-            case "this_month":
-                return rowYear === currentYear && rowMonth === currentMonth;
-
+            // -----------------------------
+            // CLOSED MONTHS
+            // -----------------------------
             case "last_month": {
                 const lastMonthDate = new Date(currentYear, currentMonth - 2);
                 const lmYear = lastMonthDate.getFullYear();
@@ -117,9 +117,16 @@ function filterByDate(rows, range) {
                 return rowYear === lmYear && rowMonth === lmMonth;
             }
 
-            case "this_quarter":
-                return rowYear === currentYear && rowQuarter === currentQuarter;
+            case "prior_month": {
+                const priorMonthDate = new Date(currentYear, currentMonth - 3);
+                const pmYear = priorMonthDate.getFullYear();
+                const pmMonth = priorMonthDate.getMonth() + 1;
+                return rowYear === pmYear && rowMonth === pmMonth;
+            }
 
+            // -----------------------------
+            // CLOSED QUARTERS
+            // -----------------------------
             case "last_quarter": {
                 let lqYear = currentYear;
                 let lqQuarter = currentQuarter - 1;
@@ -132,29 +139,48 @@ function filterByDate(rows, range) {
                 return rowYear === lqYear && rowQuarter === lqQuarter;
             }
 
-            case "this_year":
-                return rowYear === currentYear;
+            case "prior_quarter": {
+                let pqYear = currentYear;
+                let pqQuarter = currentQuarter - 2;
 
+                if (pqQuarter <= 0) {
+                    pqQuarter += 4;
+                    pqYear -= 1;
+                }
+
+                return rowYear === pqYear && rowQuarter === pqQuarter;
+            }
+
+            // -----------------------------
+            // CLOSED YEARS
+            // -----------------------------
             case "last_year":
                 return rowYear === currentYear - 1;
 
-            case "mtd": // Month-to-date
-                return rowYear === currentYear &&
-                       rowMonth === currentMonth &&
-                       rowDate <= today;
+            case "prior_year":
+                return rowYear === currentYear - 2;
 
-            case "qtd": // Quarter-to-date
+            // -----------------------------
+            // CURRENT PARTIAL PERIODS
+            // -----------------------------
+            case "mtd":
                 return rowYear === currentYear &&
-                       rowQuarter === currentQuarter &&
-                       rowDate <= today;
+                    rowMonth === currentMonth &&
+                    rowDate <= today;
 
-            case "ytd": // Year-to-date
+            case "qtd":
                 return rowYear === currentYear &&
-                       rowDate <= today;
+                    rowQuarter === currentQuarter &&
+                    rowDate <= today;
+
+            case "ytd":
+                return rowYear === currentYear &&
+                    rowDate <= today;
 
             default:
                 return true;
         }
+
     });
 }
 

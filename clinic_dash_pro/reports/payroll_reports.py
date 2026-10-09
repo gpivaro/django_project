@@ -1,6 +1,7 @@
 # accrual_reports.py
 
 import pandas as pd
+import numpy as np
 
 
 def build_accrual_payroll(gusto_df: pd.DataFrame, jane_df: pd.DataFrame) -> pd.DataFrame:
@@ -16,8 +17,6 @@ def build_accrual_payroll(gusto_df: pd.DataFrame, jane_df: pd.DataFrame) -> pd.D
             staff_member
             payroll_accrual
     """
-
-    update_build_accrual_payroll(gusto_df, jane_df)
 
     # -----------------------------
     # 1. Normalize Gusto dates
@@ -134,10 +133,24 @@ def build_accrual_payroll(gusto_df: pd.DataFrame, jane_df: pd.DataFrame) -> pd.D
 
     daily["daily_cost"] = daily.apply(compute_daily_cost, axis=1)
 
+    payroll_validation(gusto_df, daily)
+
+    daily['daily_cost'] = daily['daily_cost'].apply(lambda x: round(x, 2))
+    daily['daily_cost_base'] = daily['daily_cost_base'].apply(
+        lambda x: round(x, 2))
+
     # -----------------------------
     # 6. Convert date → period_month
     # -----------------------------
     daily["period_month"] = daily["purchase_date"].dt.to_period("M")
+
+    # Assign formatted strings
+    daily['purchase_date'] = (
+        daily['purchase_date'].apply(
+            lambda x: x.strftime('%Y-%m-%d') if hasattr(x, 'strftime') else x)
+    )
+
+    daily = daily[daily['daily_cost'] != 0]
 
     # -----------------------------
     # 7. Aggregate to monthly payroll per staff_member
@@ -174,157 +187,65 @@ def build_accrual_payroll(gusto_df: pd.DataFrame, jane_df: pd.DataFrame) -> pd.D
     monthly_payroll["period_month"] = monthly_payroll["period_month"].astype(
         "period[M]")
 
-    print("*********************\n", monthly_payroll_by_staff)
-    print("*********************\n", monthly_payroll)
-
-    return monthly_payroll_by_staff, monthly_payroll
+    return daily, monthly_payroll_by_staff, monthly_payroll
 
 
-def build_daily_employer_cost(gusto_df: pd.DataFrame, jane_df: pd.DataFrame) -> pd.DataFrame:
+def payroll_validation(gusto_df, daily_payroll):
 
-    # -----------------------------
-    # 1. Normalize Jane dates
-    # -----------------------------
-    jane = jane_df.drop(
-        columns=['hash_key', 'insert_date', 'updated_date']).copy()
-    jane["purchase_date"] = pd.to_datetime(
-        jane["purchase_date"], errors="coerce")
-
-    # Count sessions per day per therapist
-    jane = jane[jane['status'] != 'no_charge']
-
-    sessions_by_day = (
-        jane[["purchase_date", "employee_initials", "invoice_group"]]
-        .drop_duplicates()
-        .groupby(["purchase_date", "employee_initials"])
-        .agg(sessions=("invoice_group", "count"))
-        .reset_index()
-    )
-
-    # -----------------------------
-    # 2. Normalize Gusto dates
-    # -----------------------------
-    gusto = gusto_df.drop(
-        columns=['hash_key', 'insert_date', 'updated_date']).copy()
-    gusto["payroll_period_start"] = pd.to_datetime(
-        gusto["payroll_period_start"], errors="coerce")
-    gusto["payroll_period_end"] = pd.to_datetime(
-        gusto["payroll_period_end"], errors="coerce")
-
-    # Employer cost per hour
-    gusto["employer_cost_hour"] = (
-        gusto["employer_cost"] / gusto["regular_hours"]).round(2)
-    gusto["employer_cost_hour"] = gusto["employer_cost_hour"].fillna(0)
-
-    # -----------------------------
-    # 3. Expand payroll periods into daily rows
-    # -----------------------------
-    rows = []
-
-    for idx, row in gusto.iterrows():
-
-        period_year = row["period_year"]
-        ty_ly_py = row["ty_ly_py"]
-        period_quarter = row["period_quarter"]
-        period_month = row["period_month"]
-
-        employee_initials = row["employee_initials"]
-        role = row.get("department", "Therapy")
-        start = row["payroll_period_start"]
-        end = row["payroll_period_end"]
-        payroll_period = row["payroll_period"]
-        employer_cost_hour = row["employer_cost_hour"]
-        regular_hours = row["regular_hours"]
-
-        if pd.isna(start) or pd.isna(end):
-            continue
-
-        days = pd.date_range(start, end, freq="D")
-
-        for day in days:
-
-            # FIXED: correct boolean filtering
-            sessions = sessions_by_day[
-                (sessions_by_day['purchase_date'] == day) &
-                (sessions_by_day['employee_initials'] == employee_initials)
-            ]["sessions"].sum()
-
-            rows.append({
-                "period_year": period_year,
-                "ty_ly_py": ty_ly_py,
-                "period_quarter": period_quarter,
-                "period_month": period_month,
-                "work_date": day,
-                "payroll_period": payroll_period,
-                "employee_initials": employee_initials,
-                "role": role,
-                "sessions": sessions or 0,   # FIXED: default to 0
-                "employer_cost_hour": employer_cost_hour,
-                "regular_hours": regular_hours
-            })
-
-    daily_payroll = pd.DataFrame(rows)
-
-    # Ensure sessions column can hold floats
-    daily_payroll['sessions'] = daily_payroll['sessions'].astype(float)
-
-    # Adjust Admin to evenly distribute worked hours
-    admin_mask = daily_payroll['role'] == 'Admin'
-    daily_payroll.loc[admin_mask, 'sessions'] = (
-        daily_payroll.loc[admin_mask, 'regular_hours'] / 14)
-
-    # Specific for Salary Employee
-    salary_mask = daily_payroll['employee_initials'] == 'A.P'
-    daily_payroll.loc[salary_mask, 'sessions'] = (
-        daily_payroll.loc[salary_mask, 'regular_hours'] / 14)
-
-    # Drop rows where sessions = 0
-    daily_payroll = daily_payroll[daily_payroll['sessions'] != 0].copy()
-
-    # Calculate the daily cost
-    daily_payroll['employer_cost_day'] = round(
-        daily_payroll['employer_cost_hour']*daily_payroll['sessions'], 2)
-
-    daily_payroll['sessions'] = round(daily_payroll['sessions'], 2)
-
-    # Assign formatted strings
-    daily_payroll['work_date'] = (
-        daily_payroll['work_date']
-        .apply(lambda x: x.strftime('%Y-%m-%d') if hasattr(x, 'strftime') else x)
-    )
-
-    return daily_payroll.sort_values(by="work_date")
-
-
-def update_build_accrual_payroll(gusto_df: pd.DataFrame, jane_df: pd.DataFrame):
-
-    daily_payroll = build_daily_employer_cost(gusto_df, jane_df)
-
-    agg_cols = ["period_year", "ty_ly_py", "period_quarter",
-                "period_month", "employee_initials"]
-
-    num_cols = "employer_cost_day"
-
-    # Calculate Payroll Accrual by Employee
-    monthly_payroll_by_staff = (
-        daily_payroll[agg_cols+[num_cols]]
-        .groupby(agg_cols)
-        .agg(payroll_accrual=("employer_cost_day", "sum"))
-        .reset_index()
-    )
-
-    print(monthly_payroll_by_staff)
-
-    # -----------------------------
-    # 8. Aggregate to monthly payroll
-    # -----------------------------
-    monthly_payroll = (
-        monthly_payroll_by_staff.groupby(["period_month"])["payroll_accrual"]
+    # 1. Actual payroll
+    actual_payroll = (
+        gusto_df[['payroll_period_end', 'payroll_period',
+                  'employee_initials', 'employer_cost']]
+        .groupby(['payroll_period_end', 'employee_initials', 'payroll_period'])['employer_cost']
         .sum()
         .reset_index()
-        .rename(columns={"payroll_accrual": "payroll_accrual"})
     )
 
-    print(monthly_payroll)
+    # 2. Accrual payroll
+    accrual_payroll = (
+        daily_payroll[['payroll_period',
+                       'employee_initials', 'daily_cost']]
+        .groupby(['payroll_period', 'employee_initials'])['daily_cost']
+        .sum()
+        .reset_index()
+    )
 
-    return monthly_payroll_by_staff, monthly_payroll
+    # 3. Join
+    validation = actual_payroll.merge(
+        accrual_payroll,
+        on=['payroll_period', 'employee_initials'],
+        how='left'
+    )
+
+    # 4. Difference
+    validation['difference'] = round(
+        validation['daily_cost'] - validation['employer_cost'], 3)
+
+    # 5. Percent difference
+    validation['pct_difference'] = (
+        validation['difference'] / validation['employer_cost']
+    ).replace([np.inf, -np.inf], np.nan) * 100
+
+    validation['pct_difference'] = validation['pct_difference'].round(2)
+
+    # ---------------------------------------------------------
+    # ⭐ NEW: Quick statistical summary
+    # ---------------------------------------------------------
+    summary = validation[['difference', 'pct_difference']].describe()
+
+    # ---------------------------------------------------------
+    # ⭐ NEW: Accuracy score (mean absolute percent error)
+    # ---------------------------------------------------------
+    validation['abs_pct'] = validation['pct_difference'].abs()
+    accuracy_score = validation['abs_pct'].mean()
+
+    print("\n=== Payroll Validation Table ===")
+    print(validation)
+
+    print("\n=== Validation Summary (describe) ===")
+    print(summary)
+
+    print(f"\n=== Accuracy Score (Mean Absolute % Difference) ===")
+    print(f"{accuracy_score:.2f}%")
+
+    return validation, summary, accuracy_score

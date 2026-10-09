@@ -529,7 +529,7 @@ def employer_cost_list_view(request):
         df=daily_employer_cost,
         title="Employer Cost Details",
         date_field="work_date",
-        remove_fields=[],
+        remove_fields=['idx', 'staff_member'],
     )
 
 

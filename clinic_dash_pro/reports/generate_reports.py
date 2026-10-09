@@ -1,7 +1,7 @@
 # clinic_dash_pro\reports\generate_reports
 import pandas as pd
 from .expenses_reports import report_operational_expenses, operating_expenses_breakdown
-from .payroll_reports import build_accrual_payroll, build_daily_employer_cost
+from .payroll_reports import build_accrual_payroll
 from .revenue_report import merge_claims_sessions, revenue_details, report_sessions_overview
 from .unified_reports import build_unified_financials
 from .analyze_financias import analyze_unified_financials
@@ -43,10 +43,10 @@ class GenerateReport:
         return monthly_operational_expenses_assets
 
     def get_accrual_payroll(self):
-        monthly_payroll_by_staff, monthly_payroll = build_accrual_payroll(
+        daily, monthly_payroll_by_staff, monthly_payroll = build_accrual_payroll(
             self.gusto_df, self.jane_sessions_df)
 
-        return monthly_payroll_by_staff, monthly_payroll
+        return daily, monthly_payroll_by_staff, monthly_payroll
 
     def get_accrual_revenue(self):
 
@@ -61,7 +61,7 @@ class GenerateReport:
         monthly_operational = pd.DataFrame(
             report_operational_expenses(self.xero_df))
 
-        _, monthly_payroll = self.get_accrual_payroll()
+        _, _, monthly_payroll = self.get_accrual_payroll()
 
         monthly_revenue = self.get_accrual_revenue()
 
@@ -81,7 +81,7 @@ class GenerateReport:
 
     def get_analyze_unified_financials(self):
 
-        monthly_payroll_by_staff, _ = self.get_accrual_payroll()
+        _, monthly_payroll_by_staff, _ = self.get_accrual_payroll()
 
         unified_financials = self.get_unified_financials()
 
@@ -144,7 +144,7 @@ class GenerateReport:
         # ---------------------------------------------------------
         # 3. Get monthly payroll (Gusto accrual)
         # ---------------------------------------------------------
-        _, monthly_payroll = self.get_accrual_payroll()
+        _, _, monthly_payroll = self.get_accrual_payroll()
         monthly_payroll["category"] = "Wages and Salaries Transactions/Taxes - Payroll"
         monthly_payroll["related_account"] = "6450 - Wages and Salaries / 6360 - Taxes - Payroll"
         monthly_payroll = monthly_payroll.rename(
@@ -205,7 +205,6 @@ class GenerateReport:
 
     def get_daily_employer_cost(self):
 
-        daily_employer_cost = build_daily_employer_cost(
-            self.gusto_df, self.jane_sessions_df)
+        daily_employer_cost, _, _ = self.get_accrual_payroll()
 
         return daily_employer_cost
